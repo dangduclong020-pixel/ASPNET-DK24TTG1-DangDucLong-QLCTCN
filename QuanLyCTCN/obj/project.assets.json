@@ -8056,23 +8056,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ngoct\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\PC\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Study\\C#_ASP.Net_MVC\\QuanLyCTCN\\QuanLyCTCN\\QuanLyCTCN.csproj",
+      "projectUniqueName": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\QuanLyCTCN\\QuanLyCTCN.csproj",
       "projectName": "QuanLyCTCN",
-      "projectPath": "C:\\Study\\C#_ASP.Net_MVC\\QuanLyCTCN\\QuanLyCTCN\\QuanLyCTCN.csproj",
-      "packagesPath": "C:\\Users\\ngoct\\.nuget\\packages\\",
-      "outputPath": "C:\\Study\\C#_ASP.Net_MVC\\QuanLyCTCN\\QuanLyCTCN\\obj\\",
+      "projectPath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\QuanLyCTCN\\QuanLyCTCN.csproj",
+      "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\QuanLyCTCN\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\ngoct\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

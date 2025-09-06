@@ -23,6 +23,7 @@ namespace QuanLyCTCN.Models
         [Column("so_tien")]
         [Display(Name = "Số tiền")]
         [DataType(DataType.Currency)]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Số tiền phải lớn hơn 0")]
         public decimal SoTien { get; set; }
 
         [Required]

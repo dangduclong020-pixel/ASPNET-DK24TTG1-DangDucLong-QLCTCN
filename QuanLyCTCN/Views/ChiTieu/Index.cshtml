@@ -11,9 +11,23 @@
             <div class="card mb-4">
                 <div class="card-header pb-0">
                     <h6>Danh sách chi tiêu</h6>
-                    <a asp-action="Create" class="btn btn-primary float-end">
-                        <i class="fas fa-plus"></i> Thêm mới
-                    </a>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <form asp-action="Index" method="get" class="d-flex">
+                                <input type="date" name="tuNgay" value="@ViewBag.TuNgay" class="form-control me-2" />
+                                <input type="date" name="denNgay" value="@ViewBag.DenNgay" class="form-control me-2" />
+                                <button type="submit" class="btn btn-outline-primary">Lọc</button>
+                            </form>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Tổng chi tiêu: @ViewBag.TongChiTieu?.ToString("N0") đ</h5>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Thêm mới
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">

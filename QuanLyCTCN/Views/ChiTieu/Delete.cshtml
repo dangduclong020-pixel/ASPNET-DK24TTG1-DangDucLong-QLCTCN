@@ -1,0 +1,56 @@
+@model QuanLyCTCN.Models.ChiTieu
+
+@{
+    ViewData["Title"] = "Xóa chi tiêu";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <h6>Xóa chi tiêu</h6>
+                </div>
+                <div class="card-body">
+                    <h3>Bạn có chắc chắn muốn xóa chi tiêu này?</h3>
+                    <div>
+                        <hr />
+                        <dl class="row">
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.NgayChi)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.NgayChi)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.DanhMuc)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.DanhMuc.TenDanhMuc)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.SoTien)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.SoTien)
+                            </dd>
+                            <dt class="col-sm-2">
+                                @Html.DisplayNameFor(model => model.GhiChu)
+                            </dt>
+                            <dd class="col-sm-10">
+                                @Html.DisplayFor(model => model.GhiChu)
+                            </dd>
+                        </dl>
+                        
+                        <form asp-action="Delete" method="post">
+                            <input type="hidden" asp-for="ChiTieuId" />
+                            <input type="submit" value="Xóa" class="btn btn-danger" /> |
+                            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
