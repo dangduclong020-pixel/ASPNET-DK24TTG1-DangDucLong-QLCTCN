@@ -1,0 +1,20 @@
+@{
+    ViewData["Title"] = "Trang không tìm thấy";
+}
+
+<div class="container py-5 text-center">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <h1 class="text-danger">404</h1>
+                    <h2 class="mb-4">Trang không tìm thấy</h2>
+                    <p class="lead">Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.</p>
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-3">
+                        <i class="fas fa-home me-2"></i> Quay lại trang chủ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

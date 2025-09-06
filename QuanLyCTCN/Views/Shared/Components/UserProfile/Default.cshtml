@@ -1,0 +1,40 @@
+@model QuanLyCTCN.Models.NguoiDung
+
+<div class="sidebar-user">
+    <div class="sidebar-user-info">
+        @if (!string.IsNullOrEmpty(Model.AnhDaiDien))
+        {
+            <div class="sidebar-user-avatar">
+                <img src="@Model.AnhDaiDien" alt="@Model.HoTen" />
+            </div>
+        }
+        else
+        {
+            <div class="sidebar-user-avatar">
+                <div class="user-avatar-placeholder">
+                    @if (!string.IsNullOrEmpty(Model.HoTen))
+                    {
+                        @Model.HoTen.Substring(0, 1).ToUpper()
+                    }
+                    else if (!string.IsNullOrEmpty(Model.TenDangNhap))
+                    {
+                        @Model.TenDangNhap.Substring(0, 1).ToUpper()
+                    }
+                    else
+                    {
+                        <i class="fas fa-user"></i>
+                    }
+                </div>
+            </div>
+        }
+        <div class="sidebar-user-details">
+            <div class="sidebar-user-name">
+                @(string.IsNullOrEmpty(Model.HoTen) ? Model.TenDangNhap : Model.HoTen)
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Email))
+            {
+                <div class="sidebar-user-email">@Model.Email</div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,567 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Chi tiêu cá nhân (Đã cập nhật)</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/QuanLyCTCN.styles.css" asp-append-version="true" />
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --dark-color: #1a1a1a;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --light-bg: #f8fafc;
+            --sidebar-bg: #e6f7ff; /* Đã thay đổi màu sidebar */
+            --border-color: #e2e8f0;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            overflow-x: hidden; /* Tránh scroll ngang */
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            z-index: 1030;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 10px;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-brand i {
+            margin-right: 0.75rem;
+        }
+        
+        /* User profile styles */
+        .sidebar-user {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .sidebar-user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 10px;
+            flex-shrink: 0;
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .sidebar-user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .sidebar-user-details {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        
+        .sidebar-user-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.9rem;
+        }
+        
+        .sidebar-user-email {
+            color: #64748b;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar-menu a:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(66, 133, 244, 0.3);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1) translate(-50%, -50%);
+            transform-origin: 50% 50%;
+        }
+
+        .sidebar-menu a:active:after {
+            opacity: 1;
+            transform: scale(50) translate(-50%, -50%);
+            transition: all 0.6s ease;
+        }
+
+        .sidebar-menu i {
+            width: 20px;
+            margin-right: 0.75rem;
+            text-align: center;
+        }
+
+        /* Main content styles */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            width: calc(100% - 250px);
+            transition: all 0.3s ease;
+            padding-top: 60px; /* Đảm bảo nội dung không bị header che khi header fixed */
+        }
+
+        /* Header styles */
+        .main-header {
+            background-color: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 250px; /* Cùng chiều rộng với sidebar */
+            z-index: 1020;
+            transition: all 0.3s ease;
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .page-subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.2;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-add {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+            margin-right: 1rem;
+        }
+
+        .btn-add i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-add:hover {
+            background-color: #3367d6;
+            color: white;
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Content area */
+        .content-area {
+            padding: 1.5rem;
+            min-height: calc(100vh - 60px - 50px); /* 100vh - header height - footer height */
+        }
+
+        /* Menu toggle button */
+        .menu-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--dark-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+        
+        .menu-toggle:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Mobile responsive */
+        @@media (max-width: 991.98px) {
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: none;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+                z-index: 1030; /* Đảm bảo sidebar hiển thị trên cùng khi mở */
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .main-header {
+                left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        /* Footer styles */
+        footer {
+            margin-left: 250px;
+            padding: 1rem 0;
+            border-top: 1px solid var(--border-color);
+            color: #64748b;
+            font-size: 0.875rem;
+            text-align: center;
+            height: 50px; /* Định nghĩa chiều cao cố định cho footer */
+        }
+
+        @@media (max-width: 991.98px) {
+            footer {
+                margin-left: 0;
+            }
+            
+            .main-header {
+                left: 0; /* Khi sidebar ẩn đi, header mở rộng chiều rộng */
+            }
+        }
+
+        /* Stats cards and charts styles */
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            height: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .stats-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-card-title {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .stats-card-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin: 0.5rem 0;
+        }
+
+        .stats-card-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .stats-card-change.positive {
+            color: var(--success-color);
+        }
+
+        .stats-card-change.negative {
+            color: var(--danger-color);
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-wallet"></i>
+            Chi tiêu cá nhân
+        </div>
+        
+        @await Component.InvokeAsync("UserProfile")
+        
+        <ul class="sidebar-menu">
+            <li>
+                <a asp-controller="Home" asp-action="Index" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")">
+                    <i class="fas fa-chart-pie"></i>
+                    Tổng quan
+                </a>
+            </li>
+            <li>
+                <a asp-controller="ChiTieu" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "ChiTieu" ? "active" : "")">
+                    <i class="fas fa-exchange-alt"></i>
+                    Chi tiêu
+                </a>
+            </li>
+            <li>
+                <a asp-controller="ThuNhap" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "ThuNhap" ? "active" : "")">
+                    <i class="fas fa-money-bill-wave"></i>
+                    Thu nhập
+                </a>
+            </li>
+            <li>
+                <a asp-controller="ThongKe" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "ThongKe" ? "active" : "")">
+                    <i class="fas fa-chart-bar"></i>
+                    Báo cáo
+                </a>
+            </li>
+            <li>
+                <a asp-controller="DanhMuc" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "DanhMuc" ? "active" : "")">
+                    <i class="fas fa-tags"></i>
+                    Danh mục
+                </a>
+            </li>
+            <li>
+                <a asp-controller="NganSach" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "NganSach" ? "active" : "")">
+                    <i class="fas fa-piggy-bank"></i>
+                    Ngân sách
+                </a>
+            </li>
+            <li>
+                <a asp-controller="MucTieu" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "MucTieu" ? "active" : "")">
+                    <i class="fas fa-bullseye"></i>
+                    Mục tiêu
+                </a>
+            </li>
+            <li>
+                <a asp-controller="NhacNho" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "NhacNho" ? "active" : "")">
+                    <i class="fas fa-bell"></i>
+                    Nhắc nhở
+                </a>
+            </li>
+            <li>
+                <a asp-controller="NguoiDung" asp-action="CaiDat" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "CaiDat" && ViewContext.RouteData.Values["Controller"]?.ToString() == "NguoiDung" ? "active" : "")">
+                    <i class="fas fa-cog"></i>
+                    Cài đặt
+                </a>
+            </li>
+            <li>
+                <a asp-controller="NguoiDung" asp-action="DangXuat">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Đăng xuất
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="d-flex align-items-center">
+                <button id="menu-toggle" class="menu-toggle d-lg-none btn btn-sm btn-light me-3">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div>
+                    <h1 class="page-title m-0">@ViewData["Title"]</h1>
+                    @if (ViewData["Subtitle"] != null)
+                    {
+                        <p class="page-subtitle m-0">@ViewData["Subtitle"]</p>
+                    }
+                </div>
+            </div>
+            <div class="header-actions">
+                @if (IsSectionDefined("HeaderActions"))
+                {
+                    @RenderSection("HeaderActions", required: false)
+                }
+                else
+                {
+                    <a asp-controller="GiaoDich" asp-action="Create" class="btn btn-add">
+                        <i class="fas fa-plus"></i>
+                        Thêm giao dịch
+                    </a>
+                }
+                <div class="user-menu">
+                    <div class="user-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            @RenderBody()
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center">
+            <div class="container">
+                &copy; @DateTime.Now.Year - Chi tiêu cá nhân - <a asp-controller="Home" asp-action="Privacy">Chính sách bảo mật</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Toggle sidebar on mobile
+        $(document).ready(function() {
+            $("#menu-toggle").click(function(e) {
+                e.preventDefault();
+                $(".sidebar").toggleClass("show");
+            });
+            
+            // Đóng sidebar khi click bên ngoài trên màn hình di động
+            $(document).on('click', function(e) {
+                if ($(window).width() < 992) {
+                    if (!$(e.target).closest('.sidebar').length && 
+                        !$(e.target).closest('#menu-toggle').length && 
+                        $('.sidebar').hasClass('show')) {
+                        $('.sidebar').removeClass('show');
+                    }
+                }
+            });
+            
+            // Đổi màu active cho menu
+            $('.sidebar-menu a').each(function() {
+                if ($(this).hasClass('active')) {
+                    $(this).parents('li').addClass('active-item');
+                }
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,24 @@
+@{
+    Layout = "_Layout";
+}
+
+@section HeaderActions {
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="addActionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-plus"></i> Thêm mới
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="addActionDropdown">
+            <li><a class="dropdown-item" asp-controller="ChiTieu" asp-action="Create"><i class="fas fa-minus text-danger me-2"></i> Thêm chi tiêu</a></li>
+            <li><a class="dropdown-item" asp-controller="ThuNhap" asp-action="Create"><i class="fas fa-plus text-success me-2"></i> Thêm thu nhập</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" asp-controller="DanhMuc" asp-action="Create"><i class="fas fa-tags me-2"></i> Thêm danh mục</a></li>
+            <li><a class="dropdown-item" asp-controller="NganSach" asp-action="Create"><i class="fas fa-piggy-bank me-2"></i> Thêm ngân sách</a></li>
+        </ul>
+    </div>
+}
+
+@RenderBody()
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}
