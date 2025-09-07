@@ -1,0 +1,90 @@
+@model QuanLyCTCN.Models.DanhMuc
+
+@{
+    ViewData["Title"] = "Thêm danh mục";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <h6>Thêm danh mục mới</h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="TenDanhMuc" class="form-control-label"></label>
+                                    <input asp-for="TenDanhMuc" class="form-control" />
+                                    <span asp-validation-for="TenDanhMuc" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Loai" class="form-control-label"></label>
+                                    <select asp-for="Loai" class="form-control" onchange="toggleNhomField()">
+                                        <option value="ChiTieu">Chi tiêu</option>
+                                        <option value="ThuNhap">Thu nhập</option>
+                                    </select>
+                                    <span asp-validation-for="Loai" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" id="nhomField">
+                                    <label asp-for="Nhom" class="form-control-label"></label>
+                                    <select asp-for="Nhom" class="form-control">
+                                        <option value="">-- Chọn nhóm --</option>
+                                        <option value="CoDinh">Cố định</option>
+                                        <option value="BienDoi">Biến đổi</option>
+                                    </select>
+                                    <span asp-validation-for="Nhom" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="GhiChu" class="form-control-label"></label>
+                                    <input asp-for="GhiChu" class="form-control" />
+                                    <span asp-validation-for="GhiChu" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="submit" value="Thêm mới" class="btn btn-primary" />
+                            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function toggleNhomField() {
+            var loai = document.getElementById('Loai').value;
+            var nhomField = document.getElementById('nhomField');
+            // Hiển thị trường nhóm cho cả chi tiêu và thu nhập
+            if (loai === 'ChiTieu' || loai === 'ThuNhap') {
+                nhomField.style.display = 'block';
+            } else {
+                nhomField.style.display = 'none';
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleNhomField();
+        });
+    </script>
+}

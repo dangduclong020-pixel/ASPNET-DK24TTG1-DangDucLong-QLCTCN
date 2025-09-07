@@ -1,7 +1,7 @@
-@model QuanLyCTCN.Models.ChiTieu
+@model QuanLyCTCN.Models.DanhMuc
 
 @{
-    ViewData["Title"] = "Chi tiết chi tiêu";
+    ViewData["Title"] = "Chi tiết danh mục";
     Layout = "_AdminLayout";
 }
 
@@ -10,27 +10,27 @@
         <div class="col-12">
             <div class="card mb-4">
                 <div class="card-header pb-0">
-                    <h6>Chi tiết chi tiêu</h6>
+                    <h6>Chi tiết danh mục</h6>
                 </div>
                 <div class="card-body">
                     <dl class="row">
                         <dt class="col-sm-2">
-                            @Html.DisplayNameFor(model => model.NgayChi)
+                            @Html.DisplayNameFor(model => model.TenDanhMuc)
                         </dt>
                         <dd class="col-sm-10">
-                            @Html.DisplayFor(model => model.NgayChi)
+                            @Html.DisplayFor(model => model.TenDanhMuc)
                         </dd>
                         <dt class="col-sm-2">
-                            @Html.DisplayNameFor(model => model.DanhMuc)
+                            @Html.DisplayNameFor(model => model.Loai)
                         </dt>
                         <dd class="col-sm-10">
-                            @(Model.DanhMuc?.TenDanhMuc ?? "N/A")
+                            @Html.DisplayFor(model => model.Loai)
                         </dd>
                         <dt class="col-sm-2">
-                            @Html.DisplayNameFor(model => model.SoTien)
+                            @Html.DisplayNameFor(model => model.Nhom)
                         </dt>
                         <dd class="col-sm-10">
-                            @Html.DisplayFor(model => model.SoTien)
+                            @Html.DisplayFor(model => model.Nhom)
                         </dd>
                         <dt class="col-sm-2">
                             @Html.DisplayNameFor(model => model.GhiChu)
@@ -39,11 +39,10 @@
                             @Html.DisplayFor(model => model.GhiChu)
                         </dd>
                     </dl>
-                    
-                    <div>
-                        <a asp-action="Edit" asp-route-id="@Model.ChiTieuId" class="btn btn-primary">Chỉnh sửa</a> |
-                        <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
-                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Edit" asp-route-id="@Model?.DanhMucId" class="btn btn-primary">Chỉnh sửa</a> |
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
                 </div>
             </div>
         </div>

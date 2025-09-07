@@ -190,6 +190,59 @@
             text-align: center;
         }
 
+        /* Dropdown menu styles */
+        .sidebar-menu .dropdown {
+            position: relative;
+        }
+
+        .sidebar-menu .dropdown-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-menu .dropdown-menu {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 0.5rem 0;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .sidebar-menu .dropdown-menu .dropdown-item {
+            padding: 0.5rem 1rem;
+            color: var(--dark-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-menu .dropdown-menu .dropdown-item:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .sidebar-menu .dropdown-menu .dropdown-item i {
+            width: 16px;
+            margin-right: 0.5rem;
+            text-align: center;
+        }
+
         /* Main content styles */
         .main-content {
             margin-left: 250px;
@@ -438,11 +491,25 @@
                     Thu nhập
                 </a>
             </li>
-            <li>
-                <a asp-controller="ThongKe" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "ThongKe" ? "active" : "")">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ThongKe" ? "active" : "")" data-bs-toggle="dropdown">
                     <i class="fas fa-chart-bar"></i>
-                    Báo cáo
+                    Báo cáo <i class="fas fa-chevron-down"></i>
                 </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" asp-controller="ThongKe" asp-action="Index">
+                        <i class="fas fa-chart-pie"></i> Tổng quan
+                    </a></li>
+                    <li><a class="dropdown-item" asp-controller="ThongKe" asp-action="TheoThang">
+                        <i class="fas fa-calendar-alt"></i> Theo tháng
+                    </a></li>
+                    <li><a class="dropdown-item" asp-controller="ThongKe" asp-action="SoSanhDanhMuc">
+                        <i class="fas fa-tags"></i> So sánh danh mục
+                    </a></li>
+                    <li><a class="dropdown-item" asp-controller="ThongKe" asp-action="XuHuongChiTieu">
+                        <i class="fas fa-chart-line"></i> Xu hướng chi tiêu
+                    </a></li>
+                </ul>
             </li>
             <li>
                 <a asp-controller="DanhMuc" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "DanhMuc" ? "active" : "")">

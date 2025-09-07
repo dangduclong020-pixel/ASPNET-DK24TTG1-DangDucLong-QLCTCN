@@ -6,7 +6,7 @@ using QuanLyCTCN.Models;
 
 namespace QuanLyCTCN.Controllers
 {
-    public class ThuNhapController : Controller
+    public class ThuNhapController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private const string _sessionNguoiDungId = "NguoiDungId";
@@ -20,11 +20,13 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> Index(DateTime? tuNgay, DateTime? denNgay)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
+            
+            var nguoiDungId = GetCurrentUserId();
 
             // Mặc định lấy dữ liệu của tháng hiện tại
             if (!tuNgay.HasValue)
@@ -54,16 +56,18 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             if (id == null)
             {
                 return NotFound();
             }
+
+            var nguoiDungId = GetCurrentUserId();
 
             var thuNhap = await _context.ThuNhaps
                 .Include(t => t.DanhMuc)
@@ -81,10 +85,10 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> Create()
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             // Lấy danh sách danh mục thu nhập
@@ -98,7 +102,7 @@ namespace QuanLyCTCN.Controllers
             var model = new ThuNhap
             {
                 NgayNhap = DateTime.Today,
-                NguoiDungId = nguoiDungId.Value
+                NguoiDungId = GetCurrentUserId()
             };
 
             return View(model);
@@ -110,14 +114,14 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> Create(ThuNhap thuNhap)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             // Đảm bảo NguoiDungId được thiết lập
-            thuNhap.NguoiDungId = nguoiDungId.Value;
+            thuNhap.NguoiDungId = GetCurrentUserId();
 
             if (ModelState.IsValid)
             {
@@ -125,7 +129,7 @@ namespace QuanLyCTCN.Controllers
                 await _context.SaveChangesAsync();
 
                 // Kiểm tra và cập nhật mục tiêu tiết kiệm nếu cần
-                await KiemTraVaCapNhatMucTieu(nguoiDungId.Value);
+                await KiemTraVaCapNhatMucTieu(thuNhap.NguoiDungId!.Value);
 
                 TempData["SuccessMessage"] = "Thêm thu nhập thành công!";
                 return RedirectToAction(nameof(Index));
@@ -145,16 +149,18 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             if (id == null)
             {
                 return NotFound();
             }
+
+            var nguoiDungId = GetCurrentUserId();
 
             var thuNhap = await _context.ThuNhaps
                 .FirstOrDefaultAsync(t => t.ThuNhapId == id && t.NguoiDungId == nguoiDungId);
@@ -180,10 +186,10 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> Edit(int id, ThuNhap thuNhap)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             if (id != thuNhap.ThuNhapId)
@@ -192,7 +198,7 @@ namespace QuanLyCTCN.Controllers
             }
 
             // Đảm bảo NguoiDungId được thiết lập
-            thuNhap.NguoiDungId = nguoiDungId.Value;
+            thuNhap.NguoiDungId = GetCurrentUserId();
 
             if (ModelState.IsValid)
             {
@@ -202,7 +208,7 @@ namespace QuanLyCTCN.Controllers
                     await _context.SaveChangesAsync();
 
                     // Kiểm tra và cập nhật mục tiêu tiết kiệm nếu cần
-                    await KiemTraVaCapNhatMucTieu(nguoiDungId.Value);
+                    await KiemTraVaCapNhatMucTieu(thuNhap.NguoiDungId!.Value);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -233,16 +239,18 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             if (id == null)
             {
                 return NotFound();
             }
+
+            var nguoiDungId = GetCurrentUserId();
 
             var thuNhap = await _context.ThuNhaps
                 .Include(t => t.DanhMuc)
@@ -262,11 +270,13 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
+
+            var nguoiDungId = GetCurrentUserId();
 
             var thuNhap = await _context.ThuNhaps
                 .FirstOrDefaultAsync(t => t.ThuNhapId == id && t.NguoiDungId == nguoiDungId);
@@ -277,7 +287,7 @@ namespace QuanLyCTCN.Controllers
                 await _context.SaveChangesAsync();
 
                 // Cập nhật lại mục tiêu sau khi xóa thu nhập
-                await KiemTraVaCapNhatMucTieu(nguoiDungId.Value);
+                await KiemTraVaCapNhatMucTieu(nguoiDungId!.Value);
 
                 TempData["SuccessMessage"] = "Xóa thu nhập thành công!";
             }

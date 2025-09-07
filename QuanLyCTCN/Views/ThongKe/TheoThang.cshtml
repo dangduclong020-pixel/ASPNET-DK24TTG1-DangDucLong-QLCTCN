@@ -1,0 +1,132 @@
+@{
+    ViewData["Title"] = "Thống kê theo tháng";
+    ViewData["Subtitle"] = $"Năm {ViewBag.Nam}";
+}
+
+@section HeaderActions {
+    <div class="d-flex gap-2">
+        <form method="get" class="d-flex gap-2">
+            <select name="nam" class="form-select form-select-sm" onchange="this.form.submit()">
+                @for (int i = DateTime.Today.Year; i >= DateTime.Today.Year - 5; i--)
+                {
+                    <option value="@i" selected="@(ViewBag.Nam == i)">@i</option>
+                }
+            </select>
+        </form>
+    </div>
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h5 class="chart-title">Thu nhập và chi tiêu theo tháng</h5>
+            </div>
+            <canvas id="thangChart" width="800" height="400"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">Chi tiết theo tháng</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Tháng</th>
+                                <th>Thu nhập</th>
+                                <th>Chi tiêu</th>
+                                <th>Số dư</th>
+                                <th>Tỷ lệ tiết kiệm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in ViewBag.ThongKeTheoThang)
+                            {
+                                var soDu = item.Item2 - item.Item3;
+                                var tyLeTietKiem = item.Item2 > 0 ? Math.Round((soDu / item.Item2) * 100, 1) : 0;
+                                <tr>
+                                    <td>Tháng @item.Item1</td>
+                                    <td class="text-success">@item.Item2.ToString("N0") VND</td>
+                                    <td class="text-danger">@item.Item3.ToString("N0") VND</td>
+                                    <td class="@(soDu >= 0 ? "text-success" : "text-danger")">@soDu.ToString("N0") VND</td>
+                                    <td>@tyLeTietKiem%</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Dữ liệu cho biểu đồ theo tháng
+        @{
+            var thangList = ViewBag.ThongKeTheoThang;
+            var thangLabelsList = new List<string>();
+            var thuNhapData = new List<double>();
+            var chiTieuData = new List<double>();
+            foreach (var item in thangList)
+            {
+                thangLabelsList.Add("Tháng " + item.Item1);
+                thuNhapData.Add((double)item.Item2);
+                chiTieuData.Add((double)item.Item3);
+            }
+        }
+        const thangLabels = @Html.Raw(Json.Serialize(thangLabelsList));
+        const thuNhapThangData = @Html.Raw(Json.Serialize(thuNhapData));
+        const chiTieuThangData = @Html.Raw(Json.Serialize(chiTieuData));
+
+        // Biểu đồ cột theo tháng
+        const thangChart = new Chart(document.getElementById('thangChart'), {
+            type: 'bar',
+            data: {
+                labels: thangLabels,
+                datasets: [{
+                    label: 'Thu nhập',
+                    data: thuNhapThangData,
+                    backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                    borderColor: '#28a745',
+                    borderWidth: 1
+                }, {
+                    label: 'Chi tiêu',
+                    data: chiTieuThangData,
+                    backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                    borderColor: '#dc3545',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + new Intl.NumberFormat('vi-VN').format(context.parsed.y) + ' VND';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('vi-VN').format(value) + ' VND';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

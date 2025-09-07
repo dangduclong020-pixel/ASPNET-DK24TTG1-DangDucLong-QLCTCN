@@ -5,7 +5,7 @@ using QuanLyCTCN.Models;
 
 namespace QuanLyCTCN.Controllers
 {
-    public class DanhMucController : Controller
+    public class DanhMucController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private const string _sessionNguoiDungId = "NguoiDungId";
@@ -16,27 +16,44 @@ namespace QuanLyCTCN.Controllers
         }
 
         // GET: /DanhMuc
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string loai, string nhom)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
-            // Lấy danh sách danh mục chi tiêu
-            var danhMucChiTieu = await _context.DanhMucs
-                .Where(d => d.Loai == "ChiTieu")
-                .ToListAsync();
+            // Lọc danh mục chi tiêu
+            var danhMucChiTieuQuery = _context.DanhMucs.Where(d => d.Loai == "ChiTieu");
+            if (!string.IsNullOrEmpty(nhom))
+            {
+                danhMucChiTieuQuery = danhMucChiTieuQuery.Where(d => d.Nhom == nhom);
+            }
+            var danhMucChiTieu = await danhMucChiTieuQuery.ToListAsync();
 
-            // Lấy danh sách danh mục thu nhập
-            var danhMucThuNhap = await _context.DanhMucs
-                .Where(d => d.Loai == "ThuNhap")
-                .ToListAsync();
+            // Lọc danh mục thu nhập
+            var danhMucThuNhapQuery = _context.DanhMucs.Where(d => d.Loai == "ThuNhap");
+            var danhMucThuNhap = await danhMucThuNhapQuery.ToListAsync();
+
+            // Áp dụng lọc loại nếu có
+            if (!string.IsNullOrEmpty(loai))
+            {
+                if (loai == "ChiTieu")
+                {
+                    danhMucThuNhap = new List<DanhMuc>();
+                }
+                else if (loai == "ThuNhap")
+                {
+                    danhMucChiTieu = new List<DanhMuc>();
+                }
+            }
 
             ViewBag.DanhMucChiTieu = danhMucChiTieu;
             ViewBag.DanhMucThuNhap = danhMucThuNhap;
+            ViewBag.LoaiFilter = loai;
+            ViewBag.NhomFilter = nhom;
 
             return View();
         }
@@ -45,10 +62,10 @@ namespace QuanLyCTCN.Controllers
         public IActionResult Create()
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             return View();
@@ -60,10 +77,10 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> Create(DanhMuc danhMuc)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             if (ModelState.IsValid)
@@ -90,10 +107,10 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             if (id == null)
@@ -115,10 +132,10 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> Edit(int id, DanhMuc danhMuc)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             if (id != danhMuc.DanhMucId)
@@ -164,10 +181,10 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             if (id == null)
@@ -202,10 +219,10 @@ namespace QuanLyCTCN.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             // Kiểm tra đăng nhập
-            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-            if (nguoiDungId == null)
+            var redirectResult = RedirectToLoginIfNotAuthenticated();
+            if (redirectResult != null)
             {
-                return RedirectToAction("DangNhap", "NguoiDung");
+                return redirectResult;
             }
 
             var danhMuc = await _context.DanhMucs.FindAsync(id);

@@ -1,0 +1,143 @@
+@model IEnumerable<QuanLyCTCN.Models.DanhMuc>
+
+@{
+    ViewData["Title"] = "Danh sách danh mục";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0">
+                    <h6>Danh sách danh mục</h6>
+                    <a asp-action="Create" class="btn btn-primary float-end">
+                        <i class="fas fa-plus"></i> Thêm mới
+                    </a>
+                </div>
+                <div class="card-body px-0 pt-0 pb-2">
+                    <!-- Bộ lọc -->
+                    <div class="px-3 py-2">
+                        <form method="get" class="row g-3">
+                            <div class="col-md-3">
+                                <label for="loaiFilter" class="form-label">Loại danh mục</label>
+                                <select name="loai" id="loaiFilter" class="form-select" onchange="this.form.submit()">
+                                    <option value="">Tất cả</option>
+                                    <option value="ChiTieu" selected="@(ViewBag.LoaiFilter == "ChiTieu")">Chi tiêu</option>
+                                    <option value="ThuNhap" selected="@(ViewBag.LoaiFilter == "ThuNhap")">Thu nhập</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="nhomFilter" class="form-label">Nhóm chi tiêu</label>
+                                <select name="nhom" id="nhomFilter" class="form-select" onchange="this.form.submit()">
+                                    <option value="">Tất cả</option>
+                                    <option value="CoDinh" selected="@(ViewBag.NhomFilter == "CoDinh")">Cố định</option>
+                                    <option value="BienDoi" selected="@(ViewBag.NhomFilter == "BienDoi")">Biến đổi</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="table-responsive p-0">
+                        <table class="table align-items-center mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên danh mục</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Loại</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nhóm</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ghi chú</th>
+                                    <th class="text-secondary opacity-7"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.DanhMucChiTieu != null)
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center font-weight-bold">DANH MỤC CHI TIÊU</td>
+                                    </tr>
+                                    foreach (var item in ViewBag.DanhMucChiTieu)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">@item.TenDanhMuc</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0">@item.Loai</p>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <span class="badge badge-sm @(string.IsNullOrEmpty(item.Nhom) ? "bg-secondary" : item.Nhom == "CoDinh" ? "bg-success" : "bg-warning")">
+                                                    @(string.IsNullOrEmpty(item.Nhom) ? "N/A" : item.Nhom == "CoDinh" ? "Cố định" : item.Nhom == "BienDoi" ? "Biến đổi" : "N/A")
+                                                </span>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <span class="text-secondary text-xs font-weight-bold">@item.GhiChu</span>
+                                            </td>
+                                            <td class="align-middle">
+                                                <a href="@Url.Action("Edit", new { id = item.DanhMucId })" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                                                    Sửa
+                                                </a>
+                                                |
+                                                <a href="@Url.Action("Delete", new { id = item.DanhMucId })" class="text-danger font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Delete user">
+                                                    Xóa
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+
+                                @if (ViewBag.DanhMucThuNhap != null)
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center font-weight-bold">DANH MỤC THU NHẬP</td>
+                                    </tr>
+                                    foreach (var item in ViewBag.DanhMucThuNhap)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex px-2 py-1">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <h6 class="mb-0 text-sm">@item.TenDanhMuc</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <p class="text-xs font-weight-bold mb-0">@item.Loai</p>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <span class="badge badge-sm @(string.IsNullOrEmpty(item.Nhom) ? "bg-secondary" : item.Nhom == "CoDinh" ? "bg-success" : "bg-warning")">
+                                                    @(string.IsNullOrEmpty(item.Nhom) ? "N/A" : item.Nhom == "CoDinh" ? "Cố định" : item.Nhom == "BienDoi" ? "Biến đổi" : "N/A")
+                                                </span>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                <span class="text-secondary text-xs font-weight-bold">@item.GhiChu</span>
+                                            </td>
+                                            <td class="align-middle">
+                                                <a href="@Url.Action("Edit", new { id = item.DanhMucId })" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
+                                                    Sửa
+                                                </a>
+                                                |
+                                                <a href="@Url.Action("Delete", new { id = item.DanhMucId })" class="text-danger font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Delete user">
+                                                    Xóa
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+
+                                @if ((ViewBag.DanhMucChiTieu == null || ViewBag.DanhMucChiTieu.Count == 0) && (ViewBag.DanhMucThuNhap == null || ViewBag.DanhMucThuNhap.Count == 0))
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center">Không có dữ liệu</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

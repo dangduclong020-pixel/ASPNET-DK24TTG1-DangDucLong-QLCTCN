@@ -45,13 +45,6 @@ namespace QuanLyCTCN.Models.ViewModels
         public List<BieuDoTheoThoiGianViewModel> ChiTieuTheoThoiGian { get; set; } = new List<BieuDoTheoThoiGianViewModel>();
     }
 
-    public class NganSachVuotHanMucViewModel
-    {
-        public NganSach NganSach { get; set; } = default!;
-        public decimal TongChiTieu { get; set; }
-        public decimal PhanTramDaSuDung { get; set; }
-    }
-
     public class BieuDoTheoDanhMucViewModel
     {
         public DanhMuc DanhMuc { get; set; } = default!;

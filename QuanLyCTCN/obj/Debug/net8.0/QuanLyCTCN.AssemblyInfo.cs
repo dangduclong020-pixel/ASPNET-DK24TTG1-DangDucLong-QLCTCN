@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("QuanLyCTCN")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5b7319c4f60593f754fb44f5e009b2b335998cfa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+df91d435ffb76492ff917c43a864aef181b8e11c")]
 [assembly: System.Reflection.AssemblyProductAttribute("QuanLyCTCN")]
 [assembly: System.Reflection.AssemblyTitleAttribute("QuanLyCTCN")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,0 +1,239 @@
+@{
+    ViewData["Title"] = "So sánh theo danh mục";
+    ViewData["Subtitle"] = $"{(ViewBag.Loai == "ChiTieu" ? "Chi tiêu" : "Thu nhập")} - Từ {ViewBag.TuNgay} đến {ViewBag.DenNgay}";
+}
+
+@section HeaderActions {
+    <div class="d-flex gap-2">
+        <form method="get" class="d-flex gap-2">
+            <input type="hidden" name="loai" value="@ViewBag.Loai" />
+            <input type="date" name="tuNgay" value="@ViewBag.TuNgay" class="form-control form-control-sm" />
+            <input type="date" name="denNgay" value="@ViewBag.DenNgay" class="form-control form-control-sm" />
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-search"></i> Lọc
+            </button>
+        </form>
+    </div>
+}
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-card-header">
+                <h6 class="stats-card-title">Tổng @ViewBag.Loai</h6>
+                <i class="fas fa-calculator"></i>
+            </div>
+            <div class="stats-card-value">@ViewBag.TongTien.ToString("N0") VND</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-card-header">
+                <h6 class="stats-card-title">Số danh mục</h6>
+                <i class="fas fa-tags"></i>
+            </div>
+            <div class="stats-card-value">@Model.Count mục</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card">
+            <div class="stats-card-header">
+                <h6 class="stats-card-title">Trung bình/danh mục</h6>
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stats-card-value">
+                @(Model.Count > 0 ? (ViewBag.TongTien / Model.Count).ToString("N0") : 0) VND
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h5 class="chart-title">@(ViewBag.Loai == "ChiTieu" ? "Chi tiêu" : "Thu nhập") theo danh mục</h5>
+                <div class="btn-group" role="group">
+                    <a href="@Url.Action("SoSanhDanhMuc", new { loai = "ThuNhap", tuNgay = ViewBag.TuNgay, denNgay = ViewBag.DenNgay })"
+                       class="btn btn-sm @(ViewBag.Loai == "ThuNhap" ? "btn-primary" : "btn-outline-primary")">
+                        Thu nhập
+                    </a>
+                    <a href="@Url.Action("SoSanhDanhMuc", new { loai = "ChiTieu", tuNgay = ViewBag.TuNgay, denNgay = ViewBag.DenNgay })"
+                       class="btn btn-sm @(ViewBag.Loai == "ChiTieu" ? "btn-primary" : "btn-outline-primary")">
+                        Chi tiêu
+                    </a>
+                </div>
+            </div>
+            <canvas id="danhMucChart" width="600" height="400"></canvas>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">Top danh mục</h6>
+            </div>
+            <div class="card-body">
+                @{
+                    var topItems = new List<QuanLyCTCN.Models.ViewModels.ThongKeTheoDanhMucViewModel>();
+                    foreach (var item in Model)
+                    {
+                        topItems.Add(item);
+                    }
+                    // Sort descending by TongTien
+                    for (int i = 0; i < topItems.Count - 1; i++)
+                    {
+                        for (int j = i + 1; j < topItems.Count; j++)
+                        {
+                            if (topItems[i].TongTien < topItems[j].TongTien)
+                            {
+                                var temp = topItems[i];
+                                topItems[i] = topItems[j];
+                                topItems[j] = temp;
+                            }
+                        }
+                    }
+                    // Take top 5
+                    if (topItems.Count > 5)
+                    {
+                        topItems = topItems.GetRange(0, 5);
+                    }
+                }
+                @foreach (var item in topItems)
+                {
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-truncate">@item.DanhMuc.TenDanhMuc</span>
+                        <span class="fw-bold">@item.TongTien.ToString("N0") VND</span>
+                    </div>
+                    <div class="progress mb-3" style="height: 6px;">
+                        <div class="progress-bar" role="progressbar"
+                             style="width: @(ViewBag.TongTien > 0 ? (item.TongTien / ViewBag.TongTien) * 100 : 0)%"
+                             aria-valuenow="@(ViewBag.TongTien > 0 ? (item.TongTien / ViewBag.TongTien) * 100 : 0)"
+                             aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">Chi tiết @(ViewBag.Loai == "ChiTieu" ? "chi tiêu" : "thu nhập") theo danh mục</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Danh mục</th>
+                                <th>Nhóm</th>
+                                <th>Số tiền</th>
+                                <th>Phần trăm</th>
+                                <th>Biểu đồ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var sortedModel = new List<QuanLyCTCN.Models.ViewModels.ThongKeTheoDanhMucViewModel>();
+                                foreach (var item in Model)
+                                {
+                                    sortedModel.Add(item);
+                                }
+                                // Sort descending by TongTien
+                                for (int i = 0; i < sortedModel.Count - 1; i++)
+                                {
+                                    for (int j = i + 1; j < sortedModel.Count; j++)
+                                    {
+                                        if (sortedModel[i].TongTien < sortedModel[j].TongTien)
+                                        {
+                                            var temp = sortedModel[i];
+                                            sortedModel[i] = sortedModel[j];
+                                            sortedModel[j] = temp;
+                                        }
+                                    }
+                                }
+                            }
+                            @foreach (var item in sortedModel)
+                            {
+                                <tr>
+                                    <td>@item.DanhMuc.TenDanhMuc</td>
+                                    <td>
+                                        <span class="badge @(item.DanhMuc.Nhom == "CoDinh" ? "bg-primary" : "bg-warning")">
+                                            @(item.DanhMuc.Nhom == "CoDinh" ? "Cố định" : "Biến đổi")
+                                        </span>
+                                    </td>
+                                    <td class="fw-bold">@item.TongTien.ToString("N0") VND</td>
+                                    <td>@item.PhanTram%</td>
+                                    <td>
+                                        <div class="progress" style="width: 100px;">
+                                            <div class="progress-bar" role="progressbar"
+                                                 style="width: @item.PhanTram%"
+                                                 aria-valuenow="@item.PhanTram"
+                                                 aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Dữ liệu cho biểu đồ danh mục
+        @{
+            var modelList = new List<QuanLyCTCN.Models.ViewModels.ThongKeTheoDanhMucViewModel>();
+            foreach (var item in Model)
+            {
+                modelList.Add(item);
+            }
+            var labels = new List<string>();
+            var data = new List<double>();
+            foreach (var item in modelList)
+            {
+                labels.Add(item.DanhMuc.TenDanhMuc);
+                data.Add((double)item.TongTien);
+            }
+        }
+        const danhMucLabels = @Html.Raw(Json.Serialize(labels));
+        const danhMucData = @Html.Raw(Json.Serialize(data));
+
+        // Biểu đồ danh mục
+        const danhMucChart = new Chart(document.getElementById('danhMucChart'), {
+            type: 'doughnut',
+            data: {
+                labels: danhMucLabels,
+                datasets: [{
+                    data: danhMucData,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                        '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + new Intl.NumberFormat('vi-VN').format(context.parsed) + ' VND';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

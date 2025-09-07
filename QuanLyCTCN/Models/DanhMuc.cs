@@ -23,6 +23,11 @@ namespace QuanLyCTCN.Models
         [Display(Name = "Loại")]
         public string Loai { get; set; } = "ChiTieu"; // "ThuNhap" hoặc "ChiTieu"
 
+        [Column("nhom")]
+        [StringLength(20)]
+        [Display(Name = "Nhóm")]
+        public string? Nhom { get; set; } // "CoDinh" hoặc "BienDoi"
+
         [Column("ghi_chu")]
         [StringLength(200)]
         [Display(Name = "Ghi chú")]

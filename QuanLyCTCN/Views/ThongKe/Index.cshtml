@@ -1,0 +1,305 @@
+@model QuanLyCTCN.Models.ViewModels.ThongKeViewModel
+
+@{
+    ViewData["Title"] = "Thống kê tổng quan";
+    ViewData["Subtitle"] = $"Từ {Model.NgayBatDau:dd/MM/yyyy} đến {Model.NgayKetThuc:dd/MM/yyyy}";
+}
+
+@section HeaderActions {
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Index", new { tuNgay = DateTime.Today.AddDays(-7), denNgay = DateTime.Today })" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-calendar-week"></i> Tuần này
+        </a>
+        <a href="@Url.Action("Index", new { tuNgay = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1), denNgay = DateTime.Today })" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-calendar-alt"></i> Tháng này
+        </a>
+        <a href="@Url.Action("Index", new { tuNgay = new DateTime(DateTime.Today.Year, 1, 1), denNgay = DateTime.Today })" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-calendar"></i> Năm này
+        </a>
+    </div>
+}
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-card-header">
+                <h6 class="stats-card-title">Tổng thu nhập</h6>
+                <i class="fas fa-arrow-up text-success"></i>
+            </div>
+            <div class="stats-card-value text-success">@Model.TongThuNhap.ToString("N0") VND</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-card-header">
+                <h6 class="stats-card-title">Tổng chi tiêu</h6>
+                <i class="fas fa-arrow-down text-danger"></i>
+            </div>
+            <div class="stats-card-value text-danger">@Model.TongChiTieu.ToString("N0") VND</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-card-header">
+                <h6 class="stats-card-title">Số dư</h6>
+                <i class="fas fa-balance-scale @(Model.TongSoDu >= 0 ? "text-success" : "text-danger")"></i>
+            </div>
+            <div class="stats-card-value @(Model.TongSoDu >= 0 ? "text-success" : "text-danger")">@Model.TongSoDu.ToString("N0") VND</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <div class="stats-card-header">
+                <h6 class="stats-card-title">Tỷ lệ tiết kiệm</h6>
+                <i class="fas fa-piggy-bank text-info"></i>
+            </div>
+            <div class="stats-card-value text-info">
+                @(Model.TongThuNhap > 0 ? Math.Round((Model.TongSoDu / Model.TongThuNhap) * 100, 1) : 0)%
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h5 class="chart-title">Thu nhập theo danh mục</h5>
+            </div>
+            <canvas id="thuNhapChart" width="400" height="300"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h5 class="chart-title">Chi tiêu theo danh mục</h5>
+            </div>
+            <canvas id="chiTieuChart" width="400" height="300"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="chart-container">
+            <div class="chart-header">
+                <h5 class="chart-title">Xu hướng thu nhập và chi tiêu theo thời gian</h5>
+            </div>
+            <canvas id="thoiGianChart" width="800" height="400"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">Chi tiết thu nhập theo danh mục</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Danh mục</th>
+                                <th>Số tiền</th>
+                                <th>Phần trăm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ThuNhapTheoDanhMuc)
+                            {
+                                <tr>
+                                    <td>@item.DanhMuc.TenDanhMuc</td>
+                                    <td class="text-success">@item.TongTien.ToString("N0") VND</td>
+                                    <td>@item.PhanTram%</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">Chi tiết chi tiêu theo danh mục</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Danh mục</th>
+                                <th>Số tiền</th>
+                                <th>Phần trăm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.ChiTieuTheoDanhMuc)
+                            {
+                                <tr>
+                                    <td>@item.DanhMuc.TenDanhMuc</td>
+                                    <td class="text-danger">@item.TongTien.ToString("N0") VND</td>
+                                    <td>@item.PhanTram%</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Dữ liệu cho biểu đồ thu nhập theo danh mục
+        @{
+            var thuNhapLabelsList = new List<string>();
+            var thuNhapDataList = new List<double>();
+            foreach (var item in Model.ThuNhapTheoDanhMuc)
+            {
+                thuNhapLabelsList.Add(item.DanhMuc.TenDanhMuc);
+                thuNhapDataList.Add((double)item.TongTien);
+            }
+
+            var chiTieuLabelsList = new List<string>();
+            var chiTieuDataList = new List<double>();
+            foreach (var item in Model.ChiTieuTheoDanhMuc)
+            {
+                chiTieuLabelsList.Add(item.DanhMuc.TenDanhMuc);
+                chiTieuDataList.Add((double)item.TongTien);
+            }
+
+            var thoiGianLabelsList = new List<string>();
+            var thuNhapThoiGianList = new List<double>();
+            var chiTieuThoiGianList = new List<double>();
+            foreach (var item in Model.ThuNhapTheoThoiGian)
+            {
+                thoiGianLabelsList.Add(item.Ngay.ToString("dd/MM"));
+                thuNhapThoiGianList.Add((double)item.TongTien);
+            }
+            foreach (var item in Model.ChiTieuTheoThoiGian)
+            {
+                chiTieuThoiGianList.Add((double)item.TongTien);
+            }
+        }
+        const thuNhapLabels = @Html.Raw(Json.Serialize(thuNhapLabelsList));
+        const thuNhapData = @Html.Raw(Json.Serialize(thuNhapDataList));
+
+        // Dữ liệu cho biểu đồ chi tiêu theo danh mục
+        const chiTieuLabels = @Html.Raw(Json.Serialize(chiTieuLabelsList));
+        const chiTieuData = @Html.Raw(Json.Serialize(chiTieuDataList));
+
+        // Dữ liệu cho biểu đồ theo thời gian
+        const thoiGianLabels = @Html.Raw(Json.Serialize(thoiGianLabelsList));
+        const thuNhapThoiGianData = @Html.Raw(Json.Serialize(thuNhapThoiGianList));
+        const chiTieuThoiGianData = @Html.Raw(Json.Serialize(chiTieuThoiGianList));
+
+        // Biểu đồ thu nhập theo danh mục
+        const thuNhapChart = new Chart(document.getElementById('thuNhapChart'), {
+            type: 'pie',
+            data: {
+                labels: thuNhapLabels,
+                datasets: [{
+                    data: thuNhapData,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + new Intl.NumberFormat('vi-VN').format(context.parsed) + ' VND';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Biểu đồ chi tiêu theo danh mục
+        const chiTieuChart = new Chart(document.getElementById('chiTieuChart'), {
+            type: 'pie',
+            data: {
+                labels: chiTieuLabels,
+                datasets: [{
+                    data: chiTieuData,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + new Intl.NumberFormat('vi-VN').format(context.parsed) + ' VND';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Biểu đồ xu hướng theo thời gian
+        const thoiGianChart = new Chart(document.getElementById('thoiGianChart'), {
+            type: 'line',
+            data: {
+                labels: thoiGianLabels,
+                datasets: [{
+                    label: 'Thu nhập',
+                    data: thuNhapThoiGianData,
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'Chi tiêu',
+                    data: chiTieuThoiGianData,
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + new Intl.NumberFormat('vi-VN').format(context.parsed.y) + ' VND';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('vi-VN').format(value) + ' VND';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

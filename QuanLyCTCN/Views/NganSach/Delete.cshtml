@@ -1,7 +1,7 @@
-@model QuanLyCTCN.Models.ChiTieu
+@model QuanLyCTCN.Models.NganSach
 
 @{
-    ViewData["Title"] = "Xóa chi tiêu";
+    ViewData["Title"] = "Xóa ngân sách";
     Layout = "_AdminLayout";
 }
 
@@ -10,41 +10,35 @@
         <div class="col-12">
             <div class="card mb-4">
                 <div class="card-header pb-0">
-                    <h6>Xóa chi tiêu</h6>
+                    <h6>Xóa ngân sách</h6>
                 </div>
                 <div class="card-body">
-                    <h3>Bạn có chắc chắn muốn xóa chi tiêu này?</h3>
+                    <h3>Bạn có chắc chắn muốn xóa ngân sách này?</h3>
                     <div>
                         <hr />
                         <dl class="row">
                             <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.NgayChi)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.NgayChi)
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.DanhMuc)
+                                Danh mục
                             </dt>
                             <dd class="col-sm-10">
                                 @(Model.DanhMuc?.TenDanhMuc ?? "N/A")
                             </dd>
                             <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.SoTien)
+                                @Html.DisplayNameFor(model => model.HanMuc)
                             </dt>
                             <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.SoTien)
+                                @Html.DisplayFor(model => model.HanMuc) VND
                             </dd>
                             <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.GhiChu)
+                                @Html.DisplayNameFor(model => model.Thang)
                             </dt>
                             <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.GhiChu)
+                                Tháng @Html.DisplayFor(model => model.Thang)/@Html.DisplayFor(model => model.Nam)
                             </dd>
                         </dl>
-                        
+
                         <form asp-action="Delete" method="post">
-                            <input type="hidden" asp-for="ChiTieuId" />
+                            <input type="hidden" asp-for="NganSachId" />
                             <input type="submit" value="Xóa" class="btn btn-danger" /> |
                             <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
                         </form>
