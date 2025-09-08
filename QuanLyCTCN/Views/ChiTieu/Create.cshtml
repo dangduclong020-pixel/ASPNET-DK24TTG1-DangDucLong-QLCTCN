@@ -12,6 +12,292 @@
 @section Scripts {
     <script src="~/js/chitieu.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        // Ensure jQuery and Bootstrap are loaded
+        if (typeof $ === 'undefined') {
+            console.error('jQuery is not loaded!');
+        } else {
+            console.log('jQuery loaded successfully');
+        }
+
+        if (typeof bootstrap === 'undefined') {
+            console.log('Bootstrap not loaded via global object, checking jQuery...');
+        }
+
+        $(document).ready(function() {
+            console.log('Document ready in Create.cshtml');
+            
+            // Test if modal exists
+            if ($('#nganSachModal').length === 0) {
+                console.error('Modal #nganSachModal not found!');
+            } else {
+                console.log('Modal #nganSachModal found');
+            }
+
+            // Test if form exists
+            if ($('.chitieu-form').length === 0) {
+                console.error('Form .chitieu-form not found!');
+            } else {
+                console.log('Form .chitieu-form found');
+            }
+
+            // Lưu trữ thông tin ngân sách cho từng danh mục
+            var nganSachData = {};
+            var isVuotNganSach = false;
+
+            // Load thông tin ngân sách khi trang tải
+            loadNganSachInfo();
+            loadDanhMucByDate();
+
+            // Kiểm tra ngân sách khi thay đổi danh mục hoặc số tiền
+            $('#DanhMucId').on('change', function() {
+                console.log('Category changed to:', $(this).val());
+                loadNganSachInfo();
+            });
+
+            $('#NgayChi').on('change', function() {
+                console.log('Date changed to:', $(this).val());
+                loadNganSachInfo();
+                loadDanhMucByDate();
+            });
+
+            $('#SoTien').on('input change', function() {
+                console.log('Amount changed to:', $(this).val());
+                kiemTraNganSach();
+            });
+
+            // Xử lý submit form
+            $('.chitieu-form').on('submit', function(e) {
+                console.log('Form submitted, isVuotNganSach:', isVuotNganSach);
+                
+                // Loại bỏ format số tiền trước khi submit
+                cleanCurrencyInputs();
+                
+                if (isVuotNganSach) {
+                    e.preventDefault();
+                    console.log('Preventing form submission, showing modal...');
+                    showNganSachModal();
+                    return false;
+                }
+            });
+
+            // Xử lý xác nhận trong modal
+            $('#confirmSubmit').on('click', function() {
+                console.log('Confirm button clicked');
+                $('#nganSachModal').modal('hide');
+                // Loại bỏ format số tiền trước khi submit
+                cleanCurrencyInputs();
+                // Đợi một chút để đảm bảo giá trị được cập nhật
+                setTimeout(function() {
+                    console.log('Submitting form after cleaning...');
+                    $('.chitieu-form')[0].submit();
+                }, 100);
+            });
+
+            function loadNganSachInfo() {
+                var danhMucId = $('#DanhMucId').val();
+                var ngayChi = $('#NgayChi').val();
+                console.log('Loading budget info for category:', danhMucId, 'date:', ngayChi);
+                if (danhMucId) {
+                    // Gọi AJAX để lấy thông tin ngân sách
+                    $.ajax({
+                        url: '/ChiTieu/GetNganSachInfo',
+                        type: 'GET',
+                        data: { danhMucId: danhMucId, ngayChi: ngayChi },
+                        success: function(data) {
+                            console.log('AJAX Success - Budget data received:', data);
+                            if (data.error) {
+                                console.error('Server error:', data.error);
+                                return;
+                            }
+                            nganSachData[danhMucId] = data;
+                            console.log('nganSachData updated:', nganSachData);
+                            kiemTraNganSach();
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX Error:', status, error);
+                            console.error('Response:', xhr.responseText);
+                        }
+                    });
+                } else {
+                    console.log('No category selected');
+                }
+            }
+
+            function loadDanhMucByDate() {
+                var ngayChi = $('#NgayChi').val();
+                if (ngayChi) {
+                    var date = new Date(ngayChi);
+                    var thang = date.getMonth() + 1; // getMonth() trả về 0-11
+                    var nam = date.getFullYear();
+                    console.log('Loading categories for month:', thang, 'year:', nam);
+
+                    $.ajax({
+                        url: '/ChiTieu/GetDanhMucByThangNam',
+                        type: 'GET',
+                        data: { thang: thang, nam: nam },
+                        success: function(data) {
+                            console.log('AJAX Success - Categories received:', data);
+                            if (data.error) {
+                                console.error('Server error:', data.error);
+                                return;
+                            }
+                            // Cập nhật dropdown
+                            var select = $('#DanhMucId');
+                            select.empty();
+                            select.append('<option value="">-- Chọn danh mục --</option>');
+                            data.forEach(function(item) {
+                                select.append('<option value="' + item.danhMucId + '">' + item.tenDanhMuc + '</option>');
+                            });
+                            console.log('Dropdown updated with', data.length, 'categories');
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('AJAX Error loading categories:', status, error);
+                            console.error('Response:', xhr.responseText);
+                        }
+                    });
+                }
+            }
+
+            function kiemTraNganSach() {
+                var danhMucId = $('#DanhMucId').val();
+                // Loại bỏ dấu chấm phân cách hàng nghìn trước khi parse
+                var soTienRaw = $('#SoTien').val().replace(/\./g, '').replace(/\s/g, '');
+                var soTien = parseFloat(soTienRaw) || 0;
+                console.log('Checking budget - Category:', danhMucId, 'Raw amount:', soTienRaw, 'Parsed amount:', soTien);
+                console.log('nganSachData for category:', nganSachData[danhMucId]);
+
+                if (danhMucId && nganSachData[danhMucId] && soTien > 0) {
+                    var nganSach = nganSachData[danhMucId];
+                    var tongChiTieuHienTai = nganSach.daChi || 0;
+                    var hanMuc = nganSach.hanMuc || 0;
+                    var tongSauKhiThem = tongChiTieuHienTai + soTien;
+                    console.log('Budget calculation - Current spent:', tongChiTieuHienTai, 'Limit:', hanMuc, 'Total after add:', tongSauKhiThem);
+
+                    if (tongSauKhiThem > hanMuc && hanMuc > 0) {
+                        var soTienVuot = tongSauKhiThem - hanMuc;
+                        isVuotNganSach = true;
+                        console.log('Budget exceeded by:', soTienVuot, '- Setting isVuotNganSach = true');
+
+                        var warningContent = `
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <strong>Ngân sách tháng:</strong><br>
+                                    <span class="text-primary">${hanMuc.toLocaleString()} VND</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Đã chi:</strong><br>
+                                    <span class="text-info">${tongChiTieuHienTai.toLocaleString()} VND</span>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-sm-6">
+                                    <strong>Sẽ chi thêm:</strong><br>
+                                    <span class="text-warning">${soTien.toLocaleString()} VND</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Tổng sau khi chi:</strong><br>
+                                    <span class="text-danger">${tongSauKhiThem.toLocaleString()} VND</span>
+                                </div>
+                            </div>
+                            <div class="mt-3 p-2 bg-danger bg-opacity-10 rounded">
+                                <strong class="text-danger">⚠️ Vượt ngân sách: ${soTienVuot.toLocaleString()} VND</strong>
+                            </div>
+                        `;
+
+                        $('#nganSachWarningContent').html(warningContent);
+                        $('#nganSachWarning').show();
+                    } else {
+                        isVuotNganSach = false;
+                        $('#nganSachWarning').hide();
+                        console.log('Budget OK - Setting isVuotNganSach = false');
+                    }
+                } else {
+                    isVuotNganSach = false;
+                    $('#nganSachWarning').hide();
+                    console.log('No budget check needed - Missing data:', {
+                        danhMucId: danhMucId,
+                        hasNganSachData: !!nganSachData[danhMucId],
+                        soTien: soTien
+                    });
+                }
+            }
+
+            function showNganSachModal() {
+                console.log('Showing budget modal...');
+                var danhMucId = $('#DanhMucId').val();
+                // Loại bỏ dấu chấm phân cách hàng nghìn trước khi parse
+                var soTienRaw = $('#SoTien').val().replace(/\./g, '').replace(/\s/g, '');
+                var soTien = parseFloat(soTienRaw) || 0;
+
+                if (danhMucId && nganSachData[danhMucId]) {
+                    var nganSach = nganSachData[danhMucId];
+                    var tongChiTieuHienTai = nganSach.daChi || 0;
+                    var hanMuc = nganSach.hanMuc || 0;
+                    var tongSauKhiThem = tongChiTieuHienTai + soTien;
+                    var soTienVuot = tongSauKhiThem - hanMuc;
+
+                    var modalContent = `
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <strong>Danh mục:</strong><br>
+                                <span class="badge bg-primary">${nganSach.tenDanhMuc}</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Ngân sách tháng:</strong><br>
+                                <span class="text-primary fw-bold">${hanMuc.toLocaleString()} VND</span>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <strong>Đã chi:</strong><br>
+                                <span class="text-info">${tongChiTieuHienTai.toLocaleString()} VND</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Sẽ chi thêm:</strong><br>
+                                <span class="text-warning fw-bold">${soTien.toLocaleString()} VND</span>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-sm-6">
+                                <strong>Tổng sau khi chi:</strong><br>
+                                <span class="text-danger fw-bold">${tongSauKhiThem.toLocaleString()} VND</span>
+                            </div>
+                            <div class="col-sm-6">
+                                <strong>Vượt ngân sách:</strong><br>
+                                <span class="text-danger fw-bold fs-5">${soTienVuot.toLocaleString()} VND</span>
+                            </div>
+                        </div>
+                    `;
+
+                    $('#modalWarningContent').html(modalContent);
+                    $('#nganSachModal').modal('show');
+                    console.log('Modal shown successfully');
+                } else {
+                    console.log('Cannot show modal - missing data');
+                }
+            }
+
+            // Function để loại bỏ format số tiền trước khi submit
+            function cleanCurrencyInputs() {
+                // Đồng bộ hóa giá trị từ input text sang hidden input
+                const currencyInputs = document.querySelectorAll('input[name="SoTien"]:not([type="hidden"])');
+                currencyInputs.forEach(input => {
+                    if (input.value) {
+                        // Loại bỏ dấu chấm và khoảng trắng để gửi giá trị số thô
+                        const cleanValue = input.value.replace(/\./g, '').replace(/\s/g, '');
+                        console.log('Original value:', input.value, 'Cleaned value:', cleanValue);
+                        // Cập nhật hidden input
+                        const hiddenInput = document.getElementById('SoTienHidden');
+                        if (hiddenInput) {
+                            hiddenInput.value = cleanValue;
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 }
 
 <div class="container-fluid py-4 chitieu-page">
@@ -26,6 +312,13 @@
                         @Html.AntiForgeryToken()
                         <div asp-validation-summary="ModelOnly" class="chitieu-text-danger chitieu-mb-3"></div>
 
+                        <!-- Khu vực hiển thị cảnh báo ngân sách -->
+                        <div id="nganSachWarning" class="alert alert-warning" style="display: none;" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Cảnh báo ngân sách!</strong>
+                            <div id="nganSachWarningContent"></div>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="chitieu-form-group">
@@ -34,7 +327,8 @@
                                         <span class="chitieu-input-group-text">
                                             <i class="fas fa-calendar"></i>
                                         </span>
-                                        <input asp-for="NgayChi" class="chitieu-form-control grouped" type="date" required />
+                                        <input asp-for="NgayChi" class="chitieu-form-control grouped" type="date" 
+                                               value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
                                     </div>
                                     <span asp-validation-for="NgayChi" class="chitieu-text-danger"></span>
                                 </div>
@@ -63,7 +357,8 @@
                                         <span class="chitieu-input-group-text">
                                             <i class="fas fa-money-bill-wave"></i>
                                         </span>
-                                        <input asp-for="SoTien" class="chitieu-form-control grouped" type="number" step="0.01" min="0" placeholder="0.00" required />
+                                        <input asp-for="SoTien" class="chitieu-form-control grouped" type="text" placeholder="0" required />
+                                        <input type="hidden" id="SoTienHidden" name="SoTien" value="" />
                                     </div>
                                     <span asp-validation-for="SoTien" class="chitieu-text-danger"></span>
                                 </div>
@@ -98,6 +393,43 @@
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal cảnh báo vượt ngân sách -->
+    <div class="modal fade" id="nganSachModal" tabindex="-1" aria-labelledby="nganSachModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title text-dark" id="nganSachModalLabel">
+                        <i class="fas fa-exclamation-triangle"></i> Cảnh báo vượt ngân sách
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading mb-3">
+                            <i class="fas fa-exclamation-circle"></i> Bạn sắp vượt quá ngân sách đã quy định!
+                        </h6>
+                        <div id="modalWarningContent" class="mb-3"></div>
+                        <hr>
+                        <p class="mb-2">
+                            <strong>Bạn có chắc chắn muốn tiếp tục chi tiêu này không?</strong>
+                        </p>
+                        <div class="text-muted small">
+                            <i class="fas fa-info-circle"></i> Lưu ý: Việc chi tiêu vượt ngân sách có thể ảnh hưởng đến kế hoạch tài chính của bạn.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Hủy bỏ
+                    </button>
+                    <button type="button" class="btn btn-warning" id="confirmSubmit">
+                        <i class="fas fa-check"></i> Xác nhận chi tiêu
+                    </button>
                 </div>
             </div>
         </div>

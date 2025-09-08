@@ -68,6 +68,9 @@ namespace QuanLyCTCN.Controllers
             ViewBag.Thang = thang;
             ViewBag.Nam = nam;
 
+            ViewBag.Thang = thang;
+            ViewBag.Nam = nam;
+
             return View(nganSachViewModels);
         }
 

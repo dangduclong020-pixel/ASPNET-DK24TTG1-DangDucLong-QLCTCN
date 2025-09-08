@@ -45,10 +45,11 @@ namespace QuanLyCTCN.Controllers
             var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
             var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
-            // Tính tổng thu nhập tháng hiện tại
+            // Tính tổng thu nhập tháng hiện tại (dựa trên thang_thu_nhap và nam_thu_nhap)
             var tongThuNhapThang = await _context.ThuNhaps
                 .Where(t => t.NguoiDungId == nguoiDungId &&
-                       t.NgayNhap >= firstDayOfMonth && t.NgayNhap <= lastDayOfMonth)
+                       t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue &&
+                       t.ThangThuNhap == today.Month && t.NamThuNhap == today.Year)
                 .SumAsync(t => t.SoTien);
 
             // Tính tổng chi tiêu tháng hiện tại
@@ -72,7 +73,7 @@ namespace QuanLyCTCN.Controllers
                 .Take(5)
                 .ToListAsync();
 
-            // Lấy 5 giao dịch thu nhập gần nhất
+            // Lấy 5 giao dịch thu nhập gần nhất (sắp xếp theo ngay_nhap)
             var thuNhapGanDay = await _context.ThuNhaps
                 .Where(t => t.NguoiDungId == nguoiDungId)
                 .Include(t => t.DanhMuc)
@@ -146,13 +147,11 @@ namespace QuanLyCTCN.Controllers
                 }
             }
 
-            // Dữ liệu thu nhập và chi tiêu theo ngày cho biểu đồ xu hướng
-            var startDate = DateTime.Today.AddDays(-14);
-            var endDate = DateTime.Today;
-
+            // Dữ liệu thu nhập theo thời gian (hiển thị ngày thực tế)
             var thuNhapTheoThoiGian = await _context.ThuNhaps
                 .Where(t => t.NguoiDungId == nguoiDungId &&
-                       t.NgayNhap >= startDate && t.NgayNhap <= endDate)
+                       t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue &&
+                       t.ThangThuNhap == today.Month && t.NamThuNhap == today.Year)  // Thêm điều kiện tháng hiện tại
                 .GroupBy(t => t.NgayNhap.Date)
                 .Select(group => new BieuDoTheoThoiGianViewModel
                 {
@@ -162,9 +161,10 @@ namespace QuanLyCTCN.Controllers
                 .OrderBy(item => item.Ngay)
                 .ToListAsync();
 
+            // Dữ liệu chi tiêu theo thời gian (đã đúng - hiển thị ngày thực tế)
             var chiTieuTheoThoiGian = await _context.ChiTieus
                 .Where(c => c.NguoiDungId == nguoiDungId &&
-                       c.NgayChi >= startDate && c.NgayChi <= endDate)
+                       c.NgayChi >= firstDayOfMonth && c.NgayChi <= lastDayOfMonth)
                 .GroupBy(c => c.NgayChi.Date)
                 .Select(group => new BieuDoTheoThoiGianViewModel
                 {

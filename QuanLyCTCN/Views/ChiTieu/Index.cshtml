@@ -14,6 +14,34 @@
 }
 
 <div class="container-fluid py-4 chitieu-page">
+    <!-- Hiển thị thông báo -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>@Html.Raw(TempData["WarningMessage"])</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
     <div class="row">
         <div class="col-12">
             <div class="chitieu-card">
@@ -21,15 +49,26 @@
                     <h6><i class="fas fa-list-ul chitieu-icon"></i> Danh sách chi tiêu</h6>
                     <div class="row mb-3">
                         <div class="col-12">
+                            <!-- Thay thế phần filter form -->
                             <div class="chitieu-filter-section">
                                 <form asp-action="Index" method="get" class="chitieu-filter-form chitieu-d-flex chitieu-gap-3 chitieu-align-items-end chitieu-flex-wrap">
                                     <div class="chitieu-form-group">
-                                        <label class="chitieu-form-label">Từ ngày</label>
-                                        <input type="date" name="tuNgay" value="@ViewBag.TuNgay" class="chitieu-form-control" />
+                                        <label class="chitieu-form-label">Tháng chi tiêu</label>
+                                        <select name="thang" class="chitieu-form-control">
+                                            @for (int i = 1; i <= 12; i++)
+                                            {
+                                                <option value="@i" selected="@(ViewBag.Thang == i)">Tháng @i</option>
+                                            }
+                                        </select>
                                     </div>
                                     <div class="chitieu-form-group">
-                                        <label class="chitieu-form-label">Đến ngày</label>
-                                        <input type="date" name="denNgay" value="@ViewBag.DenNgay" class="chitieu-form-control" />
+                                        <label class="chitieu-form-label">Năm chi tiêu</label>
+                                        <select name="nam" class="chitieu-form-control">
+                                            @for (int i = 2020; i <= 2030; i++)
+                                            {
+                                                <option value="@i" selected="@(ViewBag.Nam == i)">@i</option>
+                                            }
+                                        </select>
                                     </div>
                                     <button type="submit" class="chitieu-btn chitieu-btn-primary">
                                         <i class="fas fa-filter chitieu-icon"></i> Lọc
@@ -37,9 +76,9 @@
                                     <button type="button" class="chitieu-btn chitieu-btn-secondary chitieu-clear-filters">
                                         <i class="fas fa-times chitieu-icon"></i> Xóa lọc
                                     </button>
-                                    <div class="chitieu-d-flex chitieu-align-items-end chitieu-ms-auto">
-                                        <a asp-action="Create" class="chitieu-btn chitieu-btn-primary">
-                                            <i class="fas fa-plus chitieu-icon"></i> Thêm mới
+                                    <div class="d-flex align-items-end ms-auto">
+                                        <a asp-action="Create" class="btn btn-primary">
+                                            <i class="fas fa-plus me-2"></i> Thêm mới
                                         </a>
                                     </div>
                                 </form>
@@ -100,8 +139,7 @@
                                                     <a href="@Url.Action("Details", new { id = item.ChiTieuId })" title="Chi tiết" data-bs-toggle="tooltip">
                                                         <i class="fas fa-eye"></i> Xem
                                                     </a>
-                                                    <a href="@Url.Action("Delete", new { id = item.ChiTieuId })" title="Xóa" data-bs-toggle="tooltip"
-                                                       data-item-name="chi tiêu ngày @item.NgayChi.ToString("dd/MM/yyyy")">
+                                                    <a href="@Url.Action("Delete", new { id = item.ChiTieuId })" title="Xóa" data-bs-toggle="tooltip">
                                                         <i class="fas fa-trash"></i> Xóa
                                                     </a>
                                                 </div>

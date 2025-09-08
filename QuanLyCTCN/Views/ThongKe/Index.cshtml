@@ -60,6 +60,47 @@
     </div>
 </div>
 
+<!-- Filter Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="Index" method="get" class="d-flex gap-3 align-items-end flex-wrap">
+                    <div class="form-group">
+                        <label class="form-label">Tháng</label>
+                        <select name="thang" class="form-control">
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <option value="@i" selected="@(ViewBag.Thang == i)">Tháng @i</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Năm</label>
+                        <select name="nam" class="form-control">
+                            @for (int i = DateTime.Today.Year - 5; i <= DateTime.Today.Year + 1; i++)
+                            {
+                                <option value="@i" selected="@(ViewBag.Nam == i)">@i</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Từ ngày</label>
+                        <input type="date" name="tuNgay" value="@Model.NgayBatDau.ToString("yyyy-MM-dd")" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Đến ngày</label>
+                        <input type="date" name="denNgay" value="@Model.NgayKetThuc.ToString("yyyy-MM-dd")" class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter"></i> Lọc
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mb-4">
     <div class="col-md-6">
         <div class="chart-container">
@@ -177,14 +218,25 @@
             var thoiGianLabelsList = new List<string>();
             var thuNhapThoiGianList = new List<double>();
             var chiTieuThoiGianList = new List<double>();
-            foreach (var item in Model.ThuNhapTheoThoiGian)
+
+            // Tạo danh sách tất cả ngày có dữ liệu (thu nhập hoặc chi tiêu)
+            var allDates = Model.ThuNhapTheoThoiGian.Select(t => t.Ngay)
+                .Union(Model.ChiTieuTheoThoiGian.Select(c => c.Ngay))
+                .OrderBy(d => d)
+                .ToList();
+
+            // Tạo labels và data tương ứng cho từng ngày
+            foreach (var date in allDates)
             {
-                thoiGianLabelsList.Add(item.Ngay.ToString("dd/MM"));
-                thuNhapThoiGianList.Add((double)item.TongTien);
-            }
-            foreach (var item in Model.ChiTieuTheoThoiGian)
-            {
-                chiTieuThoiGianList.Add((double)item.TongTien);
+                thoiGianLabelsList.Add(date.ToString("dd/MM"));
+
+                // Tìm thu nhập tương ứng với ngày này
+                var thuNhap = Model.ThuNhapTheoThoiGian.FirstOrDefault(t => t.Ngay == date);
+                thuNhapThoiGianList.Add(thuNhap != null ? (double)thuNhap.TongTien : 0);
+
+                // Tìm chi tiêu tương ứng với ngày này
+                var chiTieu = Model.ChiTieuTheoThoiGian.FirstOrDefault(c => c.Ngay == date);
+                chiTieuThoiGianList.Add(chiTieu != null ? (double)chiTieu.TongTien : 0);
             }
         }
         const thuNhapLabels = @Html.Raw(Json.Serialize(thuNhapLabelsList));

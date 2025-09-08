@@ -316,9 +316,44 @@
         const expenseLabels = @Html.Raw(Json.Serialize(Model.ChiTieuTheoDanhMuc.Select(c => c.DanhMuc?.TenDanhMuc ?? "Chưa phân loại").ToArray()));
         const expenseData = @Html.Raw(Json.Serialize(Model.ChiTieuTheoDanhMuc.Select(c => c.TongTien).ToArray()));
 
-        const incomeLabels = @Html.Raw(Json.Serialize(Model.ThuNhapTheoThoiGian.Any() ? Model.ThuNhapTheoThoiGian.Select(t => t.Ngay.ToString("dd/MM")).Take(15).ToArray() : new[] { "Không có dữ liệu" }));
-        const incomeData = @Html.Raw(Json.Serialize(Model.ThuNhapTheoThoiGian.Any() ? Model.ThuNhapTheoThoiGian.Select(t => t.TongTien / 1000000).Take(15).ToArray() : new[] { 0 }));
-        const expenseTrendData = @Html.Raw(Json.Serialize(Model.ChiTieuTheoThoiGian.Any() ? Model.ChiTieuTheoThoiGian.Select(t => t.TongTien / 1000000).Take(15).ToArray() : new[] { 0 }));
+        const thuNhapData = @Html.Raw(Json.Serialize(Model.ThuNhapTheoThoiGian));
+        const chiTieuData = @Html.Raw(Json.Serialize(Model.ChiTieuTheoThoiGian));
+
+        // Tạo danh sách tất cả ngày có dữ liệu
+        var allDates = [];
+        thuNhapData.forEach(item => {
+            const dateStr = new Date(item.ngay).toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit'});
+            if (!allDates.includes(dateStr)) {
+                allDates.push(dateStr);
+            }
+        });
+        chiTieuData.forEach(item => {
+            const dateStr = new Date(item.ngay).toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit'});
+            if (!allDates.includes(dateStr)) {
+                allDates.push(dateStr);
+            }
+        });
+        allDates.sort();
+
+        // Tạo data tương ứng
+        var incomeData = [];
+        var expenseTrendData = [];
+
+        allDates.forEach(date => {
+            // Tìm thu nhập tương ứng
+            const thuNhapItem = thuNhapData.find(t => 
+                new Date(t.ngay).toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit'}) === date
+            );
+            incomeData.push(thuNhapItem ? thuNhapItem.tongTien / 1000000 : 0);
+            
+            // Tìm chi tiêu tương ứng
+            const chiTieuItem = chiTieuData.find(c => 
+                new Date(c.ngay).toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit'}) === date
+            );
+            expenseTrendData.push(chiTieuItem ? chiTieuItem.tongTien / 1000000 : 0);
+        });
+
+        const incomeLabels = allDates.length > 0 ? allDates : ["Không có dữ liệu"];
 
         // Expense Pie Chart
         if (document.getElementById('expenseChart')) {

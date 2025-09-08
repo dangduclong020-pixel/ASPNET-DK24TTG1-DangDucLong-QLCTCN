@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeThuNhap() {
     // Initialize all ThuNhap components
     initializeFormValidation();
+    initializeFormSubmission(); // Thêm dòng này
     initializeAnimations();
     initializeTooltips();
     initializeConfirmations();
@@ -43,6 +44,11 @@ function initializeFormValidation() {
             if (input.value) {
                 input.parentElement.classList.add('focused');
             }
+
+            // Format số tiền cho input SoTien
+            if (input.name === 'SoTien' || input.id === 'SoTien') {
+                formatCurrencyInput(input);
+            }
         });
 
         // Form submission enhancement
@@ -75,10 +81,7 @@ function validateInput(input) {
             }
             break;
         case 'date':
-            if (value && new Date(value) > new Date()) {
-                isValid = false;
-                message = 'Ngày không được lớn hơn ngày hiện tại';
-            }
+            // Loại bỏ validation ngày không được lớn hơn ngày hiện tại để cho phép thu nhập dự kiến
             break;
         default:
             if (input.hasAttribute('required') && !value) {
@@ -518,6 +521,112 @@ function initializePrint() {
             window.print();
         });
     });
+}
+
+// Format currency input with thousand separators
+function formatCurrencyInput(input) {
+    if (!input) return;
+
+    let isFormatted = false;
+    let originalValue = input.value;
+
+    // Store original value for form submission
+    input.addEventListener('focus', function() {
+        if (isFormatted && this.value) {
+            // Remove formatting when focusing (allow raw number input)
+            const rawValue = this.value.replace(/\./g, '');
+            this.value = rawValue;
+            isFormatted = false;
+        }
+    });
+
+    input.addEventListener('blur', function() {
+        const currentValue = this.value.trim();
+        if (currentValue && !isFormatted) {
+            // Add formatting when blurring
+            const numericValue = parseFloat(currentValue.replace(/\./g, ''));
+            if (!isNaN(numericValue) && numericValue >= 0) {
+                this.value = formatNumber(numericValue);
+                isFormatted = true;
+                originalValue = currentValue;
+                
+                // Đồng bộ hóa với hidden input nếu có
+                const hiddenInput = document.getElementById('SoTienHidden');
+                if (hiddenInput) {
+                    hiddenInput.value = currentValue;
+                }
+            } else if (currentValue !== '') {
+                // If invalid, restore original value
+                this.value = originalValue || '';
+            }
+        }
+    });
+
+    input.addEventListener('input', function() {
+        // Allow only numbers during input (remove dots temporarily)
+        let cleanValue = this.value.replace(/[^\d]/g, '');
+        
+        // Prevent leading zeros
+        if (cleanValue.length > 1 && cleanValue.startsWith('0')) {
+            cleanValue = cleanValue.substring(1);
+        }
+        
+        this.value = cleanValue;
+        isFormatted = false;
+    });
+
+    // Initialize formatting if input has value
+    if (input.value) {
+        const numericValue = parseFloat(input.value.replace(/\./g, ''));
+        if (!isNaN(numericValue) && numericValue >= 0) {
+            input.value = formatNumber(numericValue);
+            isFormatted = true;
+            originalValue = input.value.replace(/\./g, '');
+        }
+    }
+}
+
+// Function để loại bỏ format số tiền trước khi submit
+function cleanCurrencyInputs() {
+    const currencyInputs = document.querySelectorAll('input[name="SoTien"]:not([type="hidden"])');
+    currencyInputs.forEach(input => {
+        if (input.value) {
+            // Loại bỏ dấu chấm và khoảng trắng để gửi giá trị số thô
+            const cleanValue = input.value.replace(/\./g, '').replace(/\s/g, '');
+            console.log('Original value:', input.value, 'Cleaned value:', cleanValue);
+            
+            // Cập nhật hidden input
+            const hiddenInput = document.getElementById('SoTienHidden');
+            if (hiddenInput) {
+                hiddenInput.value = cleanValue;
+                // Disable input text để ASP.NET MVC bind từ hidden input
+                input.disabled = true;
+            }
+        }
+    });
+}
+
+// Form submission enhancement for Edit/Create forms
+function initializeFormSubmission() {
+    const forms = document.querySelectorAll('.thunhap-form');
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            // Loại bỏ format số tiền trước khi submit
+            cleanCurrencyInputs();
+            
+            const submitBtn = this.querySelector('.thunhap-btn[type="submit"]');
+            if (submitBtn) {
+                submitBtn.classList.add('thunhap-loading');
+                submitBtn.innerHTML = '<div class="thunhap-spinner"></div> Đang xử lý...';
+            }
+        });
+    });
+}
+
+// Format number with Vietnamese thousand separators
+function formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
 // Initialize print on load

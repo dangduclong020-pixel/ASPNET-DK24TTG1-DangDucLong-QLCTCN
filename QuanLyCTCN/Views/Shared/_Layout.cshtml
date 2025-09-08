@@ -969,12 +969,16 @@
                     Cài đặt
                 </a>
             </li>
-            <li>
-                <a asp-controller="NguoiDung" asp-action="DangXuat">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Đăng xuất
-                </a>
-            </li>
+            <!-- Thay thế phần menu đăng xuất -->
+            @if (Context.Session.GetInt32("NguoiDungId") != null)
+            {
+                <li>
+                    <a asp-controller="NguoiDung" asp-action="DangXuat">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Đăng xuất
+                    </a>
+                </li>
+            }
         </ul>
     </div>
 

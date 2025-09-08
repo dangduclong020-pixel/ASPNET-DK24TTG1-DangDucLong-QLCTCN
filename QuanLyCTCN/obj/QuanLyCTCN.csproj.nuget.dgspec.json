@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\QuanLyCTCN\\QuanLyCTCN.csproj": {}
+    "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\quanlyctcn\\QuanLyCTCN.csproj": {}
   },
   "projects": {
-    "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\QuanLyCTCN\\QuanLyCTCN.csproj": {
+    "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\quanlyctcn\\QuanLyCTCN.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\QuanLyCTCN\\QuanLyCTCN.csproj",
+        "projectUniqueName": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\quanlyctcn\\QuanLyCTCN.csproj",
         "projectName": "QuanLyCTCN",
-        "projectPath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\QuanLyCTCN\\QuanLyCTCN.csproj",
+        "projectPath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\quanlyctcn\\QuanLyCTCN.csproj",
         "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\QuanLyCTCN\\obj\\",
+        "outputPath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\quanlyctcn\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",

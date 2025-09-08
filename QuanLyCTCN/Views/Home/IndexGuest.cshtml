@@ -1,544 +1,112 @@
 @{
     ViewData["Title"] = "MoneyTracker - Quản lý chi tiêu thông minh";
-    Layout = null;
+    Layout = "_Layout";
 }
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"]</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --primary-blue: #4285f4;
-            --light-blue: #e8f0fe;
-            --dark-text: #1a1a1a;
-            --gray-text: #666;
-        }
+<style>
+    /* Override footer margin cho trang guest */
+    .main-footer {
+        margin-left: 0 !important;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-        }
+    .main-footer.home-page {
+        margin-left: 0 !important; /* Override class home-page */
+    }
 
-        .navbar-brand {
-            font-weight: 700;
-            color: var(--primary-blue) !important;
-        }
+    /* Ẩn sidebar hoàn toàn */
+    .sidebar {
+        display: none !important;
+    }
 
-        .btn-primary {
-            background-color: var(--primary-blue);
-            border-color: var(--primary-blue);
-            border-radius: 8px;
-            padding: 8px 20px;
-        }
+    /* Điều chỉnh main content */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
 
-        .btn-outline-primary {
-            color: var(--primary-blue);
-            border-color: var(--primary-blue);
-            border-radius: 8px;
-            padding: 8px 20px;
-        }
+    /* Điều chỉnh header */
+    .main-header {
+        left: 0 !important;
+    }
 
-        .hero-section {
-            background: linear-gradient(135deg, var(--light-blue) 0%, #f8f9ff 100%);
-            min-height: 600px;
-        }
+    /* Điều chỉnh container */
+    .container-fluid {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+</style>
 
-        .hero-title {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: var(--dark-text);
-            margin-bottom: 20px;
-        }
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="hero-section py-5">
+                <h1 class="display-4 fw-bold text-primary mb-4">
+                    <i class="fas fa-wallet me-3"></i>
+                    MoneyTracker
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Quản lý chi tiêu thông minh, theo dõi tài chính cá nhân hiệu quả
+                </p>
 
-        .hero-subtitle {
-            font-size: 1.2rem;
-            color: var(--gray-text);
-            margin-bottom: 40px;
-            line-height: 1.6;
-        }
-
-        .dashboard-mockup {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            padding: 30px;
-            margin-top: 20px;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: 20px;
-        }
-
-        .features-section {
-            padding: 80px 0;
-            background: white;
-        }
-
-        .feature-card {
-            background: white;
-            border-radius: 16px;
-            padding: 30px 20px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-bottom: 30px;
-            height: 100%;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-        }
-
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 24px;
-            color: white;
-        }
-
-        .icon-blue { background-color: var(--primary-blue); }
-        .icon-orange { background-color: #ff9800; }
-        .icon-green { background-color: #4caf50; }
-
-        .stats-section {
-            background: var(--light-blue);
-            padding: 80px 0;
-        }
-
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-        }
-
-        .stat-label {
-            color: var(--gray-text);
-            font-size: 1rem;
-        }
-
-        .expense-section {
-            padding: 60px 0;
-            background: white;
-        }
-
-        .expense-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .expense-category {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .category-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .amount {
-            font-weight: 600;
-            color: var(--dark-text);
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--dark-text);
-        }
-
-        .section-subtitle {
-            text-align: center;
-            color: var(--gray-text);
-            margin-bottom: 60px;
-            font-size: 1.1rem;
-        }
-
-        .mini-chart {
-            width: 100%;
-            height: 60px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <i class="fas fa-chart-line me-2"></i>
-                Personal Finance Management
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#features">Tính năng</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about">Giới Thiệu</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Liên hệ</a>
-                    </li>
-                </ul>
-                
-                <div class="d-flex gap-2">
-                    <a asp-controller="NguoiDung" asp-action="DangNhap" class="btn btn-outline-primary">Đăng nhập</a>
-                    <a asp-controller="NguoiDung" asp-action="DangKy" class="btn btn-primary">Đăng ký</a>
+                <div class="d-flex justify-content-center gap-3 mb-5">
+                    <a href="/NguoiDung/DangKy" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Đăng ký ngay
+                    </a>
+                    <a href="/NguoiDung/DangNhap" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>
+                        Đăng nhập
+                    </a>
                 </div>
-            </div>
-        </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="hero-title">
-                        Quản lý chi tiêu<br>
-                        <span style="color: var(--primary-blue);">thông minh</span>
-                    </h1>
-                    <p class="hero-subtitle">
-                        Theo dõi thu chi, lập ngân sách và đạt mục tiêu tài chính một cách 
-                        dễ dàng. MoneyTracker giúp bạn kiểm soát hoàn toàn tài chính 
-                        cá nhân.
-                    </p>
-                    <div class="d-flex gap-3">
-                        <a asp-controller="NguoiDung" asp-action="DangKy" class="btn btn-primary btn-lg">Bắt đầu miễn phí</a>
-                        <a href="#features" class="btn btn-outline-primary btn-lg">Tìm hiểu thêm</a>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="dashboard-mockup">
-                        <h6 class="mb-3">Chi tiêu theo danh mục</h6>
-                        <div class="chart-container">
-                            <canvas id="expenseChart"></canvas>
-                        </div>
-                        <div class="row mt-4">
-                            <div class="col-6">
-                                <div class="mini-chart" id="trendChart"></div>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                                <h5 class="card-title">Theo dõi chi tiêu</h5>
+                                <p class="card-text">Ghi nhận và phân tích chi tiêu hàng ngày một cách chi tiết</p>
                             </div>
-                            <div class="col-6">
-                                <div class="d-flex justify-content-between mb-2">
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-piggy-bank fa-3x text-warning mb-3"></i>
+                                <h5 class="card-title">Lập ngân sách</h5>
+                                <p class="card-text">Thiết lập hạn mức chi tiêu cho từng danh mục</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-bullseye fa-3x text-info mb-3"></i>
+                                <h5 class="card-title">Đặt mục tiêu</h5>
+                                <p class="card-text">Lập kế hoạch tiết kiệm và đạt mục tiêu tài chính</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</div>
 
-    <!-- Features Section -->
-    <section class="features-section" id="features">
-        <div class="container">
-            <h2 class="section-title">Tính năng nổi bật</h2>
-            <p class="section-subtitle">
-                Những công cụ mạnh mẽ giúp bạn quản lý tài chính hiệu quả
-            </p>
-            
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon icon-blue">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <h5>Theo dõi chi tiêu tự động</h5>
-                        <p>Ghi nhận và phân loại các giao dịch một cách tự động, giúp bạn tiết kiệm thời gian.</p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon icon-orange">
-                            <i class="fas fa-piggy-bank"></i>
-                        </div>
-                        <h5>Lập ngân sách thông minh</h5>
-                        <p>Tạo ngân sách chi tiết theo từng danh mục và theo dõi tiến độ hàng ngày.</p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon icon-green">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <h5>Báo cáo chi tiết</h5>
-                        <p>Xem báo cáo tài chính chi tiết với biểu đồ trực quan và thống kê đầy đủ.</p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon icon-blue">
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-                        <h5>Mục tiêu tiết kiệm</h5>
-                        <p>Đặt mục tiêu tiết kiệm và theo dõi tiến độ để đạt được các mục tiêu tài chính.</p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon icon-orange">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <h5>Ứng dụng di động</h5>
-                        <p>Sử dụng trên mọi thiết bị với ứng dụng di động dễ sử dụng trên iOS và Android.</p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-4 col-md-6">
-                    <div class="feature-card">
-                        <div class="feature-icon icon-green">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h5>Bảo mật tuyệt đối</h5>
-                        <p>Dữ liệu được mã hóa và bảo mật tuyệt đối, đảm bảo thông tin tài chính luôn an toàn.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Stats Section -->
-    <section class="stats-section">
-        <div class="container">
-            <h2 class="section-title">Tại sao chọn MoneyTracker?</h2>
-            <p class="section-subtitle">
-                Hàng nghìn người dùng đã tin tương và đạt được mục tiêu tài chính
-            </p>
-            
-            <div class="row text-center">
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="stat-number">50K+</div>
-                    <div class="stat-label">Người dùng tin tưởng</div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="stat-number">95%</div>
-                    <div class="stat-label">Đánh giá tích cực</div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="stat-number">2.5M+</div>
-                    <div class="stat-label">Giao dịch được theo dõi</div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="stat-number">30%</div>
-                    <div class="stat-label">Tiết kiệm trung bình</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Expense Control Section -->
-    <section class="expense-section">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6">
-                    <h3 class="mb-4">Kiểm soát hoàn toàn tài chính cá nhân</h3>
-                    
-                    <div class="mb-4">
-                        <h6><i class="fas fa-check-circle text-success me-2"></i>Theo dõi chi tiêu realtime</h6>
-                        <p class="text-muted">Cập nhật ngay lập tức mọi giao dịch và xem tình hình tài chính hiện tại.</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h6><i class="fas fa-chart-pie text-primary me-2"></i>Phân tích thông minh</h6>
-                        <p class="text-muted">AI phân tích thói quen chi tiêu và đưa ra lời khuyên để tiết kiệm hiệu quả nhất.</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h6><i class="fas fa-bell text-warning me-2"></i>Đồng bộ đa thiết bị</h6>
-                        <p class="text-muted">Đồng bộ dữ liệu trên mọi thiết bị để bạn có thể theo dõi mọi lúc mọi nơi.</p>
-                    </div>
-                </div>
-                
-                <div class="col-lg-6">
-                    <h6 class="mb-3">Tiết kiệm hàng tháng</h6>
-                    
-                    <div class="expense-item">
-                        <div class="expense-category">
-                            <div class="category-dot" style="background-color: #4285f4;"></div>
-                            <span>Tháng 1</span>
-                        </div>
-                        <div class="amount">+2.000.000đ</div>
-                    </div>
-                    
-                    <div class="expense-item">
-                        <div class="expense-category">
-                            <div class="category-dot" style="background-color: #34a853;"></div>
-                            <span>Tháng 2</span>
-                        </div>
-                        <div class="amount">+1.500.000đ</div>
-                    </div>
-                    
-                    <div class="expense-item">
-                        <div class="expense-category">
-                            <div class="category-dot" style="background-color: #fbbc04;"></div>
-                            <span>Tháng 3</span>
-                        </div>
-                        <div class="amount">+2.500.000đ</div>
-                    </div>
-                    
-                    <div class="expense-item border-0">
-                        <div class="expense-category">
-                            <strong>Tổng tiết kiệm</strong>
-                        </div>
-                        <div class="amount text-success">
-                            <strong>6.000.000đ</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-light py-5" id="contact">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4">
-                    <h5 class="text-primary">MoneyTracker</h5>
-                    <p>Giải pháp quản lý tài chính cá nhân thông minh và hiệu quả nhất.</p>
-                </div>
-                <div class="col-lg-2">
-                    <h6>Sản phẩm</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#features" class="text-light text-decoration-none">Tính năng</a></li>
-                        <li><a href="#" class="text-light text-decoration-none">Giá cả</a></li>
-                        <li><a href="#" class="text-light text-decoration-none">API</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-2">
-                    <h6>Hỗ trợ</h6>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="text-light text-decoration-none">Trung tâm trợ giúp</a></li>
-                        <li><a href="#contact" class="text-light text-decoration-none">Liên hệ</a></li>
-                        <li><a href="#" class="text-light text-decoration-none">Blog</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-4">
-                    <h6>Theo dõi chúng tôi</h6>
-                    <div class="d-flex gap-3">
-                        <a href="#" class="text-light"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-            </div>
-            <hr class="my-4">
-            <div class="text-center">
-                <p>&copy; 2024 MoneyTracker. Tất cả quyền được bảo lưu.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@section Scripts {
     <script>
-        // Expense Chart
-        const ctx = document.getElementById('expenseChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Ăn uống', 'Di chuyển', 'Giải trí', 'Mua sắm', 'Khác'],
-                datasets: [{
-                    data: [35, 25, 20, 15, 5],
-                    backgroundColor: [
-                        '#ff6b6b',
-                        '#4ecdc4',
-                        '#45b7d1',
-                        '#96ceb4',
-                        '#feca57'
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true
-                        }
-                    }
-                },
-                cutout: '60%'
-            }
-        });
-
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+        // Simple animation for cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
             });
-        });
-
-        // Add animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observe feature cards
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
-            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(card);
         });
     </script>
-</body>
-</html>
+}

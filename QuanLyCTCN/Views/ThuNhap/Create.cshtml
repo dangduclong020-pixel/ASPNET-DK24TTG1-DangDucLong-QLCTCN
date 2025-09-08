@@ -12,6 +12,106 @@
 @section Scripts {
     <script src="~/js/thunhap.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function() {
+            // Format số tiền khi load
+            formatCurrencyInput($('#SoTien')[0]);
+
+            // Xử lý submit form để loại bỏ format số tiền
+            $('.thunhap-form').on('submit', function(e) {
+                cleanCurrencyInputs();
+            });
+
+            // Function để loại bỏ format số tiền trước khi submit
+            function cleanCurrencyInputs() {
+                // Đồng bộ hóa giá trị từ input text sang hidden input
+                const currencyInputs = document.querySelectorAll('input[name="SoTien"]:not([type="hidden"])');
+                currencyInputs.forEach(input => {
+                    if (input.value) {
+                        // Loại bỏ dấu chấm và khoảng trắng để gửi giá trị số thô
+                        const cleanValue = input.value.replace(/\./g, '').replace(/\s/g, '');
+                        console.log('Original value:', input.value, 'Cleaned value:', cleanValue);
+                        // Cập nhật hidden input
+                        const hiddenInput = document.getElementById('SoTienHidden');
+                        if (hiddenInput) {
+                            hiddenInput.value = cleanValue;
+                        }
+                    }
+                });
+            }
+
+            // Function để format số tiền với dấu chấm phân cách
+            function formatCurrencyInput(input) {
+                if (!input) return;
+
+                let isFormatted = false;
+                let originalValue = input.value;
+
+                // Store original value for form submission
+                input.addEventListener('focus', function() {
+                    if (isFormatted && this.value) {
+                        // Remove formatting when focusing (allow raw number input)
+                        const rawValue = this.value.replace(/\./g, '');
+                        this.value = rawValue;
+                        isFormatted = false;
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    const currentValue = this.value.trim();
+                    if (currentValue && !isFormatted) {
+                        // Add formatting when blurring
+                        const numericValue = parseFloat(currentValue.replace(/\./g, ''));
+                        if (!isNaN(numericValue) && numericValue >= 0) {
+                            this.value = formatNumber(numericValue);
+                            isFormatted = true;
+                            originalValue = currentValue;
+                            
+                            // Đồng bộ hóa với hidden input nếu có
+                            const hiddenInput = document.getElementById('SoTienHidden');
+                            if (hiddenInput) {
+                                hiddenInput.value = currentValue;
+                                // Disable input text để tránh conflict khi submit
+                                this.disabled = true;
+                            }
+                        } else if (currentValue !== '') {
+                            // If invalid, restore original value
+                            this.value = originalValue || '';
+                        }
+                    }
+                });
+
+                input.addEventListener('input', function() {
+                    // Allow only numbers during input (remove dots temporarily)
+                    let cleanValue = this.value.replace(/[^\d]/g, '');
+
+                    // Prevent leading zeros
+                    if (cleanValue.length > 1 && cleanValue.startsWith('0')) {
+                        cleanValue = cleanValue.substring(1);
+                    }
+
+                    this.value = cleanValue;
+                    isFormatted = false;
+                });
+
+                // Initialize formatting if input has value
+                if (input.value) {
+                    const numericValue = parseFloat(input.value.replace(/\./g, ''));
+                    if (!isNaN(numericValue) && numericValue >= 0) {
+                        input.value = formatNumber(numericValue);
+                        isFormatted = true;
+                        originalValue = input.value.replace(/\./g, '');
+                    }
+                }
+            }
+
+            // Format number with Vietnamese thousand separators
+            function formatNumber(number) {
+                return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+        });
+    </script>
 }
 
 <div class="container-fluid py-4 thunhap-page">
@@ -58,14 +158,53 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="thunhap-form-group">
+                                    <label asp-for="ThangThuNhap" class="thunhap-form-label"></label>
+                                    <div class="thunhap-input-group">
+                                        <span class="thunhap-input-group-text">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                        <select asp-for="ThangThuNhap" class="thunhap-form-select grouped" required>
+                                            <option value="">-- Chọn tháng --</option>
+                                            @for (int i = 1; i <= 12; i++)
+                                            {
+                                                <option value="@i">@i</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="ThangThuNhap" class="thunhap-text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="thunhap-form-group">
+                                    <label asp-for="NamThuNhap" class="thunhap-form-label"></label>
+                                    <div class="thunhap-input-group">
+                                        <span class="thunhap-input-group-text">
+                                            <i class="fas fa-calendar-check"></i>
+                                        </span>
+                                        <select asp-for="NamThuNhap" class="thunhap-form-select grouped" required>
+                                            @for (int i = 2020; i <= 2030; i++)
+                                            {
+                                                <option value="@i">@i</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="NamThuNhap" class="thunhap-text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="thunhap-form-group">
                                     <label asp-for="SoTien" class="thunhap-form-label"></label>
                                     <div class="thunhap-input-group">
                                         <span class="thunhap-input-group-text">
                                             <i class="fas fa-money-bill-wave"></i>
                                         </span>
-                                        <input asp-for="SoTien" class="thunhap-form-control grouped" type="number" step="0.01" min="0" placeholder="0.00" required />
+                                        <input asp-for="SoTien" class="thunhap-form-control grouped" type="text" placeholder="0" required />
                                     </div>
                                     <span asp-validation-for="SoTien" class="thunhap-text-danger"></span>
+                                    <input type="hidden" id="SoTienHidden" name="SoTien" value="" />
                                 </div>
                             </div>
                             <div class="col-md-6">

@@ -33,11 +33,27 @@
 
                         <div class="thunhap-detail-row">
                             <span class="thunhap-detail-label">
-                                <i class="fas fa-calendar"></i> Ngày nhập:
+                                <i class="fas fa-calendar"></i> Ngày nhận thực tế:
                             </span>
                             <span class="thunhap-detail-value">
                                 @Model.NgayNhap.ToString("dd/MM/yyyy")
                                 <small class="text-muted">(@Model.NgayNhap.ToString("dddd", new System.Globalization.CultureInfo("vi-VN")))</small>
+                            </span>
+                        </div>
+
+                        <div class="thunhap-detail-row">
+                            <span class="thunhap-detail-label">
+                                <i class="fas fa-calendar-alt"></i> Tháng thu nhập:
+                            </span>
+                            <span class="thunhap-detail-value">
+                                @if (Model.ThangThuNhap.HasValue && Model.NamThuNhap.HasValue)
+                                {
+                                    <span class="badge bg-info">Tháng @Model.ThangThuNhap/@Model.NamThuNhap</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Chưa phân loại</span>
+                                }
                             </span>
                         </div>
 

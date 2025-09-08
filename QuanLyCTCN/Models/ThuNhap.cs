@@ -29,8 +29,18 @@ namespace QuanLyCTCN.Models
         [Required]
         [Column("ngay_nhap")]
         [DataType(DataType.Date)]
-        [Display(Name = "Ngày nhập")]
+        [Display(Name = "Ngày nhận thực tế")]
         public DateTime NgayNhap { get; set; }
+
+        [Column("thang_thu_nhap")]
+        [Display(Name = "Tháng thu nhập")]
+        [Range(1, 12, ErrorMessage = "Tháng phải từ 1-12")]
+        public int? ThangThuNhap { get; set; }
+
+        [Column("nam_thu_nhap")]
+        [Display(Name = "Năm thu nhập")]
+        [Range(2020, 2030, ErrorMessage = "Năm phải từ 2020-2030")]
+        public int? NamThuNhap { get; set; }
 
         [Column("ghi_chu")]
         [StringLength(200)]

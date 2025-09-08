@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "P3LdaRivAhA=",
+  "dgSpecHash": "/97mq8ibrGk=",
   "success": true,
-  "projectFilePath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\QuanLyCTCN\\QuanLyCTCN.csproj",
+  "projectFilePath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\quanlyctcn\\QuanLyCTCN.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\PC\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\PC\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
@@ -174,9 +174,9 @@
       "code": "NU1903",
       "level": "Warning",
       "message": "Package 'System.Data.SqlClient' 4.8.5 has a known high severity vulnerability, https://github.com/advisories/GHSA-98g6-xh36-x2p7",
-      "projectPath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\QuanLyCTCN\\QuanLyCTCN.csproj",
+      "projectPath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\quanlyctcn\\QuanLyCTCN.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\QuanLyCTCN\\QuanLyCTCN.csproj",
+      "filePath": "C:\\Users\\PC\\source\\repos\\QuanLyCTCN\\quanlyctcn\\QuanLyCTCN.csproj",
       "libraryId": "System.Data.SqlClient",
       "targetGraphs": [
         "net8.0"

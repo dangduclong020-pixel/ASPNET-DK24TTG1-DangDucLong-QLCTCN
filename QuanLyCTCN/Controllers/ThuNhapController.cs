@@ -17,7 +17,7 @@ namespace QuanLyCTCN.Controllers
         }
 
         // GET: /ThuNhap
-        public async Task<IActionResult> Index(DateTime? tuNgay, DateTime? denNgay)
+        public async Task<IActionResult> Index(DateTime? tuNgay, DateTime? denNgay, int? thang, int? nam)
         {
             // Kiểm tra đăng nhập
             var redirectResult = RedirectToLoginIfNotAuthenticated();
@@ -28,26 +28,31 @@ namespace QuanLyCTCN.Controllers
             
             var nguoiDungId = GetCurrentUserId();
 
+            // Nếu có tham số tháng và năm, sử dụng chúng
+            if (thang.HasValue && nam.HasValue)
+            {
+                // Không cần tính tuNgay, denNgay nữa vì lọc theo thang_thu_nhap, nam_thu_nhap
+            }
             // Mặc định lấy dữ liệu của tháng hiện tại
-            if (!tuNgay.HasValue)
+            else if (!tuNgay.HasValue)
             {
                 var today = DateTime.Today;
-                tuNgay = new DateTime(today.Year, today.Month, 1);
-                denNgay = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
+                thang = today.Month;
+                nam = today.Year;
             }
 
             var thuNhaps = await _context.ThuNhaps
                 .Include(t => t.DanhMuc)
                 .Where(t => t.NguoiDungId == nguoiDungId &&
-                            t.NgayNhap >= tuNgay && t.NgayNhap <= denNgay)
+                            t.ThangThuNhap == thang && t.NamThuNhap == nam)
                 .OrderByDescending(t => t.NgayNhap)
                 .ToListAsync();
 
             // Tính tổng thu nhập
             var tongThuNhap = thuNhaps.Sum(t => t.SoTien);
             ViewBag.TongThuNhap = tongThuNhap;
-            ViewBag.TuNgay = (tuNgay ?? DateTime.Today).ToString("yyyy-MM-dd");
-            ViewBag.DenNgay = (denNgay ?? DateTime.Today).ToString("yyyy-MM-dd");
+            ViewBag.Thang = thang ?? DateTime.Today.Month;
+            ViewBag.Nam = nam ?? DateTime.Today.Year;
 
             return View(thuNhaps);
         }
@@ -102,6 +107,8 @@ namespace QuanLyCTCN.Controllers
             var model = new ThuNhap
             {
                 NgayNhap = DateTime.Today,
+                ThangThuNhap = DateTime.Today.Month,
+                NamThuNhap = DateTime.Today.Year,
                 NguoiDungId = GetCurrentUserId()
             };
 

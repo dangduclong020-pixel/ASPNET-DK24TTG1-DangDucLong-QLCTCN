@@ -16,7 +16,7 @@ namespace QuanLyCTCN.Controllers
         }
 
         // GET: /ThongKe
-        public async Task<IActionResult> Index(DateTime? tuNgay, DateTime? denNgay)
+        public async Task<IActionResult> Index(DateTime? tuNgay, DateTime? denNgay, int? thang, int? nam)
         {
             // Kiểm tra đăng nhập
             var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
@@ -25,19 +25,58 @@ namespace QuanLyCTCN.Controllers
                 return RedirectToAction("DangNhap", "NguoiDung");
             }
 
+            // Ưu tiên sử dụng tháng và năm nếu có (khi người dùng chỉ chọn tháng/năm mà không chọn ngày)
+            if (thang.HasValue && nam.HasValue && !tuNgay.HasValue && !denNgay.HasValue)
+            {
+                tuNgay = new DateTime(nam.Value, thang.Value, 1);
+                denNgay = new DateTime(nam.Value, thang.Value, DateTime.DaysInMonth(nam.Value, thang.Value));
+            }
+            // Ưu tiên sử dụng tuNgay và denNgay nếu có
+            else if (tuNgay.HasValue && denNgay.HasValue)
+            {
+                // Giữ nguyên tuNgay và denNgay đã chọn
+                thang = tuNgay.Value.Month;
+                nam = tuNgay.Value.Year;
+            }
+            // Nếu chỉ có tuNgay, set denNgay là cuối tháng
+            else if (tuNgay.HasValue && !denNgay.HasValue)
+            {
+                denNgay = new DateTime(tuNgay.Value.Year, tuNgay.Value.Month,
+                    DateTime.DaysInMonth(tuNgay.Value.Year, tuNgay.Value.Month));
+                thang = tuNgay.Value.Month;
+                nam = tuNgay.Value.Year;
+            }
+            // Nếu chỉ có denNgay, set tuNgay là đầu tháng
+            else if (!tuNgay.HasValue && denNgay.HasValue)
+            {
+                tuNgay = new DateTime(denNgay.Value.Year, denNgay.Value.Month, 1);
+                thang = denNgay.Value.Month;
+                nam = denNgay.Value.Year;
+            }
+            // Nếu có tham số tháng và năm, sử dụng chúng
+            else if (thang.HasValue && nam.HasValue)
+            {
+                tuNgay = new DateTime(nam.Value, thang.Value, 1);
+                denNgay = new DateTime(nam.Value, thang.Value, DateTime.DaysInMonth(nam.Value, thang.Value));
+            }
             // Mặc định là tháng hiện tại
-            if (!tuNgay.HasValue)
+            else
             {
                 var today = DateTime.Today;
                 tuNgay = new DateTime(today.Year, today.Month, 1);
                 denNgay = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
+                thang = today.Month;
+                nam = today.Year;
             }
 
-            // Lấy dữ liệu thu nhập
+            // Lấy dữ liệu thu nhập (sử dụng thang_thu_nhap và nam_thu_nhap nếu có, ngược lại dùng ngay_nhap)
             var thuNhaps = await _context.ThuNhaps
                 .Include(t => t.DanhMuc)
                 .Where(t => t.NguoiDungId == nguoiDungId &&
-                            t.NgayNhap >= tuNgay && t.NgayNhap <= denNgay)
+                            ((t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue &&
+                              t.ThangThuNhap == thang && t.NamThuNhap == nam) ||
+                             (!t.ThangThuNhap.HasValue && !t.NamThuNhap.HasValue &&
+                              t.NgayNhap >= tuNgay && t.NgayNhap <= denNgay)))
                 .ToListAsync();
 
             // Lấy dữ liệu chi tiêu
@@ -89,7 +128,7 @@ namespace QuanLyCTCN.Controllers
                 }
             }
 
-            // Thống kê theo thời gian (ngày)
+            // Thống kê theo thời gian (ngày cho chi tiêu, tháng cho thu nhập)
             var thuNhapTheoNgay = thuNhaps
                 .GroupBy(t => t.NgayNhap.Date)
                 .Select(group => new ThongKeTheoThoiGianViewModel
@@ -123,6 +162,9 @@ namespace QuanLyCTCN.Controllers
                 ChiTieuTheoThoiGian = chiTieuTheoNgay
             };
 
+            ViewBag.Thang = thang ?? DateTime.Today.Month;
+            ViewBag.Nam = nam ?? DateTime.Today.Year;
+
             return View(viewModel);
         }
 
@@ -147,10 +189,13 @@ namespace QuanLyCTCN.Controllers
                 var firstDayOfMonth = new DateTime(nam.Value, thang, 1);
                 var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
-                // Tính tổng thu nhập trong tháng
+                // Tính tổng thu nhập trong tháng (sử dụng thang_thu_nhap và nam_thu_nhap nếu có)
                 var tongThuNhap = await _context.ThuNhaps
                     .Where(t => t.NguoiDungId == nguoiDungId &&
-                           t.NgayNhap >= firstDayOfMonth && t.NgayNhap <= lastDayOfMonth)
+                           ((t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue &&
+                             t.ThangThuNhap == thang && t.NamThuNhap == nam.Value) ||
+                            (!t.ThangThuNhap.HasValue && !t.NamThuNhap.HasValue &&
+                             t.NgayNhap >= firstDayOfMonth && t.NgayNhap <= lastDayOfMonth)))
                     .SumAsync(t => t.SoTien);
 
                 // Tính tổng chi tiêu trong tháng
@@ -214,11 +259,14 @@ namespace QuanLyCTCN.Controllers
             }
             else
             {
-                // Thống kê thu nhập theo danh mục
+                // Thống kê thu nhập theo danh mục (sử dụng thang_thu_nhap và nam_thu_nhap nếu có)
                 var thuNhaps = await _context.ThuNhaps
                     .Include(t => t.DanhMuc)
                     .Where(t => t.NguoiDungId == nguoiDungId &&
-                                t.NgayNhap >= tuNgay && t.NgayNhap <= denNgay)
+                                ((t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue &&
+                                  t.ThangThuNhap == tuNgay.Value.Month && t.NamThuNhap == tuNgay.Value.Year) ||
+                                 (!t.ThangThuNhap.HasValue && !t.NamThuNhap.HasValue &&
+                                  t.NgayNhap >= tuNgay && t.NgayNhap <= denNgay)))
                     .ToListAsync();
 
                 tongTien = thuNhaps.Sum(t => t.SoTien);
@@ -277,10 +325,13 @@ namespace QuanLyCTCN.Controllers
                 var firstDayOfMonth = new DateTime(currentDate.Year, currentDate.Month, 1);
                 var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
-                // Tính tổng thu nhập trong tháng
+                // Tính tổng thu nhập trong tháng (sử dụng thang_thu_nhap và nam_thu_nhap nếu có)
                 var tongThuNhap = await _context.ThuNhaps
                     .Where(t => t.NguoiDungId == nguoiDungId &&
-                           t.NgayNhap >= firstDayOfMonth && t.NgayNhap <= lastDayOfMonth)
+                           ((t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue &&
+                             t.ThangThuNhap == currentDate.Month && t.NamThuNhap == currentDate.Year) ||
+                            (!t.ThangThuNhap.HasValue && !t.NamThuNhap.HasValue &&
+                             t.NgayNhap >= firstDayOfMonth && t.NgayNhap <= lastDayOfMonth)))
                     .SumAsync(t => t.SoTien);
 
                 // Tính tổng chi tiêu trong tháng

@@ -12,6 +12,13 @@
 @section Scripts {
     <script src="~/js/thunhap.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        $(document).ready(function() {
+            // Format số tiền khi load
+            formatCurrencyInput($('#SoTien')[0]);
+        });
+    </script>
 }
 
 <div class="container-fluid py-4 thunhap-page">
@@ -59,14 +66,53 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="thunhap-form-group">
+                                    <label asp-for="ThangThuNhap" class="thunhap-form-label"></label>
+                                    <div class="thunhap-input-group">
+                                        <span class="thunhap-input-group-text">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </span>
+                                        <select asp-for="ThangThuNhap" class="thunhap-form-select grouped" required>
+                                            <option value="">-- Chọn tháng --</option>
+                                            @for (int i = 1; i <= 12; i++)
+                                            {
+                                                <option value="@i">@i</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="ThangThuNhap" class="thunhap-text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="thunhap-form-group">
+                                    <label asp-for="NamThuNhap" class="thunhap-form-label"></label>
+                                    <div class="thunhap-input-group">
+                                        <span class="thunhap-input-group-text">
+                                            <i class="fas fa-calendar-check"></i>
+                                        </span>
+                                        <select asp-for="NamThuNhap" class="thunhap-form-select grouped" required>
+                                            @for (int i = 2020; i <= 2030; i++)
+                                            {
+                                                <option value="@i">@i</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="NamThuNhap" class="thunhap-text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="thunhap-form-group">
                                     <label asp-for="SoTien" class="thunhap-form-label"></label>
                                     <div class="thunhap-input-group">
                                         <span class="thunhap-input-group-text">
                                             <i class="fas fa-money-bill-wave"></i>
                                         </span>
-                                        <input asp-for="SoTien" class="thunhap-form-control grouped" type="number" step="0.01" min="0" placeholder="0.00" required />
+                                        <input asp-for="SoTien" class="thunhap-form-control grouped" type="text" placeholder="0" required />
                                     </div>
                                     <span asp-validation-for="SoTien" class="thunhap-text-danger"></span>
+                                    <input type="hidden" id="SoTienHidden" name="SoTien" value="@Model.SoTien" />
                                 </div>
                             </div>
                             <div class="col-md-6">

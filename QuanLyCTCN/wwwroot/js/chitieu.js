@@ -43,6 +43,11 @@ function initializeFormValidation() {
             if (input.value) {
                 input.parentElement.classList.add('focused');
             }
+
+            // Format số tiền cho input SoTien
+            if (input.name === 'SoTien' || input.id === 'SoTien') {
+                formatCurrencyInput(input);
+            }
         });
 
         // Form submission enhancement
@@ -75,10 +80,7 @@ function validateInput(input) {
             }
             break;
         case 'date':
-            if (value && new Date(value) > new Date()) {
-                isValid = false;
-                message = 'Ngày không được lớn hơn ngày hiện tại';
-            }
+            // Loại bỏ validation ngày không được lớn hơn ngày hiện tại để cho phép chi tiêu dự kiến
             break;
         default:
             if (input.hasAttribute('required') && !value) {
@@ -518,6 +520,78 @@ function initializePrint() {
             window.print();
         });
     });
+}
+
+// Format currency input with thousand separators
+function formatCurrencyInput(input) {
+    let isFormatted = false;
+    let originalValue = input.value;
+
+    // Store original value for form submission
+    input.addEventListener('focus', function() {
+        if (isFormatted && this.value) {
+            // Remove formatting when focusing (allow raw number input)
+            const rawValue = this.value.replace(/\./g, '');
+            this.value = rawValue;
+            isFormatted = false;
+        }
+    });
+
+    input.addEventListener('blur', function() {
+        const currentValue = this.value.trim();
+        if (currentValue && !isFormatted) {
+            // Add formatting when blurring
+            const numericValue = parseFloat(currentValue.replace(/\./g, ''));
+            if (!isNaN(numericValue) && numericValue >= 0) {
+                this.value = formatNumber(numericValue);
+                isFormatted = true;
+                originalValue = currentValue;
+                
+                // Đồng bộ hóa với hidden input nếu có
+                const hiddenInput = document.getElementById('SoTienHidden');
+                if (hiddenInput) {
+                    hiddenInput.value = currentValue;
+                    // Disable input text để tránh conflict khi submit
+                    this.disabled = true;
+                }
+            } else if (currentValue !== '') {
+                // If invalid, restore original value
+                this.value = originalValue || '';
+            }
+        }
+    });
+
+    // For number inputs, don't interfere with input event
+    // Let the browser handle number validation
+    if (input.type !== 'number') {
+        input.addEventListener('input', function() {
+            // Allow only numbers during input (remove dots temporarily)
+            let cleanValue = this.value.replace(/[^\d]/g, '');
+
+            // Prevent leading zeros
+            if (cleanValue.length > 1 && cleanValue.startsWith('0')) {
+                cleanValue = cleanValue.substring(1);
+            }
+
+            this.value = cleanValue;
+            isFormatted = false;
+        });
+    }
+
+    // Initialize formatting if input has value
+    if (input.value) {
+        const numericValue = parseFloat(input.value.replace(/\./g, ''));
+        if (!isNaN(numericValue) && numericValue >= 0) {
+            input.value = formatNumber(numericValue);
+            isFormatted = true;
+            originalValue = input.value.replace(/\./g, '');
+        }
+    }
+}
+
+// Format number with Vietnamese thousand separators
+function formatNumber(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
 // Initialize print on load
