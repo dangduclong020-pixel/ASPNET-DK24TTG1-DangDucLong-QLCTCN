@@ -89,10 +89,10 @@ namespace QuanLyCTCN.Controllers
                 return RedirectToAction("DangNhap", "NguoiDung");
             }
 
-            // Lấy danh sách danh mục chi tiêu
+            // Lấy danh sách danh mục chi tiêu của người dùng hiện tại
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ChiTieu")
+                    .Where(d => d.Loai == "ChiTieu" && d.NguoiDungId == nguoiDungId)
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc");
 
@@ -136,7 +136,7 @@ namespace QuanLyCTCN.Controllers
             // Nếu không thành công, chuẩn bị dữ liệu cho view
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ChiTieu")
+                    .Where(d => d.Loai == "ChiTieu" && d.NguoiDungId == nguoiDungId)
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc", chiTieu.DanhMucId);
 
@@ -166,10 +166,10 @@ namespace QuanLyCTCN.Controllers
                 return NotFound();
             }
 
-            // Lấy danh sách danh mục chi tiêu
+            // Lấy danh sách danh mục chi tiêu của người dùng hiện tại
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ChiTieu")
+                    .Where(d => d.Loai == "ChiTieu" && d.NguoiDungId == nguoiDungId)
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc", chiTieu.DanhMucId);
 
@@ -193,6 +193,15 @@ namespace QuanLyCTCN.Controllers
                 return NotFound();
             }
 
+            // Kiểm tra quyền sở hữu chi tiêu
+            var existingChiTieu = await _context.ChiTieus
+                .FirstOrDefaultAsync(c => c.ChiTieuId == id && c.NguoiDungId == nguoiDungId);
+
+            if (existingChiTieu == null)
+            {
+                return NotFound();
+            }
+
             // Đảm bảo NguoiDungId được thiết lập
             chiTieu.NguoiDungId = nguoiDungId;
 
@@ -200,15 +209,22 @@ namespace QuanLyCTCN.Controllers
             {
                 try
                 {
-                    _context.Update(chiTieu);
+                    // Cập nhật các thuộc tính của entity hiện có
+                    existingChiTieu.SoTien = chiTieu.SoTien;
+                    existingChiTieu.NgayChi = chiTieu.NgayChi;
+                    existingChiTieu.DanhMucId = chiTieu.DanhMucId;
+                    existingChiTieu.GhiChu = chiTieu.GhiChu;
+                    // NguoiDungId đã được kiểm tra
+
+                    _context.Update(existingChiTieu);
                     await _context.SaveChangesAsync();
 
                     // Kiểm tra ngân sách và cập nhật nếu cần
-                    await KiemTraVaCapNhatNganSach(chiTieu);
+                    await KiemTraVaCapNhatNganSach(existingChiTieu);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ChiTieuExists(chiTieu.ChiTieuId))
+                    if (!ChiTieuExists(existingChiTieu.ChiTieuId))
                     {
                         return NotFound();
                     }
@@ -224,7 +240,7 @@ namespace QuanLyCTCN.Controllers
             // Nếu không thành công, chuẩn bị dữ liệu cho view
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ChiTieu")
+                    .Where(d => d.Loai == "ChiTieu" && d.NguoiDungId == nguoiDungId)
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc", chiTieu.DanhMucId);
 
@@ -273,11 +289,34 @@ namespace QuanLyCTCN.Controllers
             var chiTieu = await _context.ChiTieus
                 .FirstOrDefaultAsync(c => c.ChiTieuId == id && c.NguoiDungId == nguoiDungId);
 
-            if (chiTieu != null)
+            if (chiTieu == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy chi tiêu cần xóa hoặc bạn không có quyền xóa chi tiêu này.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 _context.ChiTieus.Remove(chiTieu);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Xóa chi tiêu thành công!";
+                var result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    TempData["SuccessMessage"] = "Xóa chi tiêu thành công!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể xóa chi tiêu. Vui lòng thử lại.";
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                TempData["ErrorMessage"] = "Chi tiêu đã được thay đổi hoặc xóa bởi người dùng khác. Vui lòng làm mới trang và thử lại.";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi xóa chi tiêu ID {id}: {ex.Message}");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa chi tiêu. Vui lòng thử lại.";
             }
 
             return RedirectToAction(nameof(Index));

@@ -5,51 +5,129 @@
     ViewData["Subtitle"] = Model.NoiDung;
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card border-danger">
-            <div class="card-header bg-danger text-white">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Xác nhận xóa nhắc nhở
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác. Nhắc nhở này sẽ bị xóa vĩnh viễn.
-                </div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/nhacnho.css" />
+}
 
-                <div class="row mb-3">
-                    <div class="col-sm-4"><strong>Nội dung:</strong></div>
-                    <div class="col-sm-8">@Model.NoiDung</div>
-                </div>
+@section Scripts {
+    <script src="~/js/nhacnho.js"></script>
+}
 
-                <div class="row mb-3">
-                    <div class="col-sm-4"><strong>Thời gian:</strong></div>
-                    <div class="col-sm-8">@Model.ThoiGian.ToString("dd/MM/yyyy HH:mm")</div>
-                </div>
+<div class="nhacnho-page">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8 col-xl-6">
+                <!-- Delete Confirmation Card -->
+                <div class="nhacnho-card nhacnho-card-danger">
+                    <div class="nhacnho-card-header nhacnho-card-header-danger">
+                        <h6><i class="fas fa-exclamation-triangle nhacnho-icon"></i> Xác nhận xóa nhắc nhở</h6>
+                    </div>
+                    <div class="card-body">
+                        <!-- Warning Alert -->
+                        <div class="nhacnho-alert nhacnho-alert-danger">
+                            <div class="nhacnho-alert-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="nhacnho-alert-content">
+                                <div class="nhacnho-alert-title">Cảnh báo</div>
+                                <div class="nhacnho-alert-text">
+                                    Hành động này không thể hoàn tác. Nhắc nhở này sẽ bị xóa vĩnh viễn khỏi hệ thống.
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="row mb-3">
-                    <div class="col-sm-4"><strong>Loại:</strong></div>
-                    <div class="col-sm-8">
-                        <span class="badge @(Model.Loai == "ChiTieu" ? "bg-primary" : Model.Loai == "ThuNhap" ? "bg-success" : Model.Loai == "NganSach" ? "bg-warning" : "bg-info")">
-                            @(Model.Loai == "ChiTieu" ? "Chi tiêu" : Model.Loai == "ThuNhap" ? "Thu nhập" : Model.Loai == "NganSach" ? "Ngân sách" : Model.Loai == "MucTieu" ? "Mục tiêu" : Model.Loai)
-                        </span>
+                        <!-- Reminder Details -->
+                        <div class="nhacnho-delete-details">
+                            <div class="nhacnho-detail-item">
+                                <div class="nhacnho-detail-icon">
+                                    <i class="fas fa-comment"></i>
+                                </div>
+                                <div class="nhacnho-detail-content">
+                                    <div class="nhacnho-detail-value">@Model.NoiDung</div>
+                                    <div class="nhacnho-detail-label">Nội dung nhắc nhở</div>
+                                </div>
+                            </div>
+
+                            <div class="nhacnho-detail-item">
+                                <div class="nhacnho-detail-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="nhacnho-detail-content">
+                                    <div class="nhacnho-detail-value">@Model.ThoiGian.ToString("dd/MM/yyyy HH:mm")</div>
+                                    <div class="nhacnho-detail-label">Thời gian nhắc nhở</div>
+                                </div>
+                            </div>
+
+                            <div class="nhacnho-detail-item">
+                                <div class="nhacnho-detail-icon">
+                                    <i class="fas fa-tag"></i>
+                                </div>
+                                <div class="nhacnho-detail-content">
+                                    @{
+                                        var badgeClass = "";
+                                        switch (Model.Loai)
+                                        {
+                                            case "ChiTieu":
+                                                badgeClass = "nhacnho-badge-expense";
+                                                break;
+                                            case "ThuNhap":
+                                                badgeClass = "nhacnho-badge-income";
+                                                break;
+                                            case "NganSach":
+                                                badgeClass = "nhacnho-badge-budget";
+                                                break;
+                                            case "MucTieu":
+                                                badgeClass = "nhacnho-badge-goal";
+                                                break;
+                                            default:
+                                                badgeClass = "nhacnho-badge-other";
+                                                break;
+                                        }
+                                    }
+                                    <div class="nhacnho-detail-value">
+                                        <span class="nhacnho-badge @badgeClass">
+                                            @if (Model.Loai == "ChiTieu")
+                                            {
+                                                <text><i class="fas fa-minus-circle"></i> Chi tiêu</text>
+                                            }
+                                            else if (Model.Loai == "ThuNhap")
+                                            {
+                                                <text><i class="fas fa-plus-circle"></i> Thu nhập</text>
+                                            }
+                                            else if (Model.Loai == "NganSach")
+                                            {
+                                                <text><i class="fas fa-piggy-bank"></i> Ngân sách</text>
+                                            }
+                                            else if (Model.Loai == "MucTieu")
+                                            {
+                                                <text><i class="fas fa-bullseye"></i> Mục tiêu</text>
+                                            }
+                                            else
+                                            {
+                                                <text><i class="fas fa-question-circle"></i> @Model.Loai</text>
+                                            }
+                                        </span>
+                                    </div>
+                                    <div class="nhacnho-detail-label">Loại nhắc nhở</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Form -->
+                        <form asp-action="Delete" method="post" class="nhacnho-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="NhacNhoId" />
+                            <div class="nhacnho-form-actions">
+                                <a href="@Url.Action("Details", new { id = Model.NhacNhoId })" class="nhacnho-btn nhacnho-btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại chi tiết
+                                </a>
+                                <button type="submit" class="nhacnho-btn nhacnho-btn-danger">
+                                    <i class="fas fa-trash"></i> Xóa nhắc nhở
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
-                <form asp-action="Delete" method="post">
-                    <input type="hidden" asp-for="NhacNhoId" />
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="@Url.Action("Details", new { id = Model.NhacNhoId })" class="btn btn-outline-secondary me-md-2">
-                            <i class="fas fa-arrow-left"></i> Quay lại
-                        </a>
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Xóa nhắc nhở
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

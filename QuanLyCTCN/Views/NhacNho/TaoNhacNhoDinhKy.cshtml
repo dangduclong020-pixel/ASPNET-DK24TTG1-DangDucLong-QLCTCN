@@ -5,127 +5,12 @@
     ViewData["Subtitle"] = "Thiết lập thông báo lặp lại tự động";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-10 col-lg-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-calendar-plus text-primary me-2"></i>
-                    Tạo nhắc nhở định kỳ
-                </h5>
-            </div>
-            <div class="card-body">
-                <form asp-action="TaoNhacNhoDinhKy" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="mb-3">
-                                <label asp-for="NoiDung" class="form-label"></label>
-                                <textarea asp-for="NoiDung" class="form-control" rows="3" placeholder="Ví dụ: Nhớ ghi chép chi tiêu hàng ngày..."></textarea>
-                                <span asp-validation-for="NoiDung" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label asp-for="Loai" class="form-label"></label>
-                                <select asp-for="Loai" class="form-control">
-                                    <option value="ChiTieu">Chi tiêu</option>
-                                    <option value="ThuNhap">Thu nhập</option>
-                                    <option value="NganSach">Ngân sách</option>
-                                    <option value="MucTieu">Mục tiêu</option>
-                                    <option value="Khac">Khác</option>
-                                </select>
-                                <span asp-validation-for="Loai" class="text-danger"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label asp-for="ThoiGian" class="form-label"></label>
-                                <input asp-for="ThoiGian" class="form-control" type="datetime-local" />
-                                <div class="form-text">Thời gian bắt đầu lặp lại</div>
-                                <span asp-validation-for="ThoiGian" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="loaiLap" class="form-label">Loại lặp lại</label>
-                                <select name="loaiLap" id="loaiLap" class="form-control">
-                                    <option value="none">Không lặp lại</option>
-                                    <option value="daily">Hàng ngày</option>
-                                    <option value="weekly">Hàng tuần</option>
-                                    <option value="monthly">Hàng tháng</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3" id="soNgayContainer" style="display: none;">
-                        <label for="soNgayLap" class="form-label">Số ngày/ tuần/ tháng lặp lại</label>
-                        <input type="number" name="soNgayLap" id="soNgayLap" class="form-control" min="1" max="30" value="1" />
-                        <div class="form-text">
-                            Ví dụ: Chọn 7 với "Hàng ngày" = lặp lại mỗi 7 ngày<br>
-                            Chọn 2 với "Hàng tuần" = lặp lại mỗi 2 tuần
-                        </div>
-                    </div>
-
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Thông tin:</strong> Hệ thống sẽ tự động tạo các nhắc nhở lặp lại dựa trên cài đặt của bạn.
-                        Bạn có thể chỉnh sửa hoặc xóa từng nhắc nhở riêng lẻ sau khi tạo.
-                    </div>
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary me-md-2">
-                            <i class="fas fa-arrow-left"></i> Quay lại
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-calendar-plus"></i> Tạo nhắc nhở định kỳ
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title text-primary">
-                            <i class="fas fa-clock me-2"></i>
-                            Ví dụ nhắc nhở hàng ngày
-                        </h6>
-                        <ul class="small mb-0">
-                            <li>"Nhớ ghi chép chi tiêu hôm nay"</li>
-                            <li>"Kiểm tra ngân sách tháng này"</li>
-                            <li>"Cập nhật tiến độ mục tiêu"</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title text-success">
-                            <i class="fas fa-calendar-alt me-2"></i>
-                            Ví dụ nhắc nhở định kỳ
-                        </h6>
-                        <ul class="small mb-0">
-                            <li>"Thanh toán tiền điện hàng tháng"</li>
-                            <li>"Gửi báo cáo thu chi cho gia đình"</li>
-                            <li>"Đánh giá tiết kiệm cuối tháng"</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/nhacnho.css" />
+}
 
 @section Scripts {
+    <script src="~/js/nhacnho.js"></script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
@@ -158,3 +43,193 @@
         });
     </script>
 }
+
+<div class="nhacnho-page">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-8">
+                <!-- Main Form Card -->
+                <div class="nhacnho-card">
+                    <div class="nhacnho-card-header">
+                        <h6><i class="fas fa-calendar-plus nhacnho-icon"></i> Tạo nhắc nhở định kỳ</h6>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="TaoNhacNhoDinhKy" method="post" class="nhacnho-form">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <!-- Content and Type Row -->
+                            <div class="row">
+                                <div class="col-md-8" style="flex:1 0 auto;">
+                                    <div class="nhacnho-form-group">
+                                        <label asp-for="NoiDung" class="nhacnho-form-label">
+                                            <i class="fas fa-comment nhacnho-icon"></i> Nội dung nhắc nhở
+                                        </label>
+                                        <div class="nhacnho-input-group">
+                                            <textarea asp-for="NoiDung" class="nhacnho-form-control" rows="4"
+                                                      placeholder="Ví dụ: Nhớ ghi chép chi tiêu hàng ngày, kiểm tra ngân sách tháng này..."
+                                                      data-tooltip="Mô tả nội dung cần nhắc nhở định kỳ"></textarea>
+                                        </div>
+                                        <span asp-validation-for="NoiDung" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="flex:1 0 auto;">
+                                    <div class="nhacnho-form-group">
+                                        <label asp-for="Loai" class="nhacnho-form-label">
+                                            <i class="fas fa-tag nhacnho-icon"></i> Loại nhắc nhở
+                                        </label>
+                                        <div class="nhacnho-input-group">
+                                            <select asp-for="Loai" class="nhacnho-form-control" data-tooltip="Chọn loại hoạt động cần nhắc nhở định kỳ">
+                                                <option value="ChiTieu">
+                                                    <i class="fas fa-minus-circle"></i> Chi tiêu
+                                                </option>
+                                                <option value="ThuNhap">
+                                                    <i class="fas fa-plus-circle"></i> Thu nhập
+                                                </option>
+                                                <option value="NganSach">
+                                                    <i class="fas fa-piggy-bank"></i> Ngân sách
+                                                </option>
+                                                <option value="MucTieu">
+                                                    <i class="fas fa-bullseye"></i> Mục tiêu
+                                                </option>
+                                                <option value="Khac">
+                                                    <i class="fas fa-question-circle"></i> Khác
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <span asp-validation-for="Loai" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- DateTime and Recurrence Row -->
+                            <div class="row">
+                                <div class="col-md-6" style="flex:1 0 auto;">
+                                    <div class="nhacnho-form-group">
+                                        <label asp-for="ThoiGian" class="nhacnho-form-label">
+                                            <i class="fas fa-calendar-alt nhacnho-icon"></i> Thời gian bắt đầu
+                                        </label>
+                                        <div class="nhacnho-input-group">
+                                            <input asp-for="ThoiGian" class="nhacnho-form-control" type="datetime-local"
+                                                   data-tooltip="Chọn thời gian bắt đầu lặp lại nhắc nhở" />
+                                            
+                                        </div>
+                                        <div class="nhacnho-form-text">
+                                            <i class="fas fa-info-circle"></i> Thời gian bắt đầu lặp lại
+                                        </div>
+                                        <span asp-validation-for="ThoiGian" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="flex:1 0 auto;">
+                                    <div class="nhacnho-form-group">
+                                        <label for="loaiLap" class="nhacnho-form-label">
+                                            <i class="fas fa-repeat nhacnho-icon"></i> Loại lặp lại
+                                        </label>
+                                        <div class="nhacnho-input-group">
+                                            <select name="loaiLap" id="loaiLap" class="nhacnho-form-control" data-tooltip="Chọn tần suất lặp lại">
+                                                <option value="none">
+                                                    <i class="fas fa-ban"></i> Không lặp lại
+                                                </option>
+                                                <option value="daily">
+                                                    <i class="fas fa-calendar-day"></i> Hàng ngày
+                                                </option>
+                                                <option value="weekly">
+                                                    <i class="fas fa-calendar-week"></i> Hàng tuần
+                                                </option>
+                                                <option value="monthly">
+                                                    <i class="fas fa-calendar-alt"></i> Hàng tháng
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recurrence Interval -->
+                            <div class="nhacnho-form-group" id="soNgayContainer" style="display: none;">
+                                <label for="soNgayLap" class="nhacnho-form-label">
+                                    <i class="fas fa-hashtag nhacnho-icon"></i> Khoảng thời gian lặp lại
+                                </label>
+                                <div class="nhacnho-input-group">
+                                    <input type="number" name="soNgayLap" id="soNgayLap" class="nhacnho-form-control"
+                                           min="1" max="30" value="1" data-tooltip="Số ngày/tuần/tháng giữa các lần nhắc nhở" />
+                                    <div class="nhacnho-input-icon">
+                                        <i class="fas fa-calculator"></i>
+                                    </div>
+                                </div>
+                                <div class="nhacnho-form-text">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span id="recurrenceExample">
+                                        Ví dụ: Chọn 7 với "Hàng ngày" = lặp lại mỗi 7 ngày<br>
+                                        Chọn 2 với "Hàng tuần" = lặp lại mỗi 2 tuần
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Info Alert -->
+                            <div class="nhacnho-alert nhacnho-alert-info">
+                                <div class="nhacnho-alert-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div class="nhacnho-alert-content">
+                                    <div class="nhacnho-alert-title">Thông tin</div>
+                                    <div class="nhacnho-alert-text">
+                                        Hệ thống sẽ tự động tạo các nhắc nhở lặp lại dựa trên cài đặt của bạn.
+                                        Bạn có thể chỉnh sửa hoặc xóa từng nhắc nhở riêng lẻ sau khi tạo.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="nhacnho-form-actions">
+                                <div>
+                                    <a href="@Url.Action("Index")" class="nhacnho-btn nhacnho-btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="submit" class="nhacnho-btn nhacnho-btn-primary">
+                                        <i class="fas fa-calendar-plus"></i> Tạo nhắc nhở định kỳ
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Example Cards -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="nhacnho-card">
+                            <div class="nhacnho-card-header">
+                                <h6><i class="fas fa-clock nhacnho-icon text-info"></i> Ví dụ nhắc nhở hàng ngày</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="nhacnho-list">
+                                    <li><i class="fas fa-check-circle text-success"></i> Nhớ ghi chép chi tiêu hôm nay</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Kiểm tra ngân sách tháng này</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Cập nhật tiến độ mục tiêu</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Sao lưu dữ liệu tài chính</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="nhacnho-card">
+                            <div class="nhacnho-card-header">
+                                <h6><i class="fas fa-calendar-alt nhacnho-icon text-success"></i> Ví dụ nhắc nhở định kỳ</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="nhacnho-list">
+                                    <li><i class="fas fa-check-circle text-success"></i> Thanh toán tiền điện hàng tháng</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Gửi báo cáo thu chi cho gia đình</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Đánh giá tiết kiệm cuối tháng</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Lên kế hoạch tài chính quý</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

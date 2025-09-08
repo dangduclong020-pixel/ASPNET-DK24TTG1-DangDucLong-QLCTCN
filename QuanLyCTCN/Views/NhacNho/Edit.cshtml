@@ -5,88 +5,202 @@
     ViewData["Subtitle"] = Model.NoiDung;
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-edit text-primary me-2"></i>
-                    Chỉnh sửa nhắc nhở
-                </h5>
-            </div>
-            <div class="card-body">
-                <form asp-action="Edit" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <input type="hidden" asp-for="NhacNhoId" />
-                    <input type="hidden" asp-for="NguoiDungId" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/nhacnho.css" />
+}
 
-                    <div class="mb-3">
-                        <label asp-for="NoiDung" class="form-label"></label>
-                        <textarea asp-for="NoiDung" class="form-control" rows="3"></textarea>
-                        <span asp-validation-for="NoiDung" class="text-danger"></span>
-                    </div>
+@section Scripts {
+    <script src="~/js/nhacnho.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
 
-                    <div class="mb-3">
-                        <label asp-for="ThoiGian" class="form-label"></label>
-                        <input asp-for="ThoiGian" class="form-control" type="datetime-local" />
-                        <div class="form-text">Thời gian nhận thông báo</div>
-                        <span asp-validation-for="ThoiGian" class="text-danger"></span>
+<div class="nhacnho-page">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8 col-xl-6">
+                <!-- Main Form Card -->
+                <div class="nhacnho-card">
+                    <div class="nhacnho-card-header">
+                        <h6><i class="fas fa-edit nhacnho-icon"></i> Chỉnh sửa nhắc nhở</h6>
                     </div>
+                    <div class="card-body">
+                        <form asp-action="Edit" method="post" class="nhacnho-form">
+                            @Html.AntiForgeryToken()
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="hidden" asp-for="NhacNhoId" />
+                            <input type="hidden" asp-for="NguoiDungId" />
 
-                    <div class="mb-3">
-                        <label asp-for="Loai" class="form-label"></label>
-                        <select asp-for="Loai" class="form-control">
-                            <option value="ChiTieu">Chi tiêu</option>
-                            <option value="ThuNhap">Thu nhập</option>
-                            <option value="NganSach">Ngân sách</option>
-                            <option value="MucTieu">Mục tiêu</option>
-                            <option value="Khac">Khác</option>
-                        </select>
-                        <span asp-validation-for="Loai" class="text-danger"></span>
-                    </div>
+                            <!-- Content Input -->
+                            <div class="nhacnho-form-group">
+                                <label asp-for="NoiDung" class="nhacnho-form-label">
+                                    <i class="fas fa-comment nhacnho-icon"></i> Nội dung nhắc nhở
+                                </label>
+                                <div class="nhacnho-input-group">
+                                    <textarea asp-for="NoiDung" class="nhacnho-form-control" rows="4"
+                                              data-tooltip="Cập nhật nội dung nhắc nhở"></textarea>
+                                 
+                                </div>
+                                <span asp-validation-for="NoiDung" class="text-danger"></span>
+                            </div>
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="@Url.Action("Details", new { id = Model.NhacNhoId })" class="btn btn-outline-secondary me-md-2">
-                            <i class="fas fa-arrow-left"></i> Quay lại
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Lưu thay đổi
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                            <!-- DateTime Input -->
+                            <div class="nhacnho-form-group">
+                                <label asp-for="ThoiGian" class="nhacnho-form-label">
+                                    <i class="fas fa-calendar-alt nhacnho-icon"></i> Thời gian nhắc nhở
+                                </label>
+                                <div class="nhacnho-input-group">
+                                    <input asp-for="ThoiGian" class="nhacnho-form-control" type="datetime-local"
+                                           data-tooltip="Cập nhật thời gian nhận thông báo" />
+                                    <div class="nhacnho-input-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                </div>
+                                <div class="nhacnho-form-text">
+                                    <i class="fas fa-info-circle"></i> Thời gian nhận thông báo nhắc nhở
+                                </div>
+                                <span asp-validation-for="ThoiGian" class="text-danger"></span>
+                            </div>
 
-        <div class="card mt-4">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>Trạng thái hiện tại</h6>
-                        @{
-                            var timeDiff = Model.ThoiGian - DateTime.Now;
-                            var statusText = "";
-                            if (timeDiff.TotalMinutes < 0)
-                            {
-                                statusText = "Đã quá hạn";
-                            }
-                            else if (timeDiff.TotalHours <= 1)
-                            {
-                                statusText = "Sắp đến hạn";
-                            }
-                            else
-                            {
-                                statusText = "Chưa đến hạn";
-                            }
-                        }
-                        <div class="h6 mb-0">@statusText</div>
-                        <small class="text-muted">@Model.ThoiGian.ToString("dd/MM/yyyy HH:mm")</small>
+                            <!-- Type Selection -->
+                            <div class="nhacnho-form-group">
+                                <label asp-for="Loai" class="nhacnho-form-label">
+                                    <i class="fas fa-tag nhacnho-icon"></i> Loại nhắc nhở
+                                </label>
+                                <div class="nhacnho-input-group">
+                                    <select asp-for="Loai" class="nhacnho-form-control" data-tooltip="Cập nhật loại hoạt động cần nhắc nhở">
+                                        <option value="ChiTieu">
+                                            <i class="fas fa-minus-circle"></i> Chi tiêu
+                                        </option>
+                                        <option value="ThuNhap">
+                                            <i class="fas fa-plus-circle"></i> Thu nhập
+                                        </option>
+                                        <option value="NganSach">
+                                            <i class="fas fa-piggy-bank"></i> Ngân sách
+                                        </option>
+                                        <option value="MucTieu">
+                                            <i class="fas fa-bullseye"></i> Mục tiêu
+                                        </option>
+                                        <option value="Khac">
+                                            <i class="fas fa-question-circle"></i> Khác
+                                        </option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Loai" class="text-danger"></span>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="nhacnho-form-actions">
+                                <div>
+                                    <a href="@Url.Action("Index")" class="nhacnho-btn nhacnho-btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="submit" class="nhacnho-btn nhacnho-btn-primary">
+                                        <i class="fas fa-save"></i> Lưu thay đổi
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <div class="col-md-6">
-                        <h6>Loại nhắc nhở</h6>
-                        <div class="h6 mb-0">
-                            <span class="badge @(Model.Loai == "ChiTieu" ? "bg-primary" : Model.Loai == "ThuNhap" ? "bg-success" : Model.Loai == "NganSach" ? "bg-warning" : "bg-info")">
-                                @(Model.Loai == "ChiTieu" ? "Chi tiêu" : Model.Loai == "ThuNhap" ? "Thu nhập" : Model.Loai == "NganSach" ? "Ngân sách" : Model.Loai == "MucTieu" ? "Mục tiêu" : Model.Loai)
-                            </span>
+                </div>
+
+                <!-- Status Info Card -->
+                <div class="nhacnho-card mt-4">
+                    <div class="nhacnho-card-header">
+                        <h6><i class="fas fa-info-circle nhacnho-icon text-info"></i> Thông tin hiện tại</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="nhacnho-info-item">
+                                  
+                                    @{
+                                        var timeDiff = Model.ThoiGian - DateTime.Now;
+                                        var statusClass = "";
+                                        var statusText = "";
+                                        var statusIcon = "";
+                                        if (timeDiff.TotalMinutes < 0)
+                                        {
+                                            statusClass = "nhacnho-status-overdue";
+                                            statusText = "Đã quá hạn";
+                                            statusIcon = "fas fa-exclamation-triangle";
+                                        }
+                                        else if (timeDiff.TotalHours <= 1)
+                                        {
+                                            statusClass = "nhacnho-status-soon";
+                                            statusText = "Sắp đến hạn";
+                                            statusIcon = "fas fa-clock";
+                                        }
+                                        else
+                                        {
+                                            statusClass = "nhacnho-status-upcoming";
+                                            statusText = "Chưa đến hạn";
+                                            statusIcon = "fas fa-calendar-check";
+                                        }
+                                    }
+                                    <div class="nhacnho-info-value">
+                                        <span class="nhacnho-status-badge @statusClass">
+                                            <i class="@statusIcon"></i> @statusText
+                                        </span>
+                                    </div>
+                                    <div class="nhacnho-info-detail">@Model.ThoiGian.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="nhacnho-info-item">
+                                    <div class="nhacnho-info-label">
+                                        <i class="fas fa-tag nhacnho-icon"></i> Loại nhắc nhở
+                                    </div>
+                                    @{
+                                        var badgeClass = "";
+                                        switch (Model.Loai)
+                                        {
+                                            case "ChiTieu":
+                                                badgeClass = "nhacnho-badge-expense";
+                                                break;
+                                            case "ThuNhap":
+                                                badgeClass = "nhacnho-badge-income";
+                                                break;
+                                            case "NganSach":
+                                                badgeClass = "nhacnho-badge-budget";
+                                                break;
+                                            case "MucTieu":
+                                                badgeClass = "nhacnho-badge-goal";
+                                                break;
+                                            default:
+                                                badgeClass = "nhacnho-badge-other";
+                                                break;
+                                        }
+                                    }
+                                    <div class="nhacnho-info-value">
+                                        <span class="nhacnho-badge @badgeClass">
+                                            @if (Model.Loai == "ChiTieu")
+                                            {
+                                                <text><i class="fas fa-minus-circle"></i> Chi tiêu</text>
+                                            }
+                                            else if (Model.Loai == "ThuNhap")
+                                            {
+                                                <text><i class="fas fa-plus-circle"></i> Thu nhập</text>
+                                            }
+                                            else if (Model.Loai == "NganSach")
+                                            {
+                                                <text><i class="fas fa-piggy-bank"></i> Ngân sách</text>
+                                            }
+                                            else if (Model.Loai == "MucTieu")
+                                            {
+                                                <text><i class="fas fa-bullseye"></i> Mục tiêu</text>
+                                            }
+                                            else
+                                            {
+                                                <text><i class="fas fa-question-circle"></i> @Model.Loai</text>
+                                            }
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -94,9 +208,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

@@ -5,87 +5,135 @@
     ViewData["Subtitle"] = "Thiết lập thông báo và cảnh báo";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-plus-circle text-primary me-2"></i>
-                    Tạo nhắc nhở mới
-                </h5>
-            </div>
-            <div class="card-body">
-                <form asp-action="Create" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/nhacnho.css" />
+}
 
-                    <div class="mb-3">
-                        <label asp-for="NoiDung" class="form-label"></label>
-                        <textarea asp-for="NoiDung" class="form-control" rows="3" placeholder="Ví dụ: Nhớ ghi chép chi tiêu hàng ngày..."></textarea>
-                        <span asp-validation-for="NoiDung" class="text-danger"></span>
+@section Scripts {
+    <script src="~/js/nhacnho.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<div class="nhacnho-page">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8 col-xl-6">
+                <!-- Main Form Card -->
+                <div class="nhacnho-card">
+                    <div class="nhacnho-card-header">
+                        <h6><i class="fas fa-plus-circle nhacnho-icon"></i> Tạo nhắc nhở mới</h6>
                     </div>
+                    <div class="card-body">
+                        <form asp-action="Create" method="post" class="nhacnho-form">
+                            @Html.AntiForgeryToken()
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                    <div class="mb-3">
-                        <label asp-for="ThoiGian" class="form-label"></label>
-                        <input asp-for="ThoiGian" class="form-control" type="datetime-local" />
-                        <div class="form-text">Chọn thời gian để nhận thông báo</div>
-                        <span asp-validation-for="ThoiGian" class="text-danger"></span>
+                            <!-- Content Input -->
+                            <div class="nhacnho-form-group">
+                                <label asp-for="NoiDung" class="nhacnho-form-label">
+                                    <i class="fas fa-comment nhacnho-icon"></i> Nội dung nhắc nhở
+                                </label>
+                                <div class="nhacnho-input-group">
+                                    <textarea asp-for="NoiDung" class="nhacnho-form-control" rows="4"
+                                              placeholder="Ví dụ: Nhớ ghi chép chi tiêu hàng ngày, kiểm tra ngân sách tháng này..."
+                                              data-tooltip="Mô tả chi tiết nội dung cần nhắc nhở"></textarea>
+                                    
+                                </div>
+                                <span asp-validation-for="NoiDung" class="text-danger"></span>
+                            </div>
+
+                            <!-- DateTime Input -->
+                            <div class="nhacnho-form-group">
+                                <label asp-for="ThoiGian" class="nhacnho-form-label">
+                                    <i class="fas fa-calendar-alt nhacnho-icon"></i> Thời gian nhắc nhở
+                                </label>
+                                <div class="nhacnho-input-group">
+                                    <input asp-for="ThoiGian" class="nhacnho-form-control" type="datetime-local"
+                                           data-tooltip="Chọn thời gian chính xác để nhận thông báo" />
+                                    
+                                </div>
+                                <div class="nhacnho-form-text">
+                                    <i class="fas fa-info-circle"></i> Chọn thời gian để nhận thông báo nhắc nhở
+                                </div>
+                                <span asp-validation-for="ThoiGian" class="text-danger"></span>
+                            </div>
+
+                            <!-- Type Selection -->
+                            <div class="nhacnho-form-group">
+                                <label asp-for="Loai" class="nhacnho-form-label">
+                                    <i class="fas fa-tag nhacnho-icon"></i> Loại nhắc nhở
+                                </label>
+                                <div class="nhacnho-input-group">
+                                    <select asp-for="Loai" class="nhacnho-form-control" data-tooltip="Chọn loại hoạt động cần nhắc nhở">
+                                        <option value="ChiTieu">
+                                            <i class="fas fa-minus-circle"></i> Chi tiêu
+                                        </option>
+                                        <option value="ThuNhap">
+                                            <i class="fas fa-plus-circle"></i> Thu nhập
+                                        </option>
+                                        <option value="NganSach">
+                                            <i class="fas fa-piggy-bank"></i> Ngân sách
+                                        </option>
+                                        <option value="MucTieu">
+                                            <i class="fas fa-bullseye"></i> Mục tiêu
+                                        </option>
+                                        <option value="Khac">
+                                            <i class="fas fa-question-circle"></i> Khác
+                                        </option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="Loai" class="text-danger"></span>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="nhacnho-form-actions">
+                                <a href="@Url.Action("Index")" class="nhacnho-btn nhacnho-btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                                </a>
+                                <button type="submit" class="nhacnho-btn nhacnho-btn-primary">
+                                    <i class="fas fa-save"></i> Tạo nhắc nhở
+                                </button>
+                            </div>
+                        </form>
                     </div>
+                </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Loai" class="form-label"></label>
-                        <select asp-for="Loai" class="form-control">
-                            <option value="ChiTieu">Chi tiêu</option>
-                            <option value="ThuNhap">Thu nhập</option>
-                            <option value="NganSach">Ngân sách</option>
-                            <option value="MucTieu">Mục tiêu</option>
-                            <option value="Khac">Khác</option>
-                        </select>
-                        <span asp-validation-for="Loai" class="text-danger"></span>
-                    </div>
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary me-md-2">
-                            <i class="fas fa-arrow-left"></i> Quay lại
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Tạo nhắc nhở
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="card mt-4">
-            <div class="card-body">
-                <h6 class="card-title">
-                    <i class="fas fa-lightbulb text-warning me-2"></i>
-                    Các loại nhắc nhở thông dụng
-                </h6>
-                <div class="row">
+                <!-- Info Cards -->
+                <div class="row mt-4">
                     <div class="col-md-6">
-                        <h6 class="text-primary">Nhắc nhở hàng ngày</h6>
-                        <ul class="small mb-3">
-                            <li>Ghi chép chi tiêu</li>
-                            <li>Kiểm tra ngân sách</li>
-                            <li>Cập nhật mục tiêu</li>
-                        </ul>
+                        <div class="nhacnho-card">
+                            <div class="nhacnho-card-header">
+                                <h6><i class="fas fa-lightbulb nhacnho-icon text-warning"></i> Nhắc nhở hàng ngày</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="nhacnho-list">
+                                    <li><i class="fas fa-check-circle text-success"></i> Ghi chép chi tiêu</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Kiểm tra ngân sách</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Cập nhật mục tiêu</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Sao lưu dữ liệu</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <h6 class="text-success">Nhắc nhở định kỳ</h6>
-                        <ul class="small mb-3">
-                            <li>Thanh toán hóa đơn</li>
-                            <li>Gửi báo cáo thu chi</li>
-                            <li>Đánh giá tiến độ</li>
-                        </ul>
+                        <div class="nhacnho-card">
+                            <div class="nhacnho-card-header">
+                                <h6><i class="fas fa-calendar-check nhacnho-icon text-info"></i> Nhắc nhở định kỳ</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="nhacnho-list">
+                                    <li><i class="fas fa-check-circle text-success"></i> Thanh toán hóa đơn</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Gửi báo cáo thu chi</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Đánh giá tiến độ</li>
+                                    <li><i class="fas fa-check-circle text-success"></i> Lên kế hoạch tiết kiệm</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

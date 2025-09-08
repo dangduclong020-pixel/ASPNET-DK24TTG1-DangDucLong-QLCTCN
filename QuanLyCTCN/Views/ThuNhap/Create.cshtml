@@ -5,56 +5,97 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid py-4">
+@section Styles {
+    <link rel="stylesheet" href="~/css/thunhap.css" />
+}
+
+@section Scripts {
+    <script src="~/js/thunhap.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<div class="container-fluid py-4 thunhap-page">
     <div class="row">
         <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Thêm thu nhập mới</h6>
+            <div class="thunhap-card">
+                <div class="thunhap-card-header">
+                    <h6><i class="fas fa-plus-circle thunhap-icon"></i> Thêm thu nhập mới</h6>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        
+                    <form asp-action="Create" method="post" class="thunhap-form">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="thunhap-text-danger thunhap-mb-3"></div>
+
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="NgayNhap" class="form-control-label"></label>
-                                    <input asp-for="NgayNhap" class="form-control" type="date" />
-                                    <span asp-validation-for="NgayNhap" class="text-danger"></span>
+                                <div class="thunhap-form-group">
+                                    <label asp-for="NgayNhap" class="thunhap-form-label"></label>
+                                    <div class="thunhap-input-group">
+                                        <span class="thunhap-input-group-text">
+                                            <i class="fas fa-calendar"></i>
+                                        </span>
+                                        <input asp-for="NgayNhap" class="thunhap-form-control grouped" type="date" required />
+                                    </div>
+                                    <span asp-validation-for="NgayNhap" class="thunhap-text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="DanhMucId" class="form-control-label"></label>
-                                    <select asp-for="DanhMucId" class="form-control" asp-items="ViewBag.DanhMucList">
-                                        <option value="">-- Chọn danh mục --</option>
-                                    </select>
-                                    <span asp-validation-for="DanhMucId" class="text-danger"></span>
+                                <div class="thunhap-form-group">
+                                    <label asp-for="DanhMucId" class="thunhap-form-label"></label>
+                                    <div class="thunhap-input-group">
+                                        <span class="thunhap-input-group-text">
+                                            <i class="fas fa-tag"></i>
+                                        </span>
+                                        <select asp-for="DanhMucId" class="thunhap-form-select grouped" asp-items="ViewBag.DanhMucList" required>
+                                            <option value="">-- Chọn danh mục --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="DanhMucId" class="thunhap-text-danger"></span>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="SoTien" class="form-control-label"></label>
-                                    <input asp-for="SoTien" class="form-control" type="number" step="0.01" min="0" />
-                                    <span asp-validation-for="SoTien" class="text-danger"></span>
+                                <div class="thunhap-form-group">
+                                    <label asp-for="SoTien" class="thunhap-form-label"></label>
+                                    <div class="thunhap-input-group">
+                                        <span class="thunhap-input-group-text">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                        </span>
+                                        <input asp-for="SoTien" class="thunhap-form-control grouped" type="number" step="0.01" min="0" placeholder="0.00" required />
+                                    </div>
+                                    <span asp-validation-for="SoTien" class="thunhap-text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="GhiChu" class="form-control-label"></label>
-                                    <input asp-for="GhiChu" class="form-control" />
-                                    <span asp-validation-for="GhiChu" class="text-danger"></span>
+                                <div class="thunhap-form-group">
+                                    <label asp-for="GhiChu" class="thunhap-form-label"></label>
+                                    <div class="thunhap-input-group">
+                                        <span class="thunhap-input-group-text">
+                                            <i class="fas fa-comment"></i>
+                                        </span>
+                                        <input asp-for="GhiChu" class="thunhap-form-control grouped" placeholder="Nhập ghi chú (tùy chọn)" />
+                                    </div>
+                                    <span asp-validation-for="GhiChu" class="thunhap-text-danger"></span>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <input type="submit" value="Thêm mới" class="btn btn-primary" />
-                            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+
+                        <div class="thunhap-form-group thunhap-mt-3">
+                            <div class="thunhap-d-flex thunhap-gap-3 thunhap-justify-content-between">
+                                <div>
+                                    <button type="submit" class="thunhap-btn thunhap-btn-primary">
+                                        <i class="fas fa-save thunhap-icon"></i> Thêm mới
+                                    </button>
+                                    <button type="reset" class="thunhap-btn thunhap-btn-secondary">
+                                        <i class="fas fa-undo thunhap-icon"></i> Đặt lại
+                                    </button>
+                                </div>
+                                <a asp-action="Index" class="thunhap-btn thunhap-btn-outline-primary">
+                                    <i class="fas fa-arrow-left thunhap-icon"></i> Quay lại danh sách
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -62,7 +103,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

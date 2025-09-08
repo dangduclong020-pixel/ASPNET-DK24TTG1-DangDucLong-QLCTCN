@@ -209,6 +209,15 @@ namespace QuanLyCTCN.Controllers
                 return NotFound();
             }
 
+            // Kiểm tra quyền sở hữu ngân sách
+            var existingNganSach = await _context.NganSachs
+                .FirstOrDefaultAsync(n => n.NganSachId == id && n.NguoiDungId == nguoiDungId);
+
+            if (existingNganSach == null)
+            {
+                return NotFound();
+            }
+
             // Đảm bảo NguoiDungId được thiết lập
             nganSach.NguoiDungId = nguoiDungId;
 
@@ -235,15 +244,22 @@ namespace QuanLyCTCN.Controllers
 
                 try
                 {
-                    _context.Update(nganSach);
+                    // Cập nhật các thuộc tính của entity hiện có
+                    existingNganSach.HanMuc = nganSach.HanMuc;
+                    existingNganSach.Thang = nganSach.Thang;
+                    existingNganSach.Nam = nganSach.Nam;
+                    existingNganSach.DanhMucId = nganSach.DanhMucId;
+                    // NguoiDungId đã được kiểm tra
+
+                    _context.Update(existingNganSach);
                     await _context.SaveChangesAsync();
 
                     // Kiểm tra nếu đã vượt ngân sách mới thì tạo nhắc nhở
-                    await KiemTraVuotNganSach(nganSach);
+                    await KiemTraVuotNganSach(existingNganSach);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NganSachExists(nganSach.NganSachId))
+                    if (!NganSachExists(existingNganSach.NganSachId))
                     {
                         return NotFound();
                     }
@@ -312,19 +328,45 @@ namespace QuanLyCTCN.Controllers
             var nganSach = await _context.NganSachs
                 .FirstOrDefaultAsync(n => n.NganSachId == id && n.NguoiDungId == nguoiDungId);
 
-            if (nganSach != null)
+            if (nganSach == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy ngân sách cần xóa hoặc bạn không có quyền xóa ngân sách này.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 var thang = nganSach.Thang;
                 var nam = nganSach.Nam;
 
                 _context.NganSachs.Remove(nganSach);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Xóa ngân sách thành công!";
+                var result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    TempData["SuccessMessage"] = "Xóa ngân sách thành công!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể xóa ngân sách. Vui lòng thử lại.";
+                }
 
                 return RedirectToAction(nameof(Index), new { thang, nam });
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Entity đã bị thay đổi hoặc xóa bởi transaction khác
+                TempData["ErrorMessage"] = "Ngân sách đã được thay đổi hoặc xóa bởi người dùng khác. Vui lòng làm mới trang và thử lại.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi để debug
+                Console.WriteLine($"Lỗi khi xóa ngân sách ID {id}: {ex.Message}");
 
-            return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa ngân sách. Vui lòng thử lại.";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         private bool NganSachExists(int id)

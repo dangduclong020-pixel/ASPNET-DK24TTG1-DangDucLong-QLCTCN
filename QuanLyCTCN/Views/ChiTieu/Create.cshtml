@@ -5,56 +5,97 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid py-4">
+@section Styles {
+    <link rel="stylesheet" href="~/css/chitieu.css" />
+}
+
+@section Scripts {
+    <script src="~/js/chitieu.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<div class="container-fluid py-4 chitieu-page">
     <div class="row">
         <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Thêm chi tiêu mới</h6>
+            <div class="chitieu-card">
+                <div class="chitieu-card-header">
+                    <h6><i class="fas fa-plus-circle chitieu-icon"></i> Thêm chi tiêu mới</h6>
                 </div>
                 <div class="card-body">
-                    <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        
+                    <form asp-action="Create" method="post" class="chitieu-form">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="chitieu-text-danger chitieu-mb-3"></div>
+
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="NgayChi" class="form-control-label"></label>
-                                    <input asp-for="NgayChi" class="form-control" type="date" />
-                                    <span asp-validation-for="NgayChi" class="text-danger"></span>
+                                <div class="chitieu-form-group">
+                                    <label asp-for="NgayChi" class="chitieu-form-label"></label>
+                                    <div class="chitieu-input-group">
+                                        <span class="chitieu-input-group-text">
+                                            <i class="fas fa-calendar"></i>
+                                        </span>
+                                        <input asp-for="NgayChi" class="chitieu-form-control grouped" type="date" required />
+                                    </div>
+                                    <span asp-validation-for="NgayChi" class="chitieu-text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="DanhMucId" class="form-control-label"></label>
-                                    <select asp-for="DanhMucId" class="form-control" asp-items="ViewBag.DanhMucList">
-                                        <option value="">-- Chọn danh mục --</option>
-                                    </select>
-                                    <span asp-validation-for="DanhMucId" class="text-danger"></span>
+                                <div class="chitieu-form-group">
+                                    <label asp-for="DanhMucId" class="chitieu-form-label"></label>
+                                    <div class="chitieu-input-group">
+                                        <span class="chitieu-input-group-text">
+                                            <i class="fas fa-tag"></i>
+                                        </span>
+                                        <select asp-for="DanhMucId" class="chitieu-form-select grouped" asp-items="ViewBag.DanhMucList" required>
+                                            <option value="">-- Chọn danh mục --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="DanhMucId" class="chitieu-text-danger"></span>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="SoTien" class="form-control-label"></label>
-                                    <input asp-for="SoTien" class="form-control" type="number" step="0.01" min="0" />
-                                    <span asp-validation-for="SoTien" class="text-danger"></span>
+                                <div class="chitieu-form-group">
+                                    <label asp-for="SoTien" class="chitieu-form-label"></label>
+                                    <div class="chitieu-input-group">
+                                        <span class="chitieu-input-group-text">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                        </span>
+                                        <input asp-for="SoTien" class="chitieu-form-control grouped" type="number" step="0.01" min="0" placeholder="0.00" required />
+                                    </div>
+                                    <span asp-validation-for="SoTien" class="chitieu-text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="GhiChu" class="form-control-label"></label>
-                                    <input asp-for="GhiChu" class="form-control" />
-                                    <span asp-validation-for="GhiChu" class="text-danger"></span>
+                                <div class="chitieu-form-group">
+                                    <label asp-for="GhiChu" class="chitieu-form-label"></label>
+                                    <div class="chitieu-input-group">
+                                        <span class="chitieu-input-group-text">
+                                            <i class="fas fa-comment"></i>
+                                        </span>
+                                        <input asp-for="GhiChu" class="chitieu-form-control grouped" placeholder="Nhập ghi chú (tùy chọn)" />
+                                    </div>
+                                    <span asp-validation-for="GhiChu" class="chitieu-text-danger"></span>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <input type="submit" value="Thêm mới" class="btn btn-primary" />
-                            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+
+                        <div class="chitieu-form-group chitieu-mt-3">
+                            <div class="chitieu-d-flex chitieu-gap-3 chitieu-justify-content-between">
+                                <div>
+                                    <button type="submit" class="chitieu-btn chitieu-btn-primary">
+                                        <i class="fas fa-save chitieu-icon"></i> Thêm mới
+                                    </button>
+                                    <button type="reset" class="chitieu-btn chitieu-btn-secondary">
+                                        <i class="fas fa-undo chitieu-icon"></i> Đặt lại
+                                    </button>
+                                </div>
+                                <a asp-action="Index" class="chitieu-btn chitieu-btn-outline-primary">
+                                    <i class="fas fa-arrow-left chitieu-icon"></i> Quay lại danh sách
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -62,7 +103,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

@@ -24,12 +24,10 @@ namespace QuanLyCTCN.Models
         [Required]
         [Column("so_tien_can")]
         [Display(Name = "Số tiền cần")]
-        [DataType(DataType.Currency)]
         public decimal SoTienCan { get; set; }
 
         [Column("so_tien_da_tiet_kiem")]
         [Display(Name = "Số tiền đã tiết kiệm")]
-        [DataType(DataType.Currency)]
         public decimal? SoTienDaTietKiem { get; set; }
 
         [Column("han")]

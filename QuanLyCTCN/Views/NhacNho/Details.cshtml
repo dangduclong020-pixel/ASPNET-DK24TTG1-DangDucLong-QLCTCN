@@ -5,12 +5,20 @@
     ViewData["Subtitle"] = Model.NoiDung;
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/nhacnho.css" />
+}
+
+@section Scripts {
+    <script src="~/js/nhacnho.js"></script>
+}
+
 @section HeaderActions {
     <div class="d-flex gap-2">
-        <a href="@Url.Action("Edit", new { id = Model.NhacNhoId })" class="btn btn-outline-primary">
+        <a href="@Url.Action("Edit", new { id = Model.NhacNhoId })" class="nhacnho-btn nhacnho-btn-warning">
             <i class="fas fa-edit"></i> Chỉnh sửa
         </a>
-        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+        <a href="@Url.Action("Index")" class="nhacnho-btn nhacnho-btn-secondary">
             <i class="fas fa-arrow-left"></i> Quay lại danh sách
         </a>
     </div>
@@ -24,142 +32,220 @@
     </div>
 }
 
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-bell text-primary me-2"></i>
-                    @Model.NoiDung
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="border rounded p-3 text-center">
-                            <div class="h4 mb-1 text-info">
-                                <i class="fas fa-calendar-alt me-2"></i>
-                                @Model.ThoiGian.ToString("dd/MM/yyyy")
-                            </div>
-                            <div class="text-muted">Ngày</div>
-                        </div>
+<div class="nhacnho-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <!-- Main Details Card -->
+                <div class="nhacnho-card">
+                    <div class="nhacnho-card-header">
+                        <h6><i class="fas fa-bell nhacnho-icon"></i> @Model.NoiDung</h6>
                     </div>
-                    <div class="col-md-6">
-                        <div class="border rounded p-3 text-center">
-                            <div class="h4 mb-1 text-success">
-                                <i class="fas fa-clock me-2"></i>
-                                @Model.ThoiGian.ToString("HH:mm")
+                    <div class="card-body">
+                        <!-- DateTime Display -->
+                        <div class="nhacnho-detail-grid mb-4">
+                            <div class="nhacnho-detail-item">
+                                <div class="nhacnho-detail-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="nhacnho-detail-content">
+                                    <div class="nhacnho-detail-value">@Model.ThoiGian.ToString("dd/MM/yyyy")</div>
+                                    <div class="nhacnho-detail-label">Ngày nhắc nhở</div>
+                                </div>
                             </div>
-                            <div class="text-muted">Thời gian</div>
+                            <div class="nhacnho-detail-item">
+                                <div class="nhacnho-detail-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="nhacnho-detail-content">
+                                    <div class="nhacnho-detail-value">@Model.ThoiGian.ToString("HH:mm")</div>
+                                    <div class="nhacnho-detail-label">Thời gian</div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="mb-4">
-                    <h6>Thông tin chi tiết</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <strong>Loại nhắc nhở:</strong>
-                                <span class="badge @(Model.Loai == "ChiTieu" ? "bg-primary" : Model.Loai == "ThuNhap" ? "bg-success" : Model.Loai == "NganSach" ? "bg-warning" : "bg-info") ms-2">
-                                    @(Model.Loai == "ChiTieu" ? "Chi tiêu" : Model.Loai == "ThuNhap" ? "Thu nhập" : Model.Loai == "NganSach" ? "Ngân sách" : Model.Loai == "MucTieu" ? "Mục tiêu" : Model.Loai)
-                                </span>
+                        <!-- Information Section -->
+                        <div class="nhacnho-info-section">
+                            <h6 class="nhacnho-section-title">
+                                <i class="fas fa-info-circle nhacnho-icon"></i> Thông tin chi tiết
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="nhacnho-info-item">
+                                        <div class="nhacnho-info-label">
+                                            <i class="fas fa-tag nhacnho-icon"></i> Loại nhắc nhở
+                                        </div>
+                                        @{
+                                            var badgeClass = "";
+                                            switch (Model.Loai)
+                                            {
+                                                case "ChiTieu":
+                                                    badgeClass = "nhacnho-badge-expense";
+                                                    break;
+                                                case "ThuNhap":
+                                                    badgeClass = "nhacnho-badge-income";
+                                                    break;
+                                                case "NganSach":
+                                                    badgeClass = "nhacnho-badge-budget";
+                                                    break;
+                                                case "MucTieu":
+                                                    badgeClass = "nhacnho-badge-goal";
+                                                    break;
+                                                default:
+                                                    badgeClass = "nhacnho-badge-other";
+                                                    break;
+                                            }
+                                        }
+                                        <div class="nhacnho-info-value">
+                                            <span class="nhacnho-badge @badgeClass">
+                                                @if (Model.Loai == "ChiTieu")
+                                                {
+                                                    <text><i class="fas fa-minus-circle"></i> Chi tiêu</text>
+                                                }
+                                                else if (Model.Loai == "ThuNhap")
+                                                {
+                                                    <text><i class="fas fa-plus-circle"></i> Thu nhập</text>
+                                                }
+                                                else if (Model.Loai == "NganSach")
+                                                {
+                                                    <text><i class="fas fa-piggy-bank"></i> Ngân sách</text>
+                                                }
+                                                else if (Model.Loai == "MucTieu")
+                                                {
+                                                    <text><i class="fas fa-bullseye"></i> Mục tiêu</text>
+                                                }
+                                                else
+                                                {
+                                                    <text><i class="fas fa-question-circle"></i> @Model.Loai</text>
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="nhacnho-info-item">
+                                        <div class="nhacnho-info-label">
+                                            <i class="fas fa-info-circle nhacnho-icon"></i> Trạng thái
+                                        </div>
+                                        @{
+                                            var timeDiff = Model.ThoiGian - DateTime.Now;
+                                            var statusClass = "";
+                                            var statusText = "";
+                                            var statusIcon = "";
+                                            if (timeDiff.TotalMinutes < 0)
+                                            {
+                                                statusClass = "nhacnho-status-overdue";
+                                                statusText = "Đã quá hạn";
+                                                statusIcon = "fas fa-exclamation-triangle";
+                                            }
+                                            else if (timeDiff.TotalHours <= 1)
+                                            {
+                                                statusClass = "nhacnho-status-soon";
+                                                statusText = "Sắp đến hạn";
+                                                statusIcon = "fas fa-clock";
+                                            }
+                                            else
+                                            {
+                                                statusClass = "nhacnho-status-upcoming";
+                                                statusText = "Chưa đến hạn";
+                                                statusIcon = "fas fa-calendar-check";
+                                            }
+                                        }
+                                        <div class="nhacnho-info-value">
+                                            <span class="nhacnho-status-badge @statusClass">
+                                                <i class="@statusIcon"></i> @statusText
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <strong>Trạng thái:</strong>
-                                @{
-                                    var timeDiff = Model.ThoiGian - DateTime.Now;
-                                    var statusText = "";
-                                    var statusClass = "";
-                                    if (timeDiff.TotalMinutes < 0)
-                                    {
-                                        statusText = "Đã quá hạn";
-                                        statusClass = "text-danger";
-                                    }
-                                    else if (timeDiff.TotalHours <= 1)
-                                    {
-                                        statusText = "Sắp đến hạn";
-                                        statusClass = "text-warning";
-                                    }
-                                    else
-                                    {
-                                        statusText = "Chưa đến hạn";
-                                        statusClass = "text-success";
-                                    }
-                                }
-                                <span class="@statusClass ms-2">@statusText</span>
-                            </div>
-                        </div>
-                    </div>
 
-                    @if (timeDiff.TotalMinutes >= 0)
-                    {
-                        <div class="mb-3">
-                            <strong>Thời gian còn lại:</strong>
                             @{
-                                var timeLeftText = "";
-                                if (timeDiff.TotalHours < 1)
+                                var timeDiff2 = Model.ThoiGian - DateTime.Now;
+                                if (timeDiff2.TotalMinutes >= 0)
                                 {
-                                    timeLeftText = $"{Math.Round(timeDiff.TotalMinutes)} phút";
-                                }
-                                else if (timeDiff.TotalDays < 1)
-                                {
-                                    timeLeftText = $"{Math.Round(timeDiff.TotalHours)} giờ";
-                                }
-                                else
-                                {
-                                    timeLeftText = $"{Math.Round(timeDiff.TotalDays)} ngày";
+                                    <div class="nhacnho-info-item">
+                                        <div class="nhacnho-info-label">
+                                            <i class="fas fa-hourglass-half nhacnho-icon"></i> Thời gian còn lại
+                                        </div>
+                                        @{
+                                            var timeLeftText = "";
+                                            if (timeDiff.TotalHours < 1)
+                                            {
+                                                timeLeftText = $"{Math.Round(timeDiff.TotalMinutes)} phút";
+                                            }
+                                            else if (timeDiff.TotalDays < 1)
+                                            {
+                                                timeLeftText = $"{Math.Round(timeDiff.TotalHours)} giờ";
+                                            }
+                                            else
+                                            {
+                                                timeLeftText = $"{Math.Round(timeDiff.TotalDays)} ngày";
+                                            }
+                                        }
+                                        <div class="nhacnho-info-value">
+                                            <span class="nhacnho-time-remaining">@timeLeftText</span>
+                                        </div>
+                                    </div>
                                 }
                             }
-                            <span class="text-primary ms-2">@timeLeftText</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+                <!-- Actions Card -->
+                <div class="nhacnho-card">
+                    <div class="nhacnho-card-header">
+                        <h6><i class="fas fa-cogs nhacnho-icon"></i> Thao tác</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-3">
+                            <a href="@Url.Action("Edit", new { id = Model.NhacNhoId })" class="nhacnho-btn nhacnho-btn-warning w-100">
+                                <i class="fas fa-edit"></i> Chỉnh sửa nhắc nhở
+                            </a>
+                            <a href="@Url.Action("DanhDauDaDoc", new { id = Model.NhacNhoId })"
+                               class="nhacnho-btn nhacnho-btn-success w-100"
+                               onclick="return confirm('Bạn có chắc muốn đánh dấu nhắc nhở này là đã đọc?')">
+                                <i class="fas fa-check"></i> Đánh dấu đã đọc
+                            </a>
+                            <a href="@Url.Action("Delete", new { id = Model.NhacNhoId })" class="nhacnho-btn nhacnho-btn-danger w-100">
+                                <i class="fas fa-trash"></i> Xóa nhắc nhở
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Notification Card -->
+                @{
+                    var timeDiff3 = Model.ThoiGian - DateTime.Now;
+                    if (timeDiff3.TotalMinutes >= 0)
+                    {
+                        <div class="nhacnho-card mt-4">
+                            <div class="card-body text-center">
+                                <div class="nhacnho-notification-icon upcoming">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <h6 class="nhacnho-notification-title">Nhắc nhở sẽ được gửi</h6>
+                                <p class="nhacnho-notification-text">@Model.ThoiGian.ToString("HH:mm dd/MM/yyyy")</p>
+                            </div>
                         </div>
                     }
-                </div>
+                    else
+                    {
+                        <div class="nhacnho-card mt-4 nhacnho-card-warning">
+                            <div class="card-body text-center">
+                                <div class="nhacnho-notification-icon overdue">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <h6 class="nhacnho-notification-title">Nhắc nhở đã quá hạn</h6>
+                                <p class="nhacnho-notification-text">@Model.ThoiGian.ToString("HH:mm dd/MM/yyyy")</p>
+                            </div>
+                        </div>
+                    }
+                }
             </div>
         </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h6 class="card-title mb-0">Thao tác</h6>
-            </div>
-            <div class="card-body d-grid gap-2">
-                <a href="@Url.Action("Edit", new { id = Model.NhacNhoId })" class="btn btn-outline-primary">
-                    <i class="fas fa-edit"></i> Chỉnh sửa nhắc nhở
-                </a>
-                <a href="@Url.Action("DanhDauDaDoc", new { id = Model.NhacNhoId })"
-                   class="btn btn-outline-success"
-                   onclick="return confirm('Bạn có chắc muốn đánh dấu nhắc nhở này là đã đọc?')">
-                    <i class="fas fa-check"></i> Đánh dấu đã đọc
-                </a>
-                <a href="@Url.Action("Delete", new { id = Model.NhacNhoId })" class="btn btn-outline-danger">
-                    <i class="fas fa-trash"></i> Xóa nhắc nhở
-                </a>
-            </div>
-        </div>
-
-        @if (Model.ThoiGian > DateTime.Now)
-        {
-            <div class="card mt-3">
-                <div class="card-body text-center">
-                    <i class="fas fa-clock fa-3x text-info mb-3"></i>
-                    <h6>Nhắc nhở sẽ được gửi</h6>
-                    <p class="text-muted mb-0">Vào lúc @Model.ThoiGian.ToString("HH:mm dd/MM/yyyy")</p>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="card mt-3 border-warning">
-                <div class="card-body text-center">
-                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                    <h6 class="text-warning">Nhắc nhở đã quá hạn</h6>
-                    <p class="text-muted mb-0">Vào lúc @Model.ThoiGian.ToString("HH:mm dd/MM/yyyy")</p>
-                </div>
-            </div>
-        }
     </div>
 </div>

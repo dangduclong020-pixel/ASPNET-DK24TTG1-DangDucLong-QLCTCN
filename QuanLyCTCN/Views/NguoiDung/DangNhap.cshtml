@@ -16,6 +16,7 @@
         <h2 class="text-center mb-4">Đăng nhập</h2>
         
         <form asp-action="DangNhap" method="post">
+            @Html.AntiForgeryToken()
             @if (ViewBag.ReturnUrl != null)
             {
                 <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />

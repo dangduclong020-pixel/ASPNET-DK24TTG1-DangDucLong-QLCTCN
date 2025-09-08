@@ -5,69 +5,106 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid py-4">
+@section Styles {
+    <link rel="stylesheet" href="~/css/chitieu.css" />
+}
+
+@section Scripts {
+    <script src="~/js/chitieu.js"></script>
+}
+
+<div class="container-fluid py-4 chitieu-page">
     <div class="row">
         <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Danh sách chi tiêu</h6>
+            <div class="chitieu-card">
+                <div class="chitieu-card-header">
+                    <h6><i class="fas fa-list-ul chitieu-icon"></i> Danh sách chi tiêu</h6>
                     <div class="row mb-3">
-                        <div class="col-md-4">
-                            <form asp-action="Index" method="get" class="d-flex">
-                                <input type="date" name="tuNgay" value="@ViewBag.TuNgay" class="form-control me-2" />
-                                <input type="date" name="denNgay" value="@ViewBag.DenNgay" class="form-control me-2" />
-                                <button type="submit" class="btn btn-outline-primary">Lọc</button>
-                            </form>
-                        </div>
-                        <div class="col-md-4 text-end">
-                            <a asp-action="Create" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Thêm mới
-                            </a>
+                        <div class="col-12">
+                            <div class="chitieu-filter-section">
+                                <form asp-action="Index" method="get" class="chitieu-filter-form chitieu-d-flex chitieu-gap-3 chitieu-align-items-end chitieu-flex-wrap">
+                                    <div class="chitieu-form-group">
+                                        <label class="chitieu-form-label">Từ ngày</label>
+                                        <input type="date" name="tuNgay" value="@ViewBag.TuNgay" class="chitieu-form-control" />
+                                    </div>
+                                    <div class="chitieu-form-group">
+                                        <label class="chitieu-form-label">Đến ngày</label>
+                                        <input type="date" name="denNgay" value="@ViewBag.DenNgay" class="chitieu-form-control" />
+                                    </div>
+                                    <button type="submit" class="chitieu-btn chitieu-btn-primary">
+                                        <i class="fas fa-filter chitieu-icon"></i> Lọc
+                                    </button>
+                                    <button type="button" class="chitieu-btn chitieu-btn-secondary chitieu-clear-filters">
+                                        <i class="fas fa-times chitieu-icon"></i> Xóa lọc
+                                    </button>
+                                    <div class="chitieu-d-flex chitieu-align-items-end chitieu-ms-auto">
+                                        <a asp-action="Create" class="chitieu-btn chitieu-btn-primary">
+                                            <i class="fas fa-plus chitieu-icon"></i> Thêm mới
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
+                        <table class="chitieu-table">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ngày</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Danh mục</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Số tiền</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ghi chú</th>
-                                    <th class="text-secondary opacity-7"></th>
+                                    <th data-sort="ngay">Ngày</th>
+                                    <th data-sort="danhmuc">Danh mục</th>
+                                    <th data-sort="sotien" class="chitieu-text-center">Số tiền</th>
+                                    <th class="chitieu-text-center">Ghi chú</th>
+                                    <th class="chitieu-text-center">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (Model != null)
+                                @if (Model != null && Model.Any())
                                 {
                                     foreach (var item in Model)
                                     {
                                         <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-1">
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">@item.NgayChi.ToString("dd/MM/yyyy")</h6>
+                                            <td data-value="ngay">
+                                                <div class="chitieu-d-flex chitieu-align-items-center">
+                                                    <div class="chitieu-icon-preview">
+                                                        <i class="fas fa-calendar-day"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">@item.NgayChi.ToString("dd/MM/yyyy")</h6>
+                                                        <small class="text-muted">@item.NgayChi.ToString("dddd", new System.Globalization.CultureInfo("vi-VN"))</small>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">@(item.DanhMuc?.TenDanhMuc ?? "Không có")</p>
+                                            <td data-value="danhmuc">
+                                                <div class="chitieu-d-flex chitieu-align-items-center">
+                                                    <div class="chitieu-icon-preview">
+                                                        <i class="fas fa-tag"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="fw-bold">@(item.DanhMuc?.TenDanhMuc ?? "Không có")</span>
+                                                    </div>
+                                                </div>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <span class="text-secondary text-xs font-weight-bold">@item.SoTien.ToString("N0") đ</span>
+                                            <td data-value="sotien" class="chitieu-text-center">
+                                                <span class="chitieu-expense-amount">@item.SoTien.ToString("N0") đ</span>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <span class="text-secondary text-xs font-weight-bold">@item.GhiChu</span>
+                                            <td class="chitieu-text-center">
+                                                <span class="text-muted">@(string.IsNullOrEmpty(item.GhiChu) ? "Không có ghi chú" : item.GhiChu)</span>
                                             </td>
-                                            <td class="align-middle">
-                                                <a href="@Url.Action("Edit", new { id = item.ChiTieuId })" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                                                    Sửa
-                                                </a>
-                                                |
-                                                <a href="@Url.Action("Delete", new { id = item.ChiTieuId })" class="text-danger font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Delete user">
-                                                    Xóa
-                                                </a>
+                                            <td class="chitieu-text-center">
+                                                <div class="chitieu-action-links">
+                                                    <a href="@Url.Action("Edit", new { id = item.ChiTieuId })" title="Chỉnh sửa" data-bs-toggle="tooltip">
+                                                        <i class="fas fa-edit"></i> Sửa
+                                                    </a>
+                                                    <a href="@Url.Action("Details", new { id = item.ChiTieuId })" title="Chi tiết" data-bs-toggle="tooltip">
+                                                        <i class="fas fa-eye"></i> Xem
+                                                    </a>
+                                                    <a href="@Url.Action("Delete", new { id = item.ChiTieuId })" title="Xóa" data-bs-toggle="tooltip"
+                                                       data-item-name="chi tiêu ngày @item.NgayChi.ToString("dd/MM/yyyy")">
+                                                        <i class="fas fa-trash"></i> Xóa
+                                                    </a>
+                                                </div>
                                             </td>
                                         </tr>
                                     }
@@ -75,7 +112,14 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center">Không có dữ liệu</td>
+                                        <td colspan="5" class="chitieu-empty-state">
+                                            <i class="fas fa-inbox"></i>
+                                            <h5>Không có dữ liệu chi tiêu</h5>
+                                            <p>Chưa có khoản chi tiêu nào được ghi nhận.</p>
+                                            <a asp-action="Create" class="chitieu-btn chitieu-btn-primary chitieu-mt-3">
+                                                <i class="fas fa-plus chitieu-icon"></i> Thêm chi tiêu đầu tiên
+                                            </a>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>

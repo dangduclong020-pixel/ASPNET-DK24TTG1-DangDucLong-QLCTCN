@@ -5,42 +5,79 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Xóa ngân sách</h6>
-                </div>
-                <div class="card-body">
-                    <h3>Bạn có chắc chắn muốn xóa ngân sách này?</h3>
-                    <div>
-                        <hr />
-                        <dl class="row">
-                            <dt class="col-sm-2">
-                                Danh mục
-                            </dt>
-                            <dd class="col-sm-10">
-                                @(Model.DanhMuc?.TenDanhMuc ?? "N/A")
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.HanMuc)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.HanMuc) VND
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.Thang)
-                            </dt>
-                            <dd class="col-sm-10">
-                                Tháng @Html.DisplayFor(model => model.Thang)/@Html.DisplayFor(model => model.Nam)
-                            </dd>
-                        </dl>
+@section Styles {
+    <link rel="stylesheet" href="~/css/ngansach.css" />
+}
 
-                        <form asp-action="Delete" method="post">
+@section Scripts {
+    <script src="~/js/ngansach.js"></script>
+}
+
+<div class="ngansach-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="ngansach-card">
+                    <div class="ngansach-card-header delete-mode">
+                        <h6><i class="fas fa-trash-alt ngansach-icon"></i> Xóa ngân sách</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="ngansach-delete-warning">
+                            <div class="ngansach-delete-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h4 class="ngansach-delete-title">Bạn có chắc chắn muốn xóa ngân sách này?</h4>
+                            <p class="ngansach-delete-message">
+                                Hành động này không thể hoàn tác. Ngân sách sẽ bị xóa vĩnh viễn khỏi hệ thống.
+                            </p>
+                        </div>
+
+                        <div class="ngansach-details-grid">
+                            <div class="ngansach-detail-item">
+                                <div class="ngansach-detail-label">
+                                    <i class="fas fa-tag ngansach-icon"></i> Danh mục
+                                </div>
+                                <div class="ngansach-detail-value">
+                                    @(Model.DanhMuc?.TenDanhMuc ?? "N/A")
+                                </div>
+                            </div>
+
+                            <div class="ngansach-detail-item">
+                                <div class="ngansach-detail-label">
+                                    <i class="fas fa-money-bill-wave ngansach-icon"></i> Hạn mức
+                                </div>
+                                <div class="ngansach-detail-value">
+                                    @Html.DisplayFor(model => model.HanMuc) VND
+                                </div>
+                            </div>
+
+                            <div class="ngansach-detail-item">
+                                <div class="ngansach-detail-label">
+                                    <i class="fas fa-calendar-alt ngansach-icon"></i> Thời gian
+                                </div>
+                                <div class="ngansach-detail-value">
+                                    Tháng @Html.DisplayFor(model => model.Thang)/@Html.DisplayFor(model => model.Nam)
+                                </div>
+                            </div>
+                        </div>
+
+                        <form asp-action="Delete" method="post" class="ngansach-delete-form">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" asp-for="NganSachId" />
-                            <input type="submit" value="Xóa" class="btn btn-danger" /> |
-                            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+                            <div class="ngansach-form-group ngansach-mt-4">
+                                <div class="ngansach-d-flex ngansach-gap-3 ngansach-justify-content-between">
+                                    <div>
+                                        <button type="submit" class="ngansach-btn ngansach-btn-danger ngansach-delete-btn">
+                                            <i class="fas fa-trash ngansach-icon"></i> Xóa ngân sách
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <a asp-action="Index" class="ngansach-btn ngansach-btn-outline-primary">
+                                            <i class="fas fa-arrow-left ngansach-icon"></i> Quay lại danh sách
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>

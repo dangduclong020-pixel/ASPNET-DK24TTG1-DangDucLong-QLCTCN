@@ -156,6 +156,15 @@ namespace QuanLyCTCN.Controllers
                 return NotFound();
             }
 
+            // Kiểm tra quyền sở hữu nhắc nhở
+            var existingNhacNho = await _context.NhacNhos
+                .FirstOrDefaultAsync(n => n.NhacNhoId == id && n.NguoiDungId == nguoiDungId);
+
+            if (existingNhacNho == null)
+            {
+                return NotFound();
+            }
+
             // Đảm bảo NguoiDungId được thiết lập
             nhacNho.NguoiDungId = nguoiDungId;
 
@@ -163,12 +172,18 @@ namespace QuanLyCTCN.Controllers
             {
                 try
                 {
-                    _context.Update(nhacNho);
+                    // Cập nhật các thuộc tính của entity hiện có
+                    existingNhacNho.NoiDung = nhacNho.NoiDung;
+                    existingNhacNho.ThoiGian = nhacNho.ThoiGian;
+                    existingNhacNho.Loai = nhacNho.Loai;
+                    // NguoiDungId đã được kiểm tra
+
+                    _context.Update(existingNhacNho);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NhacNhoExists(nhacNho.NhacNhoId))
+                    if (!NhacNhoExists(existingNhacNho.NhacNhoId))
                     {
                         return NotFound();
                     }
@@ -224,11 +239,34 @@ namespace QuanLyCTCN.Controllers
             var nhacNho = await _context.NhacNhos
                 .FirstOrDefaultAsync(n => n.NhacNhoId == id && n.NguoiDungId == nguoiDungId);
 
-            if (nhacNho != null)
+            if (nhacNho == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy nhắc nhở cần xóa hoặc bạn không có quyền xóa nhắc nhở này.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 _context.NhacNhos.Remove(nhacNho);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Xóa nhắc nhở thành công!";
+                var result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    TempData["SuccessMessage"] = "Xóa nhắc nhở thành công!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể xóa nhắc nhở. Vui lòng thử lại.";
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                TempData["ErrorMessage"] = "Nhắc nhở đã được thay đổi hoặc xóa bởi người dùng khác. Vui lòng làm mới trang và thử lại.";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi xóa nhắc nhở ID {id}: {ex.Message}");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa nhắc nhở. Vui lòng thử lại.";
             }
 
             return RedirectToAction(nameof(Index));

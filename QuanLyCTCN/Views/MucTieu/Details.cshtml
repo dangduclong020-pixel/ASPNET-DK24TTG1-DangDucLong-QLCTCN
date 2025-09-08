@@ -5,13 +5,17 @@
     ViewData["Subtitle"] = Model.TenMucTieu;
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/muctieu.css" />
+}
+
 @section HeaderActions {
     <div class="d-flex gap-2">
-        <a href="@Url.Action("Edit", new { id = Model.MucTieuId })" class="btn btn-outline-primary">
-            <i class="fas fa-edit"></i> Chỉnh sửa
+        <a href="@Url.Action("Edit", new { id = Model.MucTieuId })" class="muctieu-btn muctieu-btn-warning">
+            <i class="fas fa-edit muctieu-icon"></i> Chỉnh sửa
         </a>
-        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Quay lại danh sách
+        <a href="@Url.Action("Index")" class="muctieu-btn muctieu-btn-outline-primary">
+            <i class="fas fa-arrow-left muctieu-icon"></i> Quay lại danh sách
         </a>
     </div>
 }
@@ -29,27 +33,27 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-bullseye text-primary me-2"></i>
+                    <i class="fas fa-bullseye text-primary me-2 muctieu-icon"></i>
                     @Model.TenMucTieu
                 </h5>
             </div>
             <div class="card-body">
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <div class="border rounded p-3 text-center">
-                            <div class="h4 mb-1 text-primary">@Model.SoTienDaTietKiem?.ToString("N0") VND</div>
-                            <div class="text-muted">Đã tiết kiệm</div>
+                        <div class="muctieu-amount-display">
+                            <div class="amount text-primary">@Model.SoTienDaTietKiem?.ToString("N0") VND</div>
+                            <div class="label">Đã tiết kiệm</div>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="border rounded p-3 text-center">
-                            <div class="h4 mb-1 text-success">@Model.SoTienCan.ToString("N0") VND</div>
-                            <div class="text-muted">Mục tiêu</div>
+                        <div class="muctieu-amount-display">
+                            <div class="amount text-success">@Model.SoTienCan.ToString("N0") VND</div>
+                            <div class="label">Mục tiêu</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="mb-4">
+                <div class="muctieu-mb-4">
                     <h6>Tiến độ hoàn thành</h6>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span>@Model.PhanTramHoanThanh% hoàn thành</span>
@@ -61,9 +65,8 @@
                             Còn lại: @tienConLai.ToString("N0") VND
                         </span>
                     </div>
-                    <div class="progress" style="height: 12px;">
-                        <div class="progress-bar @(Model.PhanTramHoanThanh >= 100 ? "bg-success" : Model.PhanTramHoanThanh >= 75 ? "bg-info" : Model.PhanTramHoanThanh >= 50 ? "bg-warning" : "bg-danger")"
-                             role="progressbar"
+                    <div class="muctieu-progress-bar">
+                        <div class="muctieu-progress-fill @(Model.PhanTramHoanThanh >= 100 ? "success" : Model.PhanTramHoanThanh >= 75 ? "info" : Model.PhanTramHoanThanh >= 50 ? "warning" : "danger")"
                              style="width: @Model.PhanTramHoanThanh%"
                              aria-valuenow="@Model.PhanTramHoanThanh"
                              aria-valuemin="0"
@@ -168,32 +171,32 @@
                             <span class="input-group-text">VND</span>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-success w-100">
-                        <i class="fas fa-plus"></i> Cập nhật tiết kiệm
+                    <button type="submit" class="muctieu-btn muctieu-btn-success w-100">
+                        <i class="fas fa-plus muctieu-icon"></i> Cập nhật tiết kiệm
                     </button>
                 </form>
             </div>
         </div>
 
-        <div class="card mt-3">
+        <div class="card muctieu-mt-3">
             <div class="card-header">
                 <h6 class="card-title mb-0">Thao tác</h6>
             </div>
             <div class="card-body d-grid gap-2">
-                <a href="@Url.Action("Edit", new { id = Model.MucTieuId })" class="btn btn-outline-primary">
-                    <i class="fas fa-edit"></i> Chỉnh sửa mục tiêu
+                <a href="@Url.Action("Edit", new { id = Model.MucTieuId })" class="muctieu-btn muctieu-btn-warning">
+                    <i class="fas fa-edit muctieu-icon"></i> Chỉnh sửa mục tiêu
                 </a>
-                <a href="@Url.Action("Delete", new { id = Model.MucTieuId })" class="btn btn-outline-danger">
-                    <i class="fas fa-trash"></i> Xóa mục tiêu
+                <a href="@Url.Action("Delete", new { id = Model.MucTieuId })" class="muctieu-btn muctieu-btn-danger">
+                    <i class="fas fa-trash muctieu-icon"></i> Xóa mục tiêu
                 </a>
             </div>
         </div>
 
         @if (Model.PhanTramHoanThanh >= 100)
         {
-            <div class="card mt-3 border-success">
+            <div class="card muctieu-mt-3 muctieu-border-success">
                 <div class="card-body text-center">
-                    <i class="fas fa-trophy fa-3x text-success mb-3"></i>
+                    <i class="fas fa-trophy fa-3x text-success muctieu-mb-3"></i>
                     <h6 class="text-success">Chúc mừng!</h6>
                     <p class="text-muted mb-0">Bạn đã hoàn thành mục tiêu này</p>
                 </div>
@@ -201,3 +204,7 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/muctieu.js"></script>
+}

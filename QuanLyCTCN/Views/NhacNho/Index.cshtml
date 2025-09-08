@@ -5,17 +5,25 @@
     ViewData["Subtitle"] = "Quản lý các thông báo và nhắc nhở của bạn";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/nhacnho.css" />
+}
+
+@section Scripts {
+    <script src="~/js/nhacnho.js"></script>
+}
+
 @section HeaderActions {
     <div class="d-flex gap-2">
-        <a href="@Url.Action("Create")" class="btn btn-primary">
+        <a href="@Url.Action("Create")" class="nhacnho-btn nhacnho-btn-primary">
             <i class="fas fa-plus"></i> Tạo nhắc nhở
         </a>
-        <a href="@Url.Action("TaoNhacNhoDinhKy")" class="btn btn-outline-success">
+        <a href="@Url.Action("TaoNhacNhoDinhKy")" class="nhacnho-btn nhacnho-btn-success">
             <i class="fas fa-calendar-plus"></i> Nhắc nhở định kỳ
         </a>
         @if (Model.Any())
         {
-            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+            <button type="button" class="nhacnho-btn nhacnho-btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
                 <i class="fas fa-trash-alt"></i> Xóa toàn bộ
             </button>
         }
@@ -30,142 +38,201 @@
     </div>
 }
 
-<div class="row">
-    <div class="col-md-4 mb-4">
-        <div class="card">
-            <div class="card-body text-center">
-                <i class="fas fa-clock fa-3x text-primary mb-3"></i>
-                <h5>@Model.Count(n => n.ThoiGian > DateTime.Now)</h5>
-                <p class="text-muted mb-0">Nhắc nhở sắp tới</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="card">
-            <div class="card-body text-center">
-                <i class="fas fa-bell fa-3x text-warning mb-3"></i>
-                <h5>@Model.Count(n => n.ThoiGian <= DateTime.Now)</h5>
-                <p class="text-muted mb-0">Nhắc nhở quá hạn</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="card">
-            <div class="card-body text-center">
-                <i class="fas fa-list fa-3x text-info mb-3"></i>
-                <h5>@Model.Count()</h5>
-                <p class="text-muted mb-0">Tổng số nhắc nhở</p>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="nhacnho-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Stats Cards -->
+                <div class="nhacnho-stats-grid">
+                    <div class="nhacnho-stat-card upcoming">
+                        <div class="nhacnho-stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="nhacnho-stat-value">@Model.Count(n => n.ThoiGian > DateTime.Now)</div>
+                        <div class="nhacnho-stat-label">Nhắc nhở sắp tới</div>
+                    </div>
+                    <div class="nhacnho-stat-card overdue">
+                        <div class="nhacnho-stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="nhacnho-stat-value">@Model.Count(n => n.ThoiGian <= DateTime.Now)</div>
+                        <div class="nhacnho-stat-label">Nhắc nhở quá hạn</div>
+                    </div>
+                    <div class="nhacnho-stat-card total">
+                        <div class="nhacnho-stat-icon">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <div class="nhacnho-stat-value">@Model.Count()</div>
+                        <div class="nhacnho-stat-label">Tổng số nhắc nhở</div>
+                    </div>
+                </div>
 
-<div class="card">
-    <div class="card-header">
-        <h5 class="card-title mb-0">
-            <i class="fas fa-bell text-primary me-2"></i>
-            Danh sách nhắc nhở
-        </h5>
-    </div>
-    <div class="card-body">
-        @if (!Model.Any())
-        {
-            <div class="text-center py-5">
-                <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
-                <h4 class="text-muted">Chưa có nhắc nhở nào</h4>
-                <p class="text-muted">Hãy tạo nhắc nhở đầu tiên của bạn</p>
-                <a href="@Url.Action("Create")" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Tạo nhắc nhở đầu tiên
-                </a>
-            </div>
-        }
-        else
-        {
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Nội dung</th>
-                            <th>Thời gian</th>
-                            <th>Loại</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
+                <!-- Main Content Card -->
+                <div class="nhacnho-card">
+                    <div class="nhacnho-card-header">
+                        <h6><i class="fas fa-bell nhacnho-icon"></i> Danh sách nhắc nhở</h6>
+                    </div>
+                    <div class="card-body">
+                        @if (!Model.Any())
                         {
-                            <tr>
-                                <td>
-                                    <div class="fw-bold">@item.NoiDung</div>
-                                </td>
-                                <td>
-                                    <div>@item.ThoiGian.ToString("dd/MM/yyyy HH:mm")</div>
-                                    @{
-                                        var timeDiff = item.ThoiGian - DateTime.Now;
-                                        var timeDiffText = "";
-                                        if (timeDiff.TotalMinutes < 0)
-                                        {
-                                            timeDiffText = $"Quá hạn {Math.Abs(Math.Round(timeDiff.TotalHours))} giờ";
-                                        }
-                                        else if (timeDiff.TotalHours < 1)
-                                        {
-                                            timeDiffText = $"Còn {Math.Round(timeDiff.TotalMinutes)} phút";
-                                        }
-                                        else if (timeDiff.TotalDays < 1)
-                                        {
-                                            timeDiffText = $"Còn {Math.Round(timeDiff.TotalHours)} giờ";
-                                        }
-                                        else
-                                        {
-                                            timeDiffText = $"Còn {Math.Round(timeDiff.TotalDays)} ngày";
-                                        }
-                                    }
-                                    <small class="text-muted">@timeDiffText</small>
-                                </td>
-                                <td>
-                                    <span class="badge @(item.Loai == "ChiTieu" ? "bg-primary" : item.Loai == "ThuNhap" ? "bg-success" : item.Loai == "NganSach" ? "bg-warning" : "bg-info")">
-                                        @(item.Loai == "ChiTieu" ? "Chi tiêu" : item.Loai == "ThuNhap" ? "Thu nhập" : item.Loai == "NganSach" ? "Ngân sách" : item.Loai == "MucTieu" ? "Mục tiêu" : item.Loai)
-                                    </span>
-                                </td>
-                                <td>
-                                    @if (item.ThoiGian <= DateTime.Now)
-                                    {
-                                        <span class="badge bg-danger">Quá hạn</span>
-                                    }
-                                    else if (timeDiff.TotalHours <= 1)
-                                    {
-                                        <span class="badge bg-warning">Sắp đến</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-success">Sắp tới</span>
-                                    }
-                                </td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <a href="@Url.Action("Details", new { id = item.NhacNhoId })" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="@Url.Action("Edit", new { id = item.NhacNhoId })" class="btn btn-sm btn-outline-secondary">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="@Url.Action("DanhDauDaDoc", new { id = item.NhacNhoId })"
-                                           class="btn btn-sm btn-outline-success"
-                                           onclick="return confirm('Bạn có chắc muốn đánh dấu nhắc nhở này là đã đọc?')">
-                                            <i class="fas fa-check"></i>
-                                        </a>
-                                        <a href="@Url.Action("Delete", new { id = item.NhacNhoId })" class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
+                            <div class="text-center py-5">
+                                <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
+                                <h4 class="text-muted">Chưa có nhắc nhở nào</h4>
+                                <p class="text-muted">Hãy tạo nhắc nhở đầu tiên của bạn</p>
+                                <a href="@Url.Action("Create")" class="nhacnho-btn nhacnho-btn-primary">
+                                    <i class="fas fa-plus"></i> Tạo nhắc nhở đầu tiên
+                                </a>
+                            </div>
                         }
-                    </tbody>
-                </table>
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table class="nhacnho-table">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-comment nhacnho-icon"></i> Nội dung</th>
+                                            <th><i class="fas fa-calendar-alt nhacnho-icon"></i> Thời gian</th>
+                                            <th><i class="fas fa-tag nhacnho-icon"></i> Loại</th>
+                                            <th><i class="fas fa-info-circle nhacnho-icon"></i> Trạng thái</th>
+                                            <th><i class="fas fa-cogs nhacnho-icon"></i> Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            var timeDiff = item.ThoiGian - DateTime.Now;
+                                            var timeDiffText = "";
+                                            if (timeDiff.TotalMinutes < 0)
+                                            {
+                                                timeDiffText = $"Quá hạn {Math.Abs(Math.Round(timeDiff.TotalHours))} giờ";
+                                            }
+                                            else if (timeDiff.TotalHours < 1)
+                                            {
+                                                timeDiffText = $"Còn {Math.Round(timeDiff.TotalMinutes)} phút";
+                                            }
+                                            else if (timeDiff.TotalDays < 1)
+                                            {
+                                                timeDiffText = $"Còn {Math.Round(timeDiff.TotalHours)} giờ";
+                                            }
+                                            else
+                                            {
+                                                timeDiffText = $"Còn {Math.Round(timeDiff.TotalDays)} ngày";
+                                            }
+
+                                            var statusClass = "";
+                                            var statusText = "";
+                                            var statusIcon = "";
+                                            if (timeDiff.TotalMinutes < 0)
+                                            {
+                                                statusClass = "nhacnho-status-overdue";
+                                                statusText = "Quá hạn";
+                                                statusIcon = "fas fa-exclamation-triangle";
+                                            }
+                                            else if (timeDiff.TotalHours <= 1)
+                                            {
+                                                statusClass = "nhacnho-status-soon";
+                                                statusText = "Sắp đến";
+                                                statusIcon = "fas fa-clock";
+                                            }
+                                            else
+                                            {
+                                                statusClass = "nhacnho-status-upcoming";
+                                                statusText = "Sắp tới";
+                                                statusIcon = "fas fa-calendar-check";
+                                            }
+
+                                            var badgeClass = "";
+                                            switch (item.Loai)
+                                            {
+                                                case "ChiTieu":
+                                                    badgeClass = "nhacnho-badge-expense";
+                                                    break;
+                                                case "ThuNhap":
+                                                    badgeClass = "nhacnho-badge-income";
+                                                    break;
+                                                case "NganSach":
+                                                    badgeClass = "nhacnho-badge-budget";
+                                                    break;
+                                                case "MucTieu":
+                                                    badgeClass = "nhacnho-badge-goal";
+                                                    break;
+                                                default:
+                                                    badgeClass = "nhacnho-badge-other";
+                                                    break;
+                                            }
+
+                                            <tr>
+                                                <td>
+                                                    <div class="fw-bold">@item.NoiDung</div>
+                                                </td>
+                                                <td>
+                                                    <div>@item.ThoiGian.ToString("dd/MM/yyyy HH:mm")</div>
+                                                    <small class="text-muted">@timeDiffText</small>
+                                                </td>
+                                                <td>
+                                                    <span class="nhacnho-badge @badgeClass">
+                                                        @if (item.Loai == "ChiTieu")
+                                                        {
+                                                            <text><i class="fas fa-minus-circle"></i> Chi tiêu</text>
+                                                        }
+                                                        else if (item.Loai == "ThuNhap")
+                                                        {
+                                                            <text><i class="fas fa-plus-circle"></i> Thu nhập</text>
+                                                        }
+                                                        else if (item.Loai == "NganSach")
+                                                        {
+                                                            <text><i class="fas fa-piggy-bank"></i> Ngân sách</text>
+                                                        }
+                                                        else if (item.Loai == "MucTieu")
+                                                        {
+                                                            <text><i class="fas fa-bullseye"></i> Mục tiêu</text>
+                                                        }
+                                                        else
+                                                        {
+                                                            <text><i class="fas fa-question-circle"></i> @item.Loai</text>
+                                                        }
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="nhacnho-status-badge @statusClass">
+                                                        <i class="@statusIcon"></i> @statusText
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="@Url.Action("Details", new { id = item.NhacNhoId })"
+                                                           class="nhacnho-btn nhacnho-btn-primary btn-sm"
+                                                           data-tooltip="Xem chi tiết">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="@Url.Action("Edit", new { id = item.NhacNhoId })"
+                                                           class="nhacnho-btn nhacnho-btn-warning btn-sm"
+                                                           data-tooltip="Chỉnh sửa">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="@Url.Action("DanhDauDaDoc", new { id = item.NhacNhoId })"
+                                                           class="nhacnho-btn nhacnho-btn-success btn-sm"
+                                                           data-tooltip="Đánh dấu đã đọc"
+                                                           onclick="return confirm('Bạn có chắc muốn đánh dấu nhắc nhở này là đã đọc?')">
+                                                            <i class="fas fa-check"></i>
+                                                        </a>
+                                                        <a href="@Url.Action("Delete", new { id = item.NhacNhoId })"
+                                                           class="nhacnho-btn nhacnho-btn-danger btn-sm"
+                                                           data-tooltip="Xóa">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
             </div>
-        }
+        </div>
     </div>
 </div>
 
@@ -194,7 +261,7 @@
                         <i class="fas fa-times"></i> Hủy bỏ
                     </button>
                     <form asp-action="DeleteAll" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-danger">
+                        <button type="submit" class="nhacnho-btn nhacnho-btn-danger">
                             <i class="fas fa-trash-alt"></i> Xóa toàn bộ
                         </button>
                     </form>
@@ -202,13 +269,4 @@
             </div>
         </div>
     </div>
-}
-
-@section Scripts {
-    <script>
-        // Tự động làm mới trang sau mỗi phút để cập nhật trạng thái nhắc nhở
-        setTimeout(function() {
-            location.reload();
-        }, 60000); // 60 giây
-    </script>
 }

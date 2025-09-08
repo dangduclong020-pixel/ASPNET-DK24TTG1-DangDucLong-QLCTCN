@@ -5,50 +5,131 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid py-4">
+@section Styles {
+    <link rel="stylesheet" href="~/css/danhmuc.css" />
+}
+
+@section Scripts {
+    <script src="~/js/danhmuc.js"></script>
+}
+
+<div class="container-fluid py-4 danhmuc-page">
     <div class="row">
         <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Xóa danh mục</h6>
+            <div class="danhmuc-card">
+                <div class="danhmuc-card-header delete-mode">
+                    <h6><i class="fas fa-trash-alt danhmuc-icon"></i> Xóa danh mục</h6>
                 </div>
                 <div class="card-body">
-                    <h3>Bạn có chắc chắn muốn xóa danh mục này?</h3>
-                    <div>
-                        <hr />
-                        <dl class="row">
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.TenDanhMuc)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.TenDanhMuc)
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.Loai)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.Loai)
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.Nhom)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.Nhom)
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.GhiChu)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.GhiChu)
-                            </dd>
-                        </dl>
-                        
-                        <form asp-action="Delete" method="post">
-                            <input type="hidden" asp-for="DanhMucId" />
-                            <input type="submit" value="Xóa" class="btn btn-danger" /> |
-                            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
-                        </form>
+                    <div class="danhmuc-delete-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa danh mục này?
                     </div>
+
+                    <div class="danhmuc-delete-details">
+                        <h5><i class="fas fa-info-circle"></i> Thông tin danh mục sẽ bị xóa:</h5>
+
+                        <div class="danhmuc-detail-row">
+                            <span class="danhmuc-detail-label">
+                                <i class="fas fa-hashtag"></i> Mã danh mục:
+                            </span>
+                            <span class="danhmuc-detail-value">#@Model.DanhMucId</span>
+                        </div>
+
+                        <div class="danhmuc-detail-row">
+                            <span class="danhmuc-detail-label">
+                                <i class="fas fa-tag"></i> Tên danh mục:
+                            </span>
+                            <span class="danhmuc-detail-value">@Model.TenDanhMuc</span>
+                        </div>
+
+                        <div class="danhmuc-detail-row">
+                            <span class="danhmuc-detail-label">
+                                <i class="fas fa-list"></i> Loại:
+                            </span>
+                            <span class="danhmuc-detail-value">
+                                @if (Model.Loai == "ChiTieu")
+                                {
+                                    <span class="danhmuc-badge danhmuc-badge-expense">
+                                        <i class="fas fa-minus-circle"></i> Chi tiêu
+                                    </span>
+                                }
+                                else if (Model.Loai == "ThuNhap")
+                                {
+                                    <span class="danhmuc-badge danhmuc-badge-income">
+                                        <i class="fas fa-plus-circle"></i> Thu nhập
+                                    </span>
+                                }
+                                else
+                                {
+                                    @Model.Loai
+                                }
+                            </span>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.Nhom))
+                        {
+                            <div class="danhmuc-detail-row">
+                                <span class="danhmuc-detail-label">
+                                    <i class="fas fa-layer-group"></i> Nhóm:
+                                </span>
+                                <span class="danhmuc-detail-value">
+                                    @if (Model.Nhom == "CoDinh")
+                                    {
+                                        <span class="danhmuc-badge danhmuc-badge-fixed">
+                                            <i class="fas fa-lock"></i> Cố định
+                                        </span>
+                                    }
+                                    else if (Model.Nhom == "BienDoi")
+                                    {
+                                        <span class="danhmuc-badge danhmuc-badge-variable">
+                                            <i class="fas fa-random"></i> Biến đổi
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        @Model.Nhom
+                                    }
+                                </span>
+                            </div>
+                        }
+
+                        <div class="danhmuc-detail-row">
+                            <span class="danhmuc-detail-label">
+                                <i class="fas fa-comment"></i> Ghi chú:
+                            </span>
+                            <span class="danhmuc-detail-value">@(string.IsNullOrEmpty(Model.GhiChu) ? "Không có ghi chú" : Model.GhiChu)</span>
+                        </div>
+
+                        <div class="danhmuc-detail-row">
+                            <span class="danhmuc-detail-label">
+                                <i class="fas fa-clock"></i> Ngày tạo:
+                            </span>
+                            <span class="danhmuc-detail-value">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</span>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete" method="post" class="danhmuc-delete-form">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="DanhMucId" />
+                        <div class="danhmuc-form-group danhmuc-mt-4">
+                            <div class="danhmuc-d-flex danhmuc-gap-3 danhmuc-justify-content-between">
+                                <div>
+                                    <button type="submit" class="danhmuc-btn danhmuc-btn-danger">
+                                        <i class="fas fa-trash"></i> Xóa danh mục
+                                    </button>
+                                </div>
+                                <div>
+                                    <a asp-action="Details" asp-route-id="@Model?.DanhMucId" class="danhmuc-btn danhmuc-btn-outline-primary">
+                                        <i class="fas fa-eye danhmuc-icon"></i> Xem chi tiết
+                                    </a>
+                                    <a asp-action="Index" class="danhmuc-btn danhmuc-btn-outline-primary">
+                                        <i class="fas fa-arrow-left danhmuc-icon"></i> Quay lại danh sách
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

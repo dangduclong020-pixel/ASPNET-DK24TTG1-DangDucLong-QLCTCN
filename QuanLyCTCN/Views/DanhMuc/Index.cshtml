@@ -5,123 +5,156 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid py-4">
+@section Styles {
+    <link rel="stylesheet" href="~/css/danhmuc.css" />
+}
+
+@section Scripts {
+    <script src="~/js/danhmuc.js"></script>
+}
+
+<div class="container-fluid py-4 danhmuc-page">
     <div class="row">
         <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Danh sách danh mục</h6>
-                    <a asp-action="Create" class="btn btn-primary float-end">
-                        <i class="fas fa-plus"></i> Thêm mới
-                    </a>
+            <div class="danhmuc-card">
+                <div class="danhmuc-card-header">
+                    <h6><i class="fas fa-list-ul danhmuc-icon"></i> Danh sách danh mục</h6>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="danhmuc-filter-section">
+                                <form method="get" class="danhmuc-filter-form danhmuc-d-flex danhmuc-gap-3 danhmuc-align-items-end danhmuc-flex-wrap">
+                                    <div class="danhmuc-form-group">
+                                        <label class="danhmuc-form-label">Loại danh mục</label>
+                                        <select name="loai" class="danhmuc-form-select" onchange="this.form.submit()">
+                                            <option value="">Tất cả</option>
+                                            <option value="ChiTieu" selected="@(ViewBag.LoaiFilter == "ChiTieu")">Chi tiêu</option>
+                                            <option value="ThuNhap" selected="@(ViewBag.LoaiFilter == "ThuNhap")">Thu nhập</option>
+                                        </select>
+                                    </div>
+                                    <div class="danhmuc-form-group">
+                                        <label class="danhmuc-form-label">Nhóm chi tiêu</label>
+                                        <select name="nhom" class="danhmuc-form-select" onchange="this.form.submit()">
+                                            <option value="">Tất cả</option>
+                                            <option value="CoDinh" selected="@(ViewBag.NhomFilter == "CoDinh")">Cố định</option>
+                                            <option value="BienDoi" selected="@(ViewBag.NhomFilter == "BienDoi")">Biến đổi</option>
+                                        </select>
+                                    </div>
+                                    <div class="danhmuc-d-flex danhmuc-align-items-end danhmuc-ms-auto">
+                                        <a asp-action="Create" class="danhmuc-btn danhmuc-btn-primary">
+                                            <i class="fas fa-plus danhmuc-icon"></i> Thêm mới
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
-                    <!-- Bộ lọc -->
-                    <div class="px-3 py-2">
-                        <form method="get" class="row g-3">
-                            <div class="col-md-3">
-                                <label for="loaiFilter" class="form-label">Loại danh mục</label>
-                                <select name="loai" id="loaiFilter" class="form-select" onchange="this.form.submit()">
-                                    <option value="">Tất cả</option>
-                                    <option value="ChiTieu" selected="@(ViewBag.LoaiFilter == "ChiTieu")">Chi tiêu</option>
-                                    <option value="ThuNhap" selected="@(ViewBag.LoaiFilter == "ThuNhap")">Thu nhập</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="nhomFilter" class="form-label">Nhóm chi tiêu</label>
-                                <select name="nhom" id="nhomFilter" class="form-select" onchange="this.form.submit()">
-                                    <option value="">Tất cả</option>
-                                    <option value="CoDinh" selected="@(ViewBag.NhomFilter == "CoDinh")">Cố định</option>
-                                    <option value="BienDoi" selected="@(ViewBag.NhomFilter == "BienDoi")">Biến đổi</option>
-                                </select>
-                            </div>
-                        </form>
-                    </div>
                     <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
+                        <table class="danhmuc-table">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tên danh mục</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Loại</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nhóm</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ghi chú</th>
-                                    <th class="text-secondary opacity-7"></th>
+                                    <th data-sort="ten">Tên danh mục</th>
+                                    <th data-sort="loai" class="danhmuc-text-center">Loại</th>
+                                    <th data-sort="nhom" class="danhmuc-text-center">Nhóm</th>
+                                    <th class="danhmuc-text-center">Ghi chú</th>
+                                    <th class="danhmuc-text-center">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (ViewBag.DanhMucChiTieu != null)
+                                @if (ViewBag.DanhMucChiTieu != null && ViewBag.DanhMucChiTieu.Count > 0)
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center font-weight-bold">DANH MỤC CHI TIÊU</td>
+                                        <td colspan="5" class="danhmuc-category-group">
+                                            <i class="fas fa-minus-circle danhmuc-icon"></i> DANH MỤC CHI TIÊU
+                                        </td>
                                     </tr>
                                     foreach (var item in ViewBag.DanhMucChiTieu)
                                     {
                                         <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-1">
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">@item.TenDanhMuc</h6>
+                                            <td data-value="ten">
+                                                <div class="danhmuc-d-flex danhmuc-align-items-center">
+                                                    <div class="danhmuc-icon-preview">
+                                                        <i class="fas fa-tag"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="danhmuc-category-name mb-0">@item.TenDanhMuc</h6>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">@item.Loai</p>
+                                            <td data-value="loai" class="danhmuc-text-center">
+                                                <span class="danhmuc-badge danhmuc-badge-expense">@item.Loai</span>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <span class="badge badge-sm @(string.IsNullOrEmpty(item.Nhom) ? "bg-secondary" : item.Nhom == "CoDinh" ? "bg-success" : "bg-warning")">
+                                            <td data-value="nhom" class="danhmuc-text-center">
+                                                <span class="danhmuc-badge @(string.IsNullOrEmpty(item.Nhom) ? "danhmuc-badge-secondary" : item.Nhom == "CoDinh" ? "danhmuc-badge-fixed" : "danhmuc-badge-variable")">
                                                     @(string.IsNullOrEmpty(item.Nhom) ? "N/A" : item.Nhom == "CoDinh" ? "Cố định" : item.Nhom == "BienDoi" ? "Biến đổi" : "N/A")
                                                 </span>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <span class="text-secondary text-xs font-weight-bold">@item.GhiChu</span>
+                                            <td class="danhmuc-text-center">
+                                                <span class="text-muted">@(string.IsNullOrEmpty(item.GhiChu) ? "Không có ghi chú" : item.GhiChu)</span>
                                             </td>
-                                            <td class="align-middle">
-                                                <a href="@Url.Action("Edit", new { id = item.DanhMucId })" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                                                    Sửa
-                                                </a>
-                                                |
-                                                <a href="@Url.Action("Delete", new { id = item.DanhMucId })" class="text-danger font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Delete user">
-                                                    Xóa
-                                                </a>
+                                            <td class="danhmuc-text-center">
+                                                <div class="danhmuc-action-links">
+                                                    <a href="@Url.Action("Edit", new { id = item.DanhMucId })" title="Chỉnh sửa" data-bs-toggle="tooltip">
+                                                        <i class="fas fa-edit"></i> Sửa
+                                                    </a>
+                                                    <a href="@Url.Action("Details", new { id = item.DanhMucId })" title="Chi tiết" data-bs-toggle="tooltip">
+                                                        <i class="fas fa-eye"></i> Xem
+                                                    </a>
+                                                    <a asp-action="Delete" asp-route-id="@item.DanhMucId" title="Xóa" data-bs-toggle="tooltip"
+                                                       data-item-name="danh mục '@item.TenDanhMuc'">
+                                                        <i class="fas fa-trash"></i> Xóa
+                                                    </a>
+                                                </div>
                                             </td>
                                         </tr>
                                     }
                                 }
 
-                                @if (ViewBag.DanhMucThuNhap != null)
+                                @if (ViewBag.DanhMucThuNhap != null && ViewBag.DanhMucThuNhap.Count > 0)
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center font-weight-bold">DANH MỤC THU NHẬP</td>
+                                        <td colspan="5" class="danhmuc-category-group">
+                                            <i class="fas fa-plus-circle danhmuc-icon"></i> DANH MỤC THU NHẬP
+                                        </td>
                                     </tr>
                                     foreach (var item in ViewBag.DanhMucThuNhap)
                                     {
                                         <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-1">
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">@item.TenDanhMuc</h6>
+                                            <td data-value="ten">
+                                                <div class="danhmuc-d-flex danhmuc-align-items-center">
+                                                    <div class="danhmuc-icon-preview">
+                                                        <i class="fas fa-tag"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="danhmuc-category-name mb-0">@item.TenDanhMuc</h6>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">@item.Loai</p>
+                                            <td data-value="loai" class="danhmuc-text-center">
+                                                <span class="danhmuc-badge danhmuc-badge-income">@item.Loai</span>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <span class="badge badge-sm @(string.IsNullOrEmpty(item.Nhom) ? "bg-secondary" : item.Nhom == "CoDinh" ? "bg-success" : "bg-warning")">
+                                            <td data-value="nhom" class="danhmuc-text-center">
+                                                <span class="danhmuc-badge @(string.IsNullOrEmpty(item.Nhom) ? "danhmuc-badge-secondary" : item.Nhom == "CoDinh" ? "danhmuc-badge-fixed" : "danhmuc-badge-variable")">
                                                     @(string.IsNullOrEmpty(item.Nhom) ? "N/A" : item.Nhom == "CoDinh" ? "Cố định" : item.Nhom == "BienDoi" ? "Biến đổi" : "N/A")
                                                 </span>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <span class="text-secondary text-xs font-weight-bold">@item.GhiChu</span>
+                                            <td class="danhmuc-text-center">
+                                                <span class="text-muted">@(string.IsNullOrEmpty(item.GhiChu) ? "Không có ghi chú" : item.GhiChu)</span>
                                             </td>
-                                            <td class="align-middle">
-                                                <a href="@Url.Action("Edit", new { id = item.DanhMucId })" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                                                    Sửa
-                                                </a>
-                                                |
-                                                <a href="@Url.Action("Delete", new { id = item.DanhMucId })" class="text-danger font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Delete user">
-                                                    Xóa
-                                                </a>
+                                            <td class="danhmuc-text-center">
+                                                <div class="danhmuc-action-links">
+                                                    <a href="@Url.Action("Edit", new { id = item.DanhMucId })" title="Chỉnh sửa" data-bs-toggle="tooltip">
+                                                        <i class="fas fa-edit"></i> Sửa
+                                                    </a>
+                                                    <a href="@Url.Action("Details", new { id = item.DanhMucId })" title="Chi tiết" data-bs-toggle="tooltip">
+                                                        <i class="fas fa-eye"></i> Xem
+                                                    </a>
+                                                    <a asp-action="Delete" asp-route-id="@item.DanhMucId" title="Xóa" data-bs-toggle="tooltip"
+                                                       data-item-name="danh mục '@item.TenDanhMuc'">
+                                                        <i class="fas fa-trash"></i> Xóa
+                                                    </a>
+                                                </div>
                                             </td>
                                         </tr>
                                     }
@@ -130,7 +163,14 @@
                                 @if ((ViewBag.DanhMucChiTieu == null || ViewBag.DanhMucChiTieu.Count == 0) && (ViewBag.DanhMucThuNhap == null || ViewBag.DanhMucThuNhap.Count == 0))
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center">Không có dữ liệu</td>
+                                        <td colspan="5" class="danhmuc-empty-state">
+                                            <i class="fas fa-tags"></i>
+                                            <h5>Không có dữ liệu danh mục</h5>
+                                            <p>Chưa có danh mục nào được tạo.</p>
+                                            <a asp-action="Create" class="danhmuc-btn danhmuc-btn-primary danhmuc-mt-3">
+                                                <i class="fas fa-plus danhmuc-icon"></i> Tạo danh mục đầu tiên
+                                            </a>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>

@@ -91,10 +91,10 @@ namespace QuanLyCTCN.Controllers
                 return redirectResult;
             }
 
-            // Lấy danh sách danh mục thu nhập
+            // Lấy danh sách danh mục thu nhập của người dùng hiện tại
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ThuNhap")
+                    .Where(d => d.Loai == "ThuNhap" && d.NguoiDungId == GetCurrentUserId())
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc");
 
@@ -138,7 +138,7 @@ namespace QuanLyCTCN.Controllers
             // Nếu không thành công, chuẩn bị dữ liệu cho view
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ThuNhap")
+                    .Where(d => d.Loai == "ThuNhap" && d.NguoiDungId == GetCurrentUserId())
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc", thuNhap.DanhMucId);
 
@@ -170,10 +170,10 @@ namespace QuanLyCTCN.Controllers
                 return NotFound();
             }
 
-            // Lấy danh sách danh mục thu nhập
+            // Lấy danh sách danh mục thu nhập của người dùng hiện tại
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ThuNhap")
+                    .Where(d => d.Loai == "ThuNhap" && d.NguoiDungId == nguoiDungId)
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc", thuNhap.DanhMucId);
 
@@ -197,6 +197,15 @@ namespace QuanLyCTCN.Controllers
                 return NotFound();
             }
 
+            // Kiểm tra quyền sở hữu thu nhập
+            var existingThuNhap = await _context.ThuNhaps
+                .FirstOrDefaultAsync(t => t.ThuNhapId == id && t.NguoiDungId == GetCurrentUserId());
+
+            if (existingThuNhap == null)
+            {
+                return NotFound();
+            }
+
             // Đảm bảo NguoiDungId được thiết lập
             thuNhap.NguoiDungId = GetCurrentUserId();
 
@@ -204,7 +213,14 @@ namespace QuanLyCTCN.Controllers
             {
                 try
                 {
-                    _context.Update(thuNhap);
+                    // Cập nhật các thuộc tính của entity hiện có
+                    existingThuNhap.SoTien = thuNhap.SoTien;
+                    existingThuNhap.NgayNhap = thuNhap.NgayNhap;
+                    existingThuNhap.DanhMucId = thuNhap.DanhMucId;
+                    existingThuNhap.GhiChu = thuNhap.GhiChu;
+                    // NguoiDungId đã được kiểm tra
+
+                    _context.Update(existingThuNhap);
                     await _context.SaveChangesAsync();
 
                     // Kiểm tra và cập nhật mục tiêu tiết kiệm nếu cần
@@ -212,7 +228,7 @@ namespace QuanLyCTCN.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ThuNhapExists(thuNhap.ThuNhapId))
+                    if (!ThuNhapExists(existingThuNhap.ThuNhapId))
                     {
                         return NotFound();
                     }
@@ -228,7 +244,7 @@ namespace QuanLyCTCN.Controllers
             // Nếu không thành công, chuẩn bị dữ liệu cho view
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ThuNhap")
+                    .Where(d => d.Loai == "ThuNhap" && d.NguoiDungId == GetCurrentUserId())
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc", thuNhap.DanhMucId);
 
@@ -281,15 +297,36 @@ namespace QuanLyCTCN.Controllers
             var thuNhap = await _context.ThuNhaps
                 .FirstOrDefaultAsync(t => t.ThuNhapId == id && t.NguoiDungId == nguoiDungId);
 
-            if (thuNhap != null)
+            if (thuNhap == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy thu nhập cần xóa hoặc bạn không có quyền xóa thu nhập này.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 _context.ThuNhaps.Remove(thuNhap);
-                await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
 
-                // Cập nhật lại mục tiêu sau khi xóa thu nhập
-                await KiemTraVaCapNhatMucTieu(nguoiDungId!.Value);
-
-                TempData["SuccessMessage"] = "Xóa thu nhập thành công!";
+                if (result > 0)
+                {
+                    // Cập nhật lại mục tiêu sau khi xóa thu nhập
+                    await KiemTraVaCapNhatMucTieu(nguoiDungId!.Value);
+                    TempData["SuccessMessage"] = "Xóa thu nhập thành công!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể xóa thu nhập. Vui lòng thử lại.";
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                TempData["ErrorMessage"] = "Thu nhập đã được thay đổi hoặc xóa bởi người dùng khác. Vui lòng làm mới trang và thử lại.";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi xóa thu nhập ID {id}: {ex.Message}");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa thu nhập. Vui lòng thử lại.";
             }
 
             return RedirectToAction(nameof(Index));

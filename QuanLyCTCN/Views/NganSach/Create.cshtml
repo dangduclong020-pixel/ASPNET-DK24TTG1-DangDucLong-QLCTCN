@@ -5,74 +5,115 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Thêm ngân sách mới</h6>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/ngansach.css" />
+}
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="DanhMucId" class="form-control-label"></label>
-                                    <select asp-for="DanhMucId" class="form-control" asp-items="ViewBag.DanhMucList">
-                                        <option value="">-- Chọn danh mục --</option>
-                                    </select>
-                                    <span asp-validation-for="DanhMucId" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="HanMuc" class="form-control-label"></label>
-                                    <input asp-for="HanMuc" class="form-control" />
-                                    <span asp-validation-for="HanMuc" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
+@section Scripts {
+    <script src="~/js/ngansach.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="Thang" class="form-control-label"></label>
-                                    <select asp-for="Thang" class="form-control">
-                                        @for (int i = 1; i <= 12; i++)
-                                        {
-                                            <option value="@i" selected="@(Model.Thang == i)">Tháng @i</option>
-                                        }
-                                    </select>
-                                    <span asp-validation-for="Thang" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="Nam" class="form-control-label"></label>
-                                    <select asp-for="Nam" class="form-control">
-                                        @for (int i = DateTime.Now.Year - 2; i <= DateTime.Now.Year + 2; i++)
-                                        {
-                                            <option value="@i" selected="@(Model.Nam == i)">@i</option>
-                                        }
-                                    </select>
-                                    <span asp-validation-for="Nam" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
+<div class="ngansach-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="ngansach-card">
+                    <div class="ngansach-card-header create-mode">
+                        <h6><i class="fas fa-plus-circle ngansach-icon"></i> Thêm ngân sách mới</h6>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="Create" method="post" class="ngansach-form">
+                            @Html.AntiForgeryToken()
+                            <div asp-validation-summary="ModelOnly" class="ngansach-text-danger ngansach-mb-3"></div>
 
-                        <div class="form-group">
-                            <input type="submit" value="Thêm mới" class="btn btn-primary" />
-                            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
-                        </div>
-                    </form>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="ngansach-form-group">
+                                        <label asp-for="DanhMucId" class="ngansach-form-label"></label>
+                                        <div class="ngansach-input-group">
+                                            <span class="ngansach-input-group-text">
+                                                <i class="fas fa-tag"></i>
+                                            </span>
+                                            <select asp-for="DanhMucId" class="ngansach-form-select grouped" asp-items="ViewBag.DanhMucList" required>
+                                                <option value="">-- Chọn danh mục --</option>
+                                            </select>
+                                        </div>
+                                        <span asp-validation-for="DanhMucId" class="ngansach-text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="ngansach-form-group">
+                                        <label asp-for="HanMuc" class="ngansach-form-label"></label>
+                                        <div class="ngansach-input-group">
+                                            <span class="ngansach-input-group-text">
+                                                <i class="fas fa-money-bill-wave"></i>
+                                            </span>
+                                            <input asp-for="HanMuc" class="ngansach-form-control grouped" placeholder="Nhập hạn mức" type="number" min="0" step="1000" required />
+                                        </div>
+                                        <span asp-validation-for="HanMuc" class="ngansach-text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="ngansach-form-group">
+                                        <label asp-for="Thang" class="ngansach-form-label"></label>
+                                        <div class="ngansach-input-group">
+                                            <span class="ngansach-input-group-text">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </span>
+                                            <select asp-for="Thang" class="ngansach-form-select grouped" required>
+                                                @for (int i = 1; i <= 12; i++)
+                                                {
+                                                    <option value="@i" selected="@(Model.Thang == i)">Tháng @i</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <span asp-validation-for="Thang" class="ngansach-text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="ngansach-form-group">
+                                        <label asp-for="Nam" class="ngansach-form-label"></label>
+                                        <div class="ngansach-input-group">
+                                            <span class="ngansach-input-group-text">
+                                                <i class="fas fa-calendar"></i>
+                                            </span>
+                                            <select asp-for="Nam" class="ngansach-form-select grouped" required>
+                                                @for (int i = DateTime.Now.Year - 2; i <= DateTime.Now.Year + 2; i++)
+                                                {
+                                                    <option value="@i" selected="@(Model.Nam == i)">@i</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <span asp-validation-for="Nam" class="ngansach-text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="ngansach-form-group ngansach-mt-3">
+                                <div class="ngansach-d-flex ngansach-gap-3 ngansach-justify-content-between">
+                                    <div>
+                                        <button type="submit" class="ngansach-btn ngansach-btn-primary">
+                                            <i class="fas fa-save ngansach-icon"></i> Thêm mới
+                                        </button>
+                                        <button type="reset" class="ngansach-btn ngansach-btn-secondary">
+                                            <i class="fas fa-undo ngansach-icon"></i> Đặt lại
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <a asp-action="Index" class="ngansach-btn ngansach-btn-outline-primary">
+                                            <i class="fas fa-arrow-left ngansach-icon"></i> Quay lại danh sách
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

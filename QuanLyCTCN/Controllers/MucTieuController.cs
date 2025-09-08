@@ -166,6 +166,15 @@ namespace QuanLyCTCN.Controllers
                 return NotFound();
             }
 
+            // Kiểm tra quyền sở hữu mục tiêu
+            var existingMucTieu = await _context.MucTieus
+                .FirstOrDefaultAsync(m => m.MucTieuId == id && m.NguoiDungId == nguoiDungId);
+
+            if (existingMucTieu == null)
+            {
+                return NotFound();
+            }
+
             // Đảm bảo NguoiDungId được thiết lập
             mucTieu.NguoiDungId = nguoiDungId;
 
@@ -177,17 +186,24 @@ namespace QuanLyCTCN.Controllers
                     var oldMucTieu = await _context.MucTieus.AsNoTracking()
                         .FirstOrDefaultAsync(m => m.MucTieuId == id);
 
-                    _context.Update(mucTieu);
+                    // Cập nhật các thuộc tính của entity hiện có
+                    existingMucTieu.TenMucTieu = mucTieu.TenMucTieu;
+                    existingMucTieu.SoTienCan = mucTieu.SoTienCan;
+                    existingMucTieu.SoTienDaTietKiem = mucTieu.SoTienDaTietKiem;
+                    existingMucTieu.Han = mucTieu.Han;
+                    // NguoiDungId đã được kiểm tra
+
+                    _context.Update(existingMucTieu);
                     await _context.SaveChangesAsync();
 
                     // Kiểm tra nếu đã đạt mục tiêu
-                    if (mucTieu.SoTienDaTietKiem >= mucTieu.SoTienCan && 
+                    if (existingMucTieu.SoTienDaTietKiem >= existingMucTieu.SoTienCan && 
                         (oldMucTieu == null || oldMucTieu.SoTienDaTietKiem < oldMucTieu.SoTienCan))
                     {
                         var nhacNho = new NhacNho
                         {
                             NguoiDungId = nguoiDungId,
-                            NoiDung = $"Chúc mừng! Bạn đã hoàn thành mục tiêu \"{mucTieu.TenMucTieu}\" với số tiền {mucTieu.SoTienCan:N0} VND.",
+                            NoiDung = $"Chúc mừng! Bạn đã hoàn thành mục tiêu \"{existingMucTieu.TenMucTieu}\" với số tiền {existingMucTieu.SoTienCan:N0} VND.",
                             ThoiGian = DateTime.Now,
                             Loai = "MucTieu"
                         };
@@ -197,7 +213,7 @@ namespace QuanLyCTCN.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MucTieuExists(mucTieu.MucTieuId))
+                    if (!MucTieuExists(existingMucTieu.MucTieuId))
                     {
                         return NotFound();
                     }
@@ -253,11 +269,34 @@ namespace QuanLyCTCN.Controllers
             var mucTieu = await _context.MucTieus
                 .FirstOrDefaultAsync(m => m.MucTieuId == id && m.NguoiDungId == nguoiDungId);
 
-            if (mucTieu != null)
+            if (mucTieu == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy mục tiêu cần xóa hoặc bạn không có quyền xóa mục tiêu này.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 _context.MucTieus.Remove(mucTieu);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Xóa mục tiêu thành công!";
+                var result = await _context.SaveChangesAsync();
+
+                if (result > 0)
+                {
+                    TempData["SuccessMessage"] = "Xóa mục tiêu thành công!";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể xóa mục tiêu. Vui lòng thử lại.";
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                TempData["ErrorMessage"] = "Mục tiêu đã được thay đổi hoặc xóa bởi người dùng khác. Vui lòng làm mới trang và thử lại.";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi xóa mục tiêu ID {id}: {ex.Message}");
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa mục tiêu. Vui lòng thử lại.";
             }
 
             return RedirectToAction(nameof(Index));
@@ -280,6 +319,10 @@ namespace QuanLyCTCN.Controllers
 
             if (mucTieu == null)
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = false, message = "Mục tiêu không tồn tại." });
+                }
                 return NotFound();
             }
 
@@ -305,10 +348,18 @@ namespace QuanLyCTCN.Controllers
                 _context.NhacNhos.Add(nhacNho);
                 await _context.SaveChangesAsync();
 
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = true, message = "Chúc mừng! Bạn đã hoàn thành mục tiêu này!" });
+                }
                 TempData["SuccessMessage"] = "Chúc mừng! Bạn đã hoàn thành mục tiêu này!";
             }
             else
             {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { success = true, message = "Cập nhật tiến độ mục tiêu thành công!" });
+                }
                 TempData["SuccessMessage"] = "Cập nhật tiến độ mục tiêu thành công!";
             }
 

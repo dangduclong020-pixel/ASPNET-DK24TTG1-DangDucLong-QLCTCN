@@ -5,49 +5,82 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid py-4">
+@section Styles {
+    <link rel="stylesheet" href="~/css/chitieu.css" />
+}
+
+@section Scripts {
+    <script src="~/js/chitieu.js"></script>
+}
+
+<div class="container-fluid py-4 chitieu-page">
     <div class="row">
         <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Xóa chi tiêu</h6>
+            <div class="chitieu-card">
+                <div class="chitieu-card-header delete-mode">
+                    <h6><i class="fas fa-trash-alt chitieu-icon"></i> Xóa chi tiêu</h6>
                 </div>
                 <div class="card-body">
-                    <h3>Bạn có chắc chắn muốn xóa chi tiêu này?</h3>
-                    <div>
-                        <hr />
-                        <dl class="row">
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.NgayChi)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.NgayChi)
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.DanhMuc)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @(Model.DanhMuc?.TenDanhMuc ?? "N/A")
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.SoTien)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.SoTien)
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.GhiChu)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.GhiChu)
-                            </dd>
-                        </dl>
-                        
-                        <form asp-action="Delete" method="post">
-                            <input type="hidden" asp-for="ChiTieuId" />
-                            <input type="submit" value="Xóa" class="btn btn-danger" /> |
-                            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
-                        </form>
+                    <div class="chitieu-delete-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa chi tiêu này?
+                    </div>
+
+                    <div class="chitieu-delete-details">
+                        <h5><i class="fas fa-info-circle"></i> Chi tiết chi tiêu sẽ bị xóa:</h5>
+
+                        <div class="chitieu-detail-row">
+                            <span class="chitieu-detail-label">
+                                <i class="fas fa-calendar"></i> Ngày chi tiêu:
+                            </span>
+                            <span class="chitieu-detail-value">@Model.NgayChi.ToString("dd/MM/yyyy")</span>
+                        </div>
+
+                        <div class="chitieu-detail-row">
+                            <span class="chitieu-detail-label">
+                                <i class="fas fa-tag"></i> Danh mục:
+                            </span>
+                            <span class="chitieu-detail-value">@(Model.DanhMuc?.TenDanhMuc ?? "N/A")</span>
+                        </div>
+
+                        <div class="chitieu-detail-row">
+                            <span class="chitieu-detail-label">
+                                <i class="fas fa-money-bill-wave"></i> Số tiền:
+                            </span>
+                            <span class="chitieu-detail-value chitieu-expense-amount">@Model.SoTien.ToString("N0") đ</span>
+                        </div>
+
+                        <div class="chitieu-detail-row">
+                            <span class="chitieu-detail-label">
+                                <i class="fas fa-comment"></i> Ghi chú:
+                            </span>
+                            <span class="chitieu-detail-value">@(string.IsNullOrEmpty(Model.GhiChu) ? "Không có ghi chú" : Model.GhiChu)</span>
+                        </div>
+                    </div>
+
+                    <div class="chitieu-form-group chitieu-mt-3">
+                        <div class="chitieu-d-flex chitieu-gap-3 chitieu-justify-content-between">
+                            <div>
+                                <form asp-action="Delete" method="post" class="chitieu-d-flex chitieu-align-items-center">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" asp-for="ChiTieuId" />
+                                    <button type="submit" class="chitieu-btn chitieu-btn-danger">
+                                        <i class="fas fa-trash chitieu-icon"></i> Xóa chi tiêu
+                                    </button>
+                                </form>
+                            </div>
+                            <div>
+                                <a asp-action="Details" asp-route-id="@Model.ChiTieuId" class="chitieu-btn chitieu-btn-outline-primary">
+                                    <i class="fas fa-eye chitieu-icon"></i> Xem chi tiết
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@Model.ChiTieuId" class="chitieu-btn chitieu-btn-outline-primary">
+                                    <i class="fas fa-edit chitieu-icon"></i> Chỉnh sửa
+                                </a>
+                                <a asp-action="Index" class="chitieu-btn chitieu-btn-outline-primary">
+                                    <i class="fas fa-arrow-left chitieu-icon"></i> Quay lại danh sách
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -5,71 +5,12 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Chỉnh sửa danh mục</h6>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Edit" method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <input type="hidden" asp-for="DanhMucId" />
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="TenDanhMuc" class="form-control-label"></label>
-                                    <input asp-for="TenDanhMuc" class="form-control" />
-                                    <span asp-validation-for="TenDanhMuc" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="Loai" class="form-control-label"></label>
-                                    <select asp-for="Loai" class="form-control" onchange="toggleNhomField()">
-                                        <option value="ChiTieu">Chi tiêu</option>
-                                        <option value="ThuNhap">Thu nhập</option>
-                                    </select>
-                                    <span asp-validation-for="Loai" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group" id="nhomField">
-                                    <label asp-for="Nhom" class="form-control-label"></label>
-                                    <select asp-for="Nhom" class="form-control">
-                                        <option value="">-- Chọn nhóm --</option>
-                                        <option value="CoDinh">Cố định</option>
-                                        <option value="BienDoi">Biến đổi</option>
-                                    </select>
-                                    <span asp-validation-for="Nhom" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label asp-for="GhiChu" class="form-control-label"></label>
-                                    <input asp-for="GhiChu" class="form-control" />
-                                    <span asp-validation-for="GhiChu" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <input type="submit" value="Cập nhật" class="btn btn-primary" />
-                            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/danhmuc.css" />
+}
 
 @section Scripts {
+    <script src="~/js/danhmuc.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
         function toggleNhomField() {
@@ -82,10 +23,111 @@
                 nhomField.style.display = 'none';
             }
         }
-        
+
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             toggleNhomField();
         });
     </script>
 }
+
+<div class="container-fluid py-4 danhmuc-page">
+    <div class="row">
+        <div class="col-12">
+            <div class="danhmuc-card">
+                <div class="danhmuc-card-header edit-mode">
+                    <h6><i class="fas fa-edit danhmuc-icon"></i> Chỉnh sửa danh mục</h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" class="danhmuc-form">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="danhmuc-text-danger danhmuc-mb-3"></div>
+                        <input type="hidden" asp-for="DanhMucId" />
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="danhmuc-form-group">
+                                    <label asp-for="TenDanhMuc" class="danhmuc-form-label"></label>
+                                    <div class="danhmuc-input-group">
+                                        <span class="danhmuc-input-group-text">
+                                            <i class="fas fa-tag"></i>
+                                        </span>
+                                        <input asp-for="TenDanhMuc" class="danhmuc-form-control grouped" placeholder="Nhập tên danh mục" required />
+                                    </div>
+                                    <span asp-validation-for="TenDanhMuc" class="danhmuc-text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="danhmuc-form-group">
+                                    <label asp-for="Loai" class="danhmuc-form-label"></label>
+                                    <div class="danhmuc-input-group">
+                                        <span class="danhmuc-input-group-text">
+                                            <i class="fas fa-list"></i>
+                                        </span>
+                                        <select asp-for="Loai" class="danhmuc-form-select grouped" onchange="toggleNhomField()" required>
+                                            <option value="ChiTieu">Chi tiêu</option>
+                                            <option value="ThuNhap">Thu nhập</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="Loai" class="danhmuc-text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="danhmuc-form-group" id="nhomField">
+                                    <label asp-for="Nhom" class="danhmuc-form-label"></label>
+                                    <div class="danhmuc-input-group">
+                                        <span class="danhmuc-input-group-text">
+                                            <i class="fas fa-layer-group"></i>
+                                        </span>
+                                        <select asp-for="Nhom" class="danhmuc-form-select grouped">
+                                            <option value="">-- Chọn nhóm --</option>
+                                            <option value="CoDinh">Cố định</option>
+                                            <option value="BienDoi">Biến đổi</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="Nhom" class="danhmuc-text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="danhmuc-form-group">
+                                    <label asp-for="GhiChu" class="danhmuc-form-label"></label>
+                                    <div class="danhmuc-input-group">
+                                        <span class="danhmuc-input-group-text">
+                                            <i class="fas fa-comment"></i>
+                                        </span>
+                                        <input asp-for="GhiChu" class="danhmuc-form-control grouped" placeholder="Nhập ghi chú (tùy chọn)" />
+                                    </div>
+                                    <span asp-validation-for="GhiChu" class="danhmuc-text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="danhmuc-form-group danhmuc-mt-3">
+                            <div class="danhmuc-d-flex danhmuc-gap-3 danhmuc-justify-content-between">
+                                <div>
+                                    <button type="submit" class="danhmuc-btn danhmuc-btn-warning">
+                                        <i class="fas fa-save danhmuc-icon"></i> Cập nhật
+                                    </button>
+                                    <button type="reset" class="danhmuc-btn danhmuc-btn-secondary">
+                                        <i class="fas fa-undo danhmuc-icon"></i> Đặt lại
+                                    </button>
+                                </div>
+                                <div>
+                                    <a asp-action="Details" asp-route-id="@Model.DanhMucId" class="danhmuc-btn danhmuc-btn-outline-primary">
+                                        <i class="fas fa-eye danhmuc-icon"></i> Xem chi tiết
+                                    </a>
+                                    <a asp-action="Index" class="danhmuc-btn danhmuc-btn-outline-primary">
+                                        <i class="fas fa-arrow-left danhmuc-icon"></i> Quay lại danh sách
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -5,69 +5,106 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid py-4">
+@section Styles {
+    <link rel="stylesheet" href="~/css/thunhap.css" />
+}
+
+@section Scripts {
+    <script src="~/js/thunhap.js"></script>
+}
+
+<div class="container-fluid py-4 thunhap-page">
     <div class="row">
         <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Danh sách thu nhập</h6>
+            <div class="thunhap-card">
+                <div class="thunhap-card-header">
+                    <h6><i class="fas fa-list-ul thunhap-icon"></i> Danh sách thu nhập</h6>
                     <div class="row mb-3">
-                        <div class="col-md-4">
-                            <form asp-action="Index" method="get" class="d-flex">
-                                <input type="date" name="tuNgay" value="@ViewBag.TuNgay" class="form-control me-2" />
-                                <input type="date" name="denNgay" value="@ViewBag.DenNgay" class="form-control me-2" />
-                                <button type="submit" class="btn btn-outline-primary">Lọc</button>
-                            </form>
-                        </div>
-                        <div class="col-md-4 text-end">
-                            <a asp-action="Create" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Thêm mới
-                            </a>
+                        <div class="col-12">
+                            <div class="thunhap-filter-section">
+                                <form asp-action="Index" method="get" class="thunhap-filter-form thunhap-d-flex thunhap-gap-3 thunhap-align-items-end thunhap-flex-wrap">
+                                    <div class="thunhap-form-group">
+                                        <label class="thunhap-form-label">Từ ngày</label>
+                                        <input type="date" name="tuNgay" value="@ViewBag.TuNgay" class="thunhap-form-control" />
+                                    </div>
+                                    <div class="thunhap-form-group">
+                                        <label class="thunhap-form-label">Đến ngày</label>
+                                        <input type="date" name="denNgay" value="@ViewBag.DenNgay" class="thunhap-form-control" />
+                                    </div>
+                                    <button type="submit" class="thunhap-btn thunhap-btn-primary">
+                                        <i class="fas fa-filter thunhap-icon"></i> Lọc
+                                    </button>
+                                    <button type="button" class="thunhap-btn thunhap-btn-secondary thunhap-clear-filters">
+                                        <i class="fas fa-times thunhap-icon"></i> Xóa lọc
+                                    </button>
+                                    <div class="thunhap-d-flex thunhap-align-items-end thunhap-ms-auto">
+                                        <a asp-action="Create" class="thunhap-btn thunhap-btn-primary">
+                                            <i class="fas fa-plus thunhap-icon"></i> Thêm mới
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
+                        <table class="thunhap-table">
                             <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ngày</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Danh mục</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Số tiền</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ghi chú</th>
-                                    <th class="text-secondary opacity-7"></th>
+                                    <th data-sort="ngay">Ngày</th>
+                                    <th data-sort="danhmuc">Danh mục</th>
+                                    <th data-sort="sotien" class="thunhap-text-center">Số tiền</th>
+                                    <th class="thunhap-text-center">Ghi chú</th>
+                                    <th class="thunhap-text-center">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (Model != null)
+                                @if (Model != null && Model.Any())
                                 {
                                     foreach (var item in Model)
                                     {
                                         <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-1">
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">@item.NgayNhap.ToString("dd/MM/yyyy")</h6>
+                                            <td data-value="ngay">
+                                                <div class="thunhap-d-flex thunhap-align-items-center">
+                                                    <div class="thunhap-icon-preview">
+                                                        <i class="fas fa-calendar-day"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-0">@item.NgayNhap.ToString("dd/MM/yyyy")</h6>
+                                                        <small class="text-muted">@item.NgayNhap.ToString("dddd", new System.Globalization.CultureInfo("vi-VN"))</small>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <p class="text-xs font-weight-bold mb-0">@(item.DanhMuc?.TenDanhMuc ?? "Không có")</p>
+                                            <td data-value="danhmuc">
+                                                <div class="thunhap-d-flex thunhap-align-items-center">
+                                                    <div class="thunhap-icon-preview">
+                                                        <i class="fas fa-tag"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="fw-bold">@(item.DanhMuc?.TenDanhMuc ?? "Không có")</span>
+                                                    </div>
+                                                </div>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <span class="text-secondary text-xs font-weight-bold">@item.SoTien.ToString("N0") đ</span>
+                                            <td data-value="sotien" class="thunhap-text-center">
+                                                <span class="thunhap-income-amount">@item.SoTien.ToString("N0") đ</span>
                                             </td>
-                                            <td class="align-middle text-center">
-                                                <span class="text-secondary text-xs font-weight-bold">@item.GhiChu</span>
+                                            <td class="thunhap-text-center">
+                                                <span class="text-muted">@(string.IsNullOrEmpty(item.GhiChu) ? "Không có ghi chú" : item.GhiChu)</span>
                                             </td>
-                                            <td class="align-middle">
-                                                <a href="@Url.Action("Edit", new { id = item.ThuNhapId })" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit user">
-                                                    Sửa
-                                                </a>
-                                                |
-                                                <a href="@Url.Action("Delete", new { id = item.ThuNhapId })" class="text-danger font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Delete user">
-                                                    Xóa
-                                                </a>
+                                            <td class="thunhap-text-center">
+                                                <div class="thunhap-action-links">
+                                                    <a href="@Url.Action("Edit", new { id = item.ThuNhapId })" title="Chỉnh sửa" data-bs-toggle="tooltip">
+                                                        <i class="fas fa-edit"></i> Sửa
+                                                    </a>
+                                                    <a href="@Url.Action("Details", new { id = item.ThuNhapId })" title="Chi tiết" data-bs-toggle="tooltip">
+                                                        <i class="fas fa-eye"></i> Xem
+                                                    </a>
+                                                    <a href="@Url.Action("Delete", new { id = item.ThuNhapId })" title="Xóa" data-bs-toggle="tooltip"
+                                                       data-item-name="thu nhập ngày @item.NgayNhap.ToString("dd/MM/yyyy")">
+                                                        <i class="fas fa-trash"></i> Xóa
+                                                    </a>
+                                                </div>
                                             </td>
                                         </tr>
                                     }
@@ -75,7 +112,14 @@
                                 else
                                 {
                                     <tr>
-                                        <td colspan="5" class="text-center">Không có dữ liệu</td>
+                                        <td colspan="5" class="thunhap-empty-state">
+                                            <i class="fas fa-inbox"></i>
+                                            <h5>Không có dữ liệu thu nhập</h5>
+                                            <p>Chưa có khoản thu nhập nào được ghi nhận.</p>
+                                            <a asp-action="Create" class="thunhap-btn thunhap-btn-primary thunhap-mt-3">
+                                                <i class="fas fa-plus thunhap-icon"></i> Thêm thu nhập đầu tiên
+                                            </a>
+                                        </td>
                                     </tr>
                                 }
                             </tbody>

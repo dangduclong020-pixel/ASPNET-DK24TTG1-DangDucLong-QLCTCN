@@ -1,0 +1,661 @@
+/* MucTieu CSS - Interactive Components and Animations */
+
+/* ===== VARIABLES ===== */
+:root {
+    --muctieu-primary: #4f46e5;
+    --muctieu-primary-light: #6366f1;
+    --muctieu-primary-dark: #3730a3;
+    --muctieu-success: #10b981;
+    --muctieu-success-light: #34d399;
+    --muctieu-success-dark: #059669;
+    --muctieu-warning: #f59e0b;
+    --muctieu-warning-light: #fbbf24;
+    --muctieu-warning-dark: #d97706;
+    --muctieu-danger: #ef4444;
+    --muctieu-danger-light: #f87171;
+    --muctieu-danger-dark: #dc2626;
+    --muctieu-info: #06b6d4;
+    --muctieu-info-light: #22d3ee;
+    --muctieu-info-dark: #0891b2;
+    --muctieu-secondary: #6b7280;
+    --muctieu-secondary-light: #9ca3af;
+    --muctieu-secondary-dark: #4b5563;
+    --muctieu-light: #f8fafc;
+    --muctieu-dark: #1f2937;
+    --muctieu-border: #e5e7eb;
+    --muctieu-border-light: #f3f4f6;
+    --muctieu-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --muctieu-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --muctieu-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --muctieu-radius: 0.5rem;
+    --muctieu-radius-lg: 0.75rem;
+    --muctieu-radius-xl: 1rem;
+    --muctieu-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --muctieu-transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --muctieu-transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== BASE STYLES ===== */
+.muctieu-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.muctieu-card {
+    background: white;
+    border-radius: var(--muctieu-radius-lg);
+    box-shadow: var(--muctieu-shadow-xl);
+    border: none;
+    overflow: hidden;
+    transition: var(--muctieu-transition);
+    margin-bottom: 1.5rem;
+}
+
+.muctieu-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.muctieu-card-header {
+    background: linear-gradient(135deg, var(--muctieu-primary) 0%, var(--muctieu-primary-light) 100%);
+    color: white;
+    padding: 1.5rem;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.muctieu-card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.muctieu-card-header h6 {
+    margin: 0;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+}
+
+.muctieu-icon {
+    margin-right: 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+/* ===== CARD COMPONENTS ===== */
+.muctieu-goal-card {
+    border: 2px solid var(--muctieu-border);
+    border-radius: var(--muctieu-radius-lg);
+    transition: var(--muctieu-transition);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.muctieu-goal-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.muctieu-goal-card:hover::before {
+    left: 100%;
+}
+
+.muctieu-goal-card:hover {
+    border-color: var(--muctieu-primary);
+    transform: translateY(-4px);
+    box-shadow: var(--muctieu-shadow-lg);
+}
+
+.muctieu-goal-card.completed {
+    border-color: var(--muctieu-success);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+}
+
+.muctieu-goal-card.overdue {
+    border-color: var(--muctieu-danger);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+}
+
+/* ===== PROGRESS COMPONENTS ===== */
+.muctieu-progress-container {
+    position: relative;
+    margin: 1rem 0;
+}
+
+.muctieu-progress-bar {
+    height: 12px;
+    border-radius: 6px;
+    background: var(--muctieu-border-light);
+    overflow: hidden;
+    position: relative;
+}
+
+.muctieu-progress-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 1s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.muctieu-progress-fill::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+.muctieu-progress-fill.success {
+    background: linear-gradient(135deg, var(--muctieu-success) 0%, var(--muctieu-success-light) 100%);
+}
+
+.muctieu-progress-fill.warning {
+    background: linear-gradient(135deg, var(--muctieu-warning) 0%, var(--muctieu-warning-light) 100%);
+}
+
+.muctieu-progress-fill.danger {
+    background: linear-gradient(135deg, var(--muctieu-danger) 0%, var(--muctieu-danger-light) 100%);
+}
+
+.muctieu-progress-fill.info {
+    background: linear-gradient(135deg, var(--muctieu-info) 0%, var(--muctieu-info-light) 100%);
+}
+
+/* ===== AMOUNT DISPLAY ===== */
+.muctieu-amount-display {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: var(--muctieu-radius);
+    transition: var(--muctieu-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.muctieu-amount-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(79, 70, 229, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.muctieu-amount-display:hover::before {
+    opacity: 1;
+}
+
+.muctieu-amount-display .amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.muctieu-amount-display .label {
+    font-size: 0.875rem;
+    color: var(--muctieu-secondary);
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== BUTTONS ===== */
+.muctieu-btn {
+    border: none;
+    border-radius: var(--muctieu-radius);
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--muctieu-transition);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.muctieu-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.muctieu-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.muctieu-btn-primary {
+    background: linear-gradient(135deg, var(--muctieu-primary) 0%, var(--muctieu-primary-light) 100%);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1);
+}
+
+.muctieu-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.1);
+}
+
+.muctieu-btn-success {
+    background: linear-gradient(135deg, var(--muctieu-success) 0%, var(--muctieu-success-light) 100%);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1);
+}
+
+.muctieu-btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
+}
+
+.muctieu-btn-warning {
+    background: linear-gradient(135deg, var(--muctieu-warning) 0%, var(--muctieu-warning-light) 100%);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1);
+}
+
+.muctieu-btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.1);
+}
+
+.muctieu-btn-danger {
+    background: linear-gradient(135deg, var(--muctieu-danger) 0%, var(--muctieu-danger-light) 100%);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
+}
+
+.muctieu-btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.1);
+}
+
+.muctieu-btn-outline-primary {
+    background: transparent;
+    color: var(--muctieu-primary);
+    border: 2px solid var(--muctieu-primary);
+}
+
+.muctieu-btn-outline-primary:hover {
+    background: var(--muctieu-primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ===== MODAL ENHANCEMENTS ===== */
+.muctieu-modal .modal-content {
+    border-radius: var(--muctieu-radius-lg);
+    border: none;
+    box-shadow: var(--muctieu-shadow-xl);
+}
+
+.muctieu-modal .modal-header {
+    background: linear-gradient(135deg, var(--muctieu-primary) 0%, var(--muctieu-primary-light) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--muctieu-radius-lg) var(--muctieu-radius-lg) 0 0;
+}
+
+.muctieu-modal .modal-body {
+    padding: 2rem;
+}
+
+.muctieu-modal .form-control {
+    border: 2px solid var(--muctieu-border);
+    border-radius: var(--muctieu-radius);
+    padding: 0.75rem 1rem;
+    transition: var(--muctieu-transition);
+}
+
+.muctieu-modal .form-control:focus {
+    border-color: var(--muctieu-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ===== UTILITY CLASSES ===== */
+.muctieu-fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.muctieu-bounce-in {
+    animation: bounceIn 0.8s ease-out;
+}
+
+.muctieu-slide-in-left {
+    animation: slideInLeft 0.6s ease-out;
+}
+
+.muctieu-slide-in-right {
+    animation: slideInRight 0.6s ease-out;
+}
+
+.muctieu-d-flex {
+    display: flex;
+}
+
+.muctieu-align-items-center {
+    align-items: center;
+}
+
+.muctieu-justify-content-center {
+    justify-content: center;
+}
+
+.muctieu-justify-content-between {
+    justify-content: space-between;
+}
+
+.muctieu-gap-2 {
+    gap: 0.5rem;
+}
+
+.muctieu-gap-3 {
+    gap: 1rem;
+}
+
+.muctieu-mb-3 {
+    margin-bottom: 1rem;
+}
+
+.muctieu-mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.muctieu-mt-3 {
+    margin-top: 1rem;
+}
+
+.muctieu-mt-4 {
+    margin-top: 1.5rem;
+}
+
+.muctieu-p-3 {
+    padding: 1rem;
+}
+
+.muctieu-p-4 {
+    padding: 1.5rem;
+}
+
+.muctieu-text-center {
+    text-align: center;
+}
+
+.muctieu-text-primary {
+    color: var(--muctieu-primary) !important;
+}
+
+.muctieu-text-success {
+    color: var(--muctieu-success) !important;
+}
+
+.muctieu-text-warning {
+    color: var(--muctieu-warning) !important;
+}
+
+.muctieu-text-danger {
+    color: var(--muctieu-danger) !important;
+}
+
+.muctieu-bg-light {
+    background-color: var(--muctieu-light) !important;
+}
+
+.muctieu-border {
+    border: 1px solid var(--muctieu-border) !important;
+}
+
+.muctieu-border-primary {
+    border-color: var(--muctieu-primary) !important;
+}
+
+.muctieu-border-success {
+    border-color: var(--muctieu-success) !important;
+}
+
+.muctieu-border-warning {
+    border-color: var(--muctieu-warning) !important;
+}
+
+.muctieu-border-danger {
+    border-color: var(--muctieu-danger) !important;
+}
+
+.muctieu-shadow {
+    box-shadow: var(--muctieu-shadow) !important;
+}
+
+.muctieu-shadow-lg {
+    box-shadow: var(--muctieu-shadow-lg) !important;
+}
+
+.muctieu-shadow-xl {
+    box-shadow: var(--muctieu-shadow-xl) !important;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .muctieu-page {
+        padding: 1rem 0;
+    }
+
+    .muctieu-card {
+        margin: 0 1rem 1rem;
+    }
+
+    .muctieu-card-header {
+        padding: 1rem;
+    }
+
+    .muctieu-amount-display {
+        padding: 1rem;
+    }
+
+    .muctieu-amount-display .amount {
+        font-size: 1.25rem;
+    }
+
+    .muctieu-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .muctieu-goal-card {
+        margin-bottom: 1rem;
+    }
+
+    .muctieu-modal .modal-body {
+        padding: 1.5rem;
+    }
+
+    .muctieu-progress-container {
+        margin: 0.5rem 0;
+    }
+}
+
+/* ===== LOADING STATES ===== */
+.muctieu-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.muctieu-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--muctieu-border);
+    border-top: 2px solid var(--muctieu-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===== SUCCESS/CELEBRATION EFFECTS ===== */
+.muctieu-celebration {
+    position: relative;
+    overflow: hidden;
+}
+
+.muctieu-celebration::before {
+    content: '🎉';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    animation: bounceIn 0.8s ease-out;
+}
+
+.muctieu-celebration::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(16, 185, 129, 0.1) 50%, transparent 70%);
+    animation: shimmer 3s infinite;
+}
+
+/* ===== TOOLTIP ENHANCEMENTS ===== */
+.muctieu-tooltip {
+    position: relative;
+}
+
+.muctieu-tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--muctieu-dark);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--muctieu-radius);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0;
+    animation: fadeInUp 0.3s ease-out forwards;
+}
+
+.muctieu-tooltip:hover::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% - 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--muctieu-dark);
+    z-index: 1000;
+    opacity: 0;
+    animation: fadeInUp 0.3s ease-out forwards;
+}

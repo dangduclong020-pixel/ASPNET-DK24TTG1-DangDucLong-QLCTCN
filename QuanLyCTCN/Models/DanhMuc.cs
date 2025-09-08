@@ -33,7 +33,12 @@ namespace QuanLyCTCN.Models
         [Display(Name = "Ghi chú")]
         public string? GhiChu { get; set; }
 
+        [Column("nguoidung_id")]
+        [Display(Name = "Người dùng")]
+        public int? NguoiDungId { get; set; }
+
         // Navigation properties
+        public virtual NguoiDung? NguoiDung { get; set; }
         public virtual ICollection<ChiTieu> ChiTieus { get; set; } = new List<ChiTieu>();
         public virtual ICollection<ThuNhap> ThuNhaps { get; set; } = new List<ThuNhap>();
         public virtual ICollection<NganSach> NganSaches { get; set; } = new List<NganSach>();

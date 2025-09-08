@@ -5,49 +5,82 @@
     Layout = "_AdminLayout";
 }
 
-<div class="container-fluid py-4">
+@section Styles {
+    <link rel="stylesheet" href="~/css/thunhap.css" />
+}
+
+@section Scripts {
+    <script src="~/js/thunhap.js"></script>
+}
+
+<div class="container-fluid py-4 thunhap-page">
     <div class="row">
         <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header pb-0">
-                    <h6>Xóa thu nhập</h6>
+            <div class="thunhap-card">
+                <div class="thunhap-card-header delete-mode">
+                    <h6><i class="fas fa-trash-alt thunhap-icon"></i> Xóa thu nhập</h6>
                 </div>
                 <div class="card-body">
-                    <h3>Bạn có chắc chắn muốn xóa thu nhập này?</h3>
-                    <div>
-                        <hr />
-                        <dl class="row">
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.NgayNhap)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.NgayNhap)
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.DanhMuc)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @(Model.DanhMuc?.TenDanhMuc ?? "N/A")
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.SoTien)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.SoTien)
-                            </dd>
-                            <dt class="col-sm-2">
-                                @Html.DisplayNameFor(model => model.GhiChu)
-                            </dt>
-                            <dd class="col-sm-10">
-                                @Html.DisplayFor(model => model.GhiChu)
-                            </dd>
-                        </dl>
-                        
-                        <form asp-action="Delete" method="post">
-                            <input type="hidden" asp-for="ThuNhapId" />
-                            <input type="submit" value="Xóa" class="btn btn-danger" /> |
-                            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
-                        </form>
+                    <div class="thunhap-delete-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa thu nhập này?
+                    </div>
+
+                    <div class="thunhap-delete-details">
+                        <h5><i class="fas fa-info-circle"></i> Chi tiết thu nhập sẽ bị xóa:</h5>
+
+                        <div class="thunhap-detail-row">
+                            <span class="thunhap-detail-label">
+                                <i class="fas fa-calendar"></i> Ngày nhập:
+                            </span>
+                            <span class="thunhap-detail-value">@Model.NgayNhap.ToString("dd/MM/yyyy")</span>
+                        </div>
+
+                        <div class="thunhap-detail-row">
+                            <span class="thunhap-detail-label">
+                                <i class="fas fa-tag"></i> Danh mục:
+                            </span>
+                            <span class="thunhap-detail-value">@(Model.DanhMuc?.TenDanhMuc ?? "N/A")</span>
+                        </div>
+
+                        <div class="thunhap-detail-row">
+                            <span class="thunhap-detail-label">
+                                <i class="fas fa-money-bill-wave"></i> Số tiền:
+                            </span>
+                            <span class="thunhap-detail-value thunhap-income-amount">@Model.SoTien.ToString("N0") đ</span>
+                        </div>
+
+                        <div class="thunhap-detail-row">
+                            <span class="thunhap-detail-label">
+                                <i class="fas fa-comment"></i> Ghi chú:
+                            </span>
+                            <span class="thunhap-detail-value">@(string.IsNullOrEmpty(Model.GhiChu) ? "Không có ghi chú" : Model.GhiChu)</span>
+                        </div>
+                    </div>
+
+                    <div class="thunhap-form-group thunhap-mt-3">
+                        <div class="thunhap-d-flex thunhap-gap-3 thunhap-justify-content-between">
+                            <div>
+                                <form asp-action="Delete" method="post" class="thunhap-d-flex thunhap-align-items-center">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" asp-for="ThuNhapId" />
+                                    <button type="submit" class="thunhap-btn thunhap-btn-danger">
+                                        <i class="fas fa-trash thunhap-icon"></i> Xóa thu nhập
+                                    </button>
+                                </form>
+                            </div>
+                            <div>
+                                <a asp-action="Details" asp-route-id="@Model.ThuNhapId" class="thunhap-btn thunhap-btn-outline-primary">
+                                    <i class="fas fa-eye thunhap-icon"></i> Xem chi tiết
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@Model.ThuNhapId" class="thunhap-btn thunhap-btn-outline-primary">
+                                    <i class="fas fa-edit thunhap-icon"></i> Chỉnh sửa
+                                </a>
+                                <a asp-action="Index" class="thunhap-btn thunhap-btn-outline-primary">
+                                    <i class="fas fa-arrow-left thunhap-icon"></i> Quay lại danh sách
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

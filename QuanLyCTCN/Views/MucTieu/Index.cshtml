@@ -5,10 +5,14 @@
     ViewData["Subtitle"] = "Quản lý các mục tiêu tiết kiệm của bạn";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/muctieu.css" />
+}
+
 @section HeaderActions {
     <div class="d-flex gap-2">
-        <a href="@Url.Action("Create")" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Thêm mục tiêu mới
+        <a href="@Url.Action("Create")" class="muctieu-btn muctieu-btn-primary">
+            <i class="fas fa-plus muctieu-icon"></i> Thêm mục tiêu mới
         </a>
     </div>
 }
@@ -40,7 +44,7 @@
         @foreach (var item in Model)
         {
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100">
+                <div class="muctieu-goal-card card h-100">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6 class="card-title mb-0">@item.TenMucTieu</h6>
                         <div class="dropdown">
@@ -53,7 +57,8 @@
                                 <li><a class="dropdown-item" href="@Url.Action("Edit", new { id = item.MucTieuId })">
                                     <i class="fas fa-edit"></i> Chỉnh sửa</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="@Url.Action("Delete", new { id = item.MucTieuId })">
+                                <li><a class="dropdown-item text-danger" href="@Url.Action("Delete", new { id = item.MucTieuId })"
+                                       data-item-name="mục tiêu '@item.TenMucTieu'">
                                     <i class="fas fa-trash"></i> Xóa</a></li>
                             </ul>
                         </div>
@@ -61,23 +66,26 @@
                     <div class="card-body">
                         <div class="row text-center mb-3">
                             <div class="col-6">
-                                <div class="h5 mb-0 text-primary">@item.SoTienDaTietKiem?.ToString("N0") VND</div>
-                                <small class="text-muted">Đã tiết kiệm</small>
+                                <div class="muctieu-amount-display">
+                                    <div class="amount text-primary">@item.SoTienDaTietKiem?.ToString("N0") VND</div>
+                                    <div class="label">Đã tiết kiệm</div>
+                                </div>
                             </div>
                             <div class="col-6">
-                                <div class="h5 mb-0 text-success">@item.SoTienCan.ToString("N0") VND</div>
-                                <small class="text-muted">Mục tiêu</small>
+                                <div class="muctieu-amount-display">
+                                    <div class="amount text-success">@item.SoTienCan.ToString("N0") VND</div>
+                                    <div class="label">Mục tiêu</div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="muctieu-progress-container">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <small class="text-muted">Tiến độ</small>
                                 <small class="fw-bold">@item.PhanTramHoanThanh%</small>
                             </div>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar @(item.PhanTramHoanThanh >= 100 ? "bg-success" : item.PhanTramHoanThanh >= 50 ? "bg-warning" : "bg-info")"
-                                     role="progressbar"
+                            <div class="muctieu-progress-bar">
+                                <div class="muctieu-progress-fill @(item.PhanTramHoanThanh >= 100 ? "success" : item.PhanTramHoanThanh >= 75 ? "info" : item.PhanTramHoanThanh >= 50 ? "warning" : "danger")"
                                      style="width: @item.PhanTramHoanThanh%"
                                      aria-valuenow="@item.PhanTramHoanThanh"
                                      aria-valuemin="0"
@@ -114,10 +122,10 @@
                     </div>
                     <div class="card-footer">
                         <div class="d-flex gap-2">
-                            <a href="@Url.Action("Details", new { id = item.MucTieuId })" class="btn btn-outline-primary btn-sm flex-fill">
+                            <a href="@Url.Action("Details", new { id = item.MucTieuId })" class="muctieu-btn muctieu-btn-outline-primary btn-sm flex-fill">
                                 <i class="fas fa-eye"></i> Chi tiết
                             </a>
-                            <button type="button" class="btn btn-outline-success btn-sm flex-fill" data-bs-toggle="modal" data-bs-target="#capNhatModal" data-id="@item.MucTieuId" data-ten="@item.TenMucTieu">
+                            <button type="button" class="muctieu-btn muctieu-btn-success btn-sm flex-fill" data-bs-toggle="modal" data-bs-target="#capNhatModal" data-id="@item.MucTieuId" data-ten="@item.TenMucTieu">
                                 <i class="fas fa-plus"></i> Cập nhật
                             </button>
                         </div>
@@ -129,7 +137,7 @@
 </div>
 
 <!-- Modal cập nhật tiền tiết kiệm -->
-<div class="modal fade" id="capNhatModal" tabindex="-1">
+<div class="modal fade muctieu-modal" id="capNhatModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -141,7 +149,10 @@
                     <input type="hidden" id="mucTieuId" name="id" />
                     <div class="mb-3">
                         <label for="soTienThem" class="form-label">Số tiền thêm vào tiết kiệm</label>
-                        <input type="number" class="form-control" id="soTienThem" name="soTienThem" min="0" step="1000" required />
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="soTienThem" name="soTienThem" min="0" step="1000" required />
+                            <span class="input-group-text">VND</span>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="ghiChu" class="form-label">Ghi chú (tùy chọn)</label>
@@ -150,7 +161,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success">Cập nhật</button>
+                    <button type="submit" class="muctieu-btn muctieu-btn-success">Cập nhật</button>
                 </div>
             </form>
         </div>
@@ -158,22 +169,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        // Xử lý modal cập nhật
-        const capNhatModal = document.getElementById('capNhatModal');
-        capNhatModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const id = button.getAttribute('data-id');
-            const ten = button.getAttribute('data-ten');
-
-            document.getElementById('mucTieuId').value = id;
-            document.querySelector('.modal-title').textContent = `Cập nhật: ${ten}`;
-            document.getElementById('capNhatForm').action = `@Url.Action("CapNhatTienTietKiem", "MucTieu")/${id}`;
-        });
-
-        // Reset form khi đóng modal
-        capNhatModal.addEventListener('hidden.bs.modal', function () {
-            document.getElementById('capNhatForm').reset();
-        });
-    </script>
+    <script src="~/js/muctieu.js"></script>
 }

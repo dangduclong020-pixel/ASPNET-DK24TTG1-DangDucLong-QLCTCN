@@ -5,12 +5,24 @@
     ViewData["Subtitle"] = "Thiết lập mục tiêu tài chính của bạn";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/muctieu.css" />
+}
+
+@section HeaderActions {
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Index")" class="muctieu-btn muctieu-btn-outline-primary">
+            <i class="fas fa-arrow-left muctieu-icon"></i> Quay lại danh sách
+        </a>
+    </div>
+}
+
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
-        <div class="card">
+        <div class="muctieu-card">
             <div class="card-header">
                 <h5 class="card-title mb-0">
-                    <i class="fas fa-plus-circle text-primary me-2"></i>
+                    <i class="fas fa-plus-circle text-primary me-2 muctieu-icon"></i>
                     Tạo mục tiêu tiết kiệm
                 </h5>
             </div>
@@ -51,21 +63,21 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary me-md-2">
-                            <i class="fas fa-arrow-left"></i> Quay lại
+                        <a href="@Url.Action("Index")" class="muctieu-btn muctieu-btn-outline-primary me-md-2">
+                            <i class="fas fa-arrow-left muctieu-icon"></i> Quay lại
                         </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Tạo mục tiêu
+                        <button type="submit" class="muctieu-btn muctieu-btn-primary">
+                            <i class="fas fa-save muctieu-icon"></i> Tạo mục tiêu
                         </button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <div class="card mt-4">
+        <div class="muctieu-card muctieu-mt-4">
             <div class="card-body">
                 <h6 class="card-title">
-                    <i class="fas fa-lightbulb text-warning me-2"></i>
+                    <i class="fas fa-lightbulb text-warning me-2 muctieu-icon"></i>
                     Mẹo thiết lập mục tiêu hiệu quả
                 </h6>
                 <ul class="mb-0 small">
@@ -81,6 +93,7 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/muctieu.js"></script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
