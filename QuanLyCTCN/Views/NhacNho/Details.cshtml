@@ -1,0 +1,165 @@
+@model QuanLyCTCN.Models.NhacNho
+
+@{
+    ViewData["Title"] = "Chi tiết nhắc nhở";
+    ViewData["Subtitle"] = Model.NoiDung;
+}
+
+@section HeaderActions {
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Edit", new { id = Model.NhacNhoId })" class="btn btn-outline-primary">
+            <i class="fas fa-edit"></i> Chỉnh sửa
+        </a>
+        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại danh sách
+        </a>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bell text-primary me-2"></i>
+                    @Model.NoiDung
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 text-center">
+                            <div class="h4 mb-1 text-info">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                @Model.ThoiGian.ToString("dd/MM/yyyy")
+                            </div>
+                            <div class="text-muted">Ngày</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 text-center">
+                            <div class="h4 mb-1 text-success">
+                                <i class="fas fa-clock me-2"></i>
+                                @Model.ThoiGian.ToString("HH:mm")
+                            </div>
+                            <div class="text-muted">Thời gian</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6>Thông tin chi tiết</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Loại nhắc nhở:</strong>
+                                <span class="badge @(Model.Loai == "ChiTieu" ? "bg-primary" : Model.Loai == "ThuNhap" ? "bg-success" : Model.Loai == "NganSach" ? "bg-warning" : "bg-info") ms-2">
+                                    @(Model.Loai == "ChiTieu" ? "Chi tiêu" : Model.Loai == "ThuNhap" ? "Thu nhập" : Model.Loai == "NganSach" ? "Ngân sách" : Model.Loai == "MucTieu" ? "Mục tiêu" : Model.Loai)
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>Trạng thái:</strong>
+                                @{
+                                    var timeDiff = Model.ThoiGian - DateTime.Now;
+                                    var statusText = "";
+                                    var statusClass = "";
+                                    if (timeDiff.TotalMinutes < 0)
+                                    {
+                                        statusText = "Đã quá hạn";
+                                        statusClass = "text-danger";
+                                    }
+                                    else if (timeDiff.TotalHours <= 1)
+                                    {
+                                        statusText = "Sắp đến hạn";
+                                        statusClass = "text-warning";
+                                    }
+                                    else
+                                    {
+                                        statusText = "Chưa đến hạn";
+                                        statusClass = "text-success";
+                                    }
+                                }
+                                <span class="@statusClass ms-2">@statusText</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (timeDiff.TotalMinutes >= 0)
+                    {
+                        <div class="mb-3">
+                            <strong>Thời gian còn lại:</strong>
+                            @{
+                                var timeLeftText = "";
+                                if (timeDiff.TotalHours < 1)
+                                {
+                                    timeLeftText = $"{Math.Round(timeDiff.TotalMinutes)} phút";
+                                }
+                                else if (timeDiff.TotalDays < 1)
+                                {
+                                    timeLeftText = $"{Math.Round(timeDiff.TotalHours)} giờ";
+                                }
+                                else
+                                {
+                                    timeLeftText = $"{Math.Round(timeDiff.TotalDays)} ngày";
+                                }
+                            }
+                            <span class="text-primary ms-2">@timeLeftText</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">Thao tác</h6>
+            </div>
+            <div class="card-body d-grid gap-2">
+                <a href="@Url.Action("Edit", new { id = Model.NhacNhoId })" class="btn btn-outline-primary">
+                    <i class="fas fa-edit"></i> Chỉnh sửa nhắc nhở
+                </a>
+                <a href="@Url.Action("DanhDauDaDoc", new { id = Model.NhacNhoId })"
+                   class="btn btn-outline-success"
+                   onclick="return confirm('Bạn có chắc muốn đánh dấu nhắc nhở này là đã đọc?')">
+                    <i class="fas fa-check"></i> Đánh dấu đã đọc
+                </a>
+                <a href="@Url.Action("Delete", new { id = Model.NhacNhoId })" class="btn btn-outline-danger">
+                    <i class="fas fa-trash"></i> Xóa nhắc nhở
+                </a>
+            </div>
+        </div>
+
+        @if (Model.ThoiGian > DateTime.Now)
+        {
+            <div class="card mt-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-3x text-info mb-3"></i>
+                    <h6>Nhắc nhở sẽ được gửi</h6>
+                    <p class="text-muted mb-0">Vào lúc @Model.ThoiGian.ToString("HH:mm dd/MM/yyyy")</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card mt-3 border-warning">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                    <h6 class="text-warning">Nhắc nhở đã quá hạn</h6>
+                    <p class="text-muted mb-0">Vào lúc @Model.ThoiGian.ToString("HH:mm dd/MM/yyyy")</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>

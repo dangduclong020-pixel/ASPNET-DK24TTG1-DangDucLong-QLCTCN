@@ -1,0 +1,160 @@
+@model QuanLyCTCN.Models.NhacNho
+
+@{
+    ViewData["Title"] = "Tạo nhắc nhở định kỳ";
+    ViewData["Subtitle"] = "Thiết lập thông báo lặp lại tự động";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-calendar-plus text-primary me-2"></i>
+                    Tạo nhắc nhở định kỳ
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="TaoNhacNhoDinhKy" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label asp-for="NoiDung" class="form-label"></label>
+                                <textarea asp-for="NoiDung" class="form-control" rows="3" placeholder="Ví dụ: Nhớ ghi chép chi tiêu hàng ngày..."></textarea>
+                                <span asp-validation-for="NoiDung" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label asp-for="Loai" class="form-label"></label>
+                                <select asp-for="Loai" class="form-control">
+                                    <option value="ChiTieu">Chi tiêu</option>
+                                    <option value="ThuNhap">Thu nhập</option>
+                                    <option value="NganSach">Ngân sách</option>
+                                    <option value="MucTieu">Mục tiêu</option>
+                                    <option value="Khac">Khác</option>
+                                </select>
+                                <span asp-validation-for="Loai" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="ThoiGian" class="form-label"></label>
+                                <input asp-for="ThoiGian" class="form-control" type="datetime-local" />
+                                <div class="form-text">Thời gian bắt đầu lặp lại</div>
+                                <span asp-validation-for="ThoiGian" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="loaiLap" class="form-label">Loại lặp lại</label>
+                                <select name="loaiLap" id="loaiLap" class="form-control">
+                                    <option value="none">Không lặp lại</option>
+                                    <option value="daily">Hàng ngày</option>
+                                    <option value="weekly">Hàng tuần</option>
+                                    <option value="monthly">Hàng tháng</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3" id="soNgayContainer" style="display: none;">
+                        <label for="soNgayLap" class="form-label">Số ngày/ tuần/ tháng lặp lại</label>
+                        <input type="number" name="soNgayLap" id="soNgayLap" class="form-control" min="1" max="30" value="1" />
+                        <div class="form-text">
+                            Ví dụ: Chọn 7 với "Hàng ngày" = lặp lại mỗi 7 ngày<br>
+                            Chọn 2 với "Hàng tuần" = lặp lại mỗi 2 tuần
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Thông tin:</strong> Hệ thống sẽ tự động tạo các nhắc nhở lặp lại dựa trên cài đặt của bạn.
+                        Bạn có thể chỉnh sửa hoặc xóa từng nhắc nhở riêng lẻ sau khi tạo.
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calendar-plus"></i> Tạo nhắc nhở định kỳ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title text-primary">
+                            <i class="fas fa-clock me-2"></i>
+                            Ví dụ nhắc nhở hàng ngày
+                        </h6>
+                        <ul class="small mb-0">
+                            <li>"Nhớ ghi chép chi tiêu hôm nay"</li>
+                            <li>"Kiểm tra ngân sách tháng này"</li>
+                            <li>"Cập nhật tiến độ mục tiêu"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title text-success">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Ví dụ nhắc nhở định kỳ
+                        </h6>
+                        <ul class="small mb-0">
+                            <li>"Thanh toán tiền điện hàng tháng"</li>
+                            <li>"Gửi báo cáo thu chi cho gia đình"</li>
+                            <li>"Đánh giá tiết kiệm cuối tháng"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Hiển thị/ẩn trường số ngày lặp lại
+        document.getElementById('loaiLap').addEventListener('change', function() {
+            const container = document.getElementById('soNgayContainer');
+            const soNgayInput = document.getElementById('soNgayLap');
+
+            if (this.value === 'none') {
+                container.style.display = 'none';
+                soNgayInput.required = false;
+            } else {
+                container.style.display = 'block';
+                soNgayInput.required = true;
+
+                // Cập nhật placeholder dựa trên loại lặp lại
+                switch(this.value) {
+                    case 'daily':
+                        soNgayInput.placeholder = 'Ví dụ: 1 (mỗi ngày), 7 (mỗi tuần)';
+                        break;
+                    case 'weekly':
+                        soNgayInput.placeholder = 'Ví dụ: 1 (mỗi tuần), 2 (mỗi 2 tuần)';
+                        break;
+                    case 'monthly':
+                        soNgayInput.placeholder = 'Ví dụ: 1 (mỗi tháng), 3 (mỗi quý)';
+                        break;
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,214 @@
+@model IEnumerable<QuanLyCTCN.Models.NhacNho>
+
+@{
+    ViewData["Title"] = "Nhắc nhở & Cảnh báo";
+    ViewData["Subtitle"] = "Quản lý các thông báo và nhắc nhở của bạn";
+}
+
+@section HeaderActions {
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Create")" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Tạo nhắc nhở
+        </a>
+        <a href="@Url.Action("TaoNhacNhoDinhKy")" class="btn btn-outline-success">
+            <i class="fas fa-calendar-plus"></i> Nhắc nhở định kỳ
+        </a>
+        @if (Model.Any())
+        {
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+                <i class="fas fa-trash-alt"></i> Xóa toàn bộ
+            </button>
+        }
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                <h5>@Model.Count(n => n.ThoiGian > DateTime.Now)</h5>
+                <p class="text-muted mb-0">Nhắc nhở sắp tới</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-bell fa-3x text-warning mb-3"></i>
+                <h5>@Model.Count(n => n.ThoiGian <= DateTime.Now)</h5>
+                <p class="text-muted mb-0">Nhắc nhở quá hạn</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <i class="fas fa-list fa-3x text-info mb-3"></i>
+                <h5>@Model.Count()</h5>
+                <p class="text-muted mb-0">Tổng số nhắc nhở</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-bell text-primary me-2"></i>
+            Danh sách nhắc nhở
+        </h5>
+    </div>
+    <div class="card-body">
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">Chưa có nhắc nhở nào</h4>
+                <p class="text-muted">Hãy tạo nhắc nhở đầu tiên của bạn</p>
+                <a href="@Url.Action("Create")" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Tạo nhắc nhở đầu tiên
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nội dung</th>
+                            <th>Thời gian</th>
+                            <th>Loại</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">@item.NoiDung</div>
+                                </td>
+                                <td>
+                                    <div>@item.ThoiGian.ToString("dd/MM/yyyy HH:mm")</div>
+                                    @{
+                                        var timeDiff = item.ThoiGian - DateTime.Now;
+                                        var timeDiffText = "";
+                                        if (timeDiff.TotalMinutes < 0)
+                                        {
+                                            timeDiffText = $"Quá hạn {Math.Abs(Math.Round(timeDiff.TotalHours))} giờ";
+                                        }
+                                        else if (timeDiff.TotalHours < 1)
+                                        {
+                                            timeDiffText = $"Còn {Math.Round(timeDiff.TotalMinutes)} phút";
+                                        }
+                                        else if (timeDiff.TotalDays < 1)
+                                        {
+                                            timeDiffText = $"Còn {Math.Round(timeDiff.TotalHours)} giờ";
+                                        }
+                                        else
+                                        {
+                                            timeDiffText = $"Còn {Math.Round(timeDiff.TotalDays)} ngày";
+                                        }
+                                    }
+                                    <small class="text-muted">@timeDiffText</small>
+                                </td>
+                                <td>
+                                    <span class="badge @(item.Loai == "ChiTieu" ? "bg-primary" : item.Loai == "ThuNhap" ? "bg-success" : item.Loai == "NganSach" ? "bg-warning" : "bg-info")">
+                                        @(item.Loai == "ChiTieu" ? "Chi tiêu" : item.Loai == "ThuNhap" ? "Thu nhập" : item.Loai == "NganSach" ? "Ngân sách" : item.Loai == "MucTieu" ? "Mục tiêu" : item.Loai)
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (item.ThoiGian <= DateTime.Now)
+                                    {
+                                        <span class="badge bg-danger">Quá hạn</span>
+                                    }
+                                    else if (timeDiff.TotalHours <= 1)
+                                    {
+                                        <span class="badge bg-warning">Sắp đến</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Sắp tới</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="@Url.Action("Details", new { id = item.NhacNhoId })" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="@Url.Action("Edit", new { id = item.NhacNhoId })" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="@Url.Action("DanhDauDaDoc", new { id = item.NhacNhoId })"
+                                           class="btn btn-sm btn-outline-success"
+                                           onclick="return confirm('Bạn có chắc muốn đánh dấu nhắc nhở này là đã đọc?')">
+                                            <i class="fas fa-check"></i>
+                                        </a>
+                                        <a href="@Url.Action("Delete", new { id = item.NhacNhoId })" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal xác nhận xóa toàn bộ -->
+@if (Model.Any())
+{
+    <div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteAllModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Xác nhận xóa toàn bộ nhắc nhở
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>Cảnh báo:</strong> Hành động này sẽ xóa tất cả @Model.Count() nhắc nhở của bạn. Hành động này không thể hoàn tác.
+                    </div>
+                    <p class="mb-0">Bạn có chắc chắn muốn xóa toàn bộ nhắc nhở?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Hủy bỏ
+                    </button>
+                    <form asp-action="DeleteAll" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt"></i> Xóa toàn bộ
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Tự động làm mới trang sau mỗi phút để cập nhật trạng thái nhắc nhở
+        setTimeout(function() {
+            location.reload();
+        }, 60000); // 60 giây
+    </script>
+}

@@ -128,7 +128,7 @@
         }
         
         .sidebar-user-email {
-            color: #64748b;
+            color: #374151;
             font-size: 0.8rem;
             white-space: nowrap;
             overflow: hidden;
@@ -149,7 +149,7 @@
             display: flex;
             align-items: center;
             padding: 1rem 1.5rem;
-            color: #64748b;
+            color: #374151;
             text-decoration: none;
             transition: all 0.3s;
             border-left: 3px solid transparent;
@@ -270,7 +270,7 @@
         }
 
         .page-title {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 600;
             color: var(--dark-color);
             margin: 0;
@@ -310,8 +310,22 @@
             color: white;
         }
 
+        .btn-primary-custom {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: #5856eb;
+            border-color: #5856eb;
+        }
+
         .user-menu {
             position: relative;
+            margin-left: 10px;
         }
 
         .user-icon {
@@ -328,7 +342,7 @@
 
         /* Content area */
         .content-area {
-            padding: 1.5rem;
+            padding: 4rem;
             min-height: calc(100vh - 60px - 50px); /* 100vh - header height - footer height */
         }
 
@@ -491,6 +505,12 @@
                     Thu nhập
                 </a>
             </li>
+            <li>
+                <a asp-controller="MucTieu" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "MucTieu" ? "active" : "")">
+                    <i class="fas fa-bullseye"></i>
+                    Mục tiêu tài chính
+                </a>
+            </li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle @(ViewContext.RouteData.Values["Controller"]?.ToString() == "ThongKe" ? "active" : "")" data-bs-toggle="dropdown">
                     <i class="fas fa-chart-bar"></i>
@@ -521,6 +541,12 @@
                 <a asp-controller="NganSach" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "NganSach" ? "active" : "")">
                     <i class="fas fa-piggy-bank"></i>
                     Ngân sách
+                </a>
+            </li>
+            <li>
+                <a asp-controller="NhacNho" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "NhacNho" ? "active" : "")">
+                    <i class="fas fa-bell"></i>
+                    Nhắc nhở
                 </a>
             </li>
             <li>

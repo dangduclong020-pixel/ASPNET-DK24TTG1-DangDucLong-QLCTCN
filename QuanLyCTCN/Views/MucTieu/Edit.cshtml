@@ -1,0 +1,115 @@
+@model QuanLyCTCN.Models.MucTieu
+
+@{
+    ViewData["Title"] = "Chỉnh sửa mục tiêu";
+    ViewData["Subtitle"] = Model.TenMucTieu;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-edit text-primary me-2"></i>
+                    Chỉnh sửa mục tiêu
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="MucTieuId" />
+                    <input type="hidden" asp-for="NguoiDungId" />
+
+                    <div class="mb-3">
+                        <label asp-for="TenMucTieu" class="form-label"></label>
+                        <input asp-for="TenMucTieu" class="form-control" />
+                        <span asp-validation-for="TenMucTieu" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SoTienCan" class="form-label"></label>
+                        <div class="input-group">
+                            <input asp-for="SoTienCan" class="form-control" type="number" min="0" step="1000" />
+                            <span class="input-group-text">VND</span>
+                        </div>
+                        <span asp-validation-for="SoTienCan" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="SoTienDaTietKiem" class="form-label"></label>
+                        <div class="input-group">
+                            <input asp-for="SoTienDaTietKiem" class="form-control" type="number" min="0" step="1000" />
+                            <span class="input-group-text">VND</span>
+                        </div>
+                        <div class="form-text">Số tiền đã tiết kiệm được</div>
+                        <span asp-validation-for="SoTienDaTietKiem" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Han" class="form-label"></label>
+                        <input asp-for="Han" class="form-control" type="date" />
+                        <div class="form-text">Thời hạn hoàn thành mục tiêu</div>
+                        <span asp-validation-for="Han" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="@Url.Action("Details", new { id = Model.MucTieuId })" class="btn btn-outline-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Tiến độ hiện tại</h6>
+                        <div class="progress mb-2" style="height: 10px;">
+                            <div class="progress-bar" role="progressbar"
+                                 style="width: @Model.PhanTramHoanThanh%"
+                                 aria-valuenow="@Model.PhanTramHoanThanh"
+                                 aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <small class="text-muted">@Model.PhanTramHoanThanh% hoàn thành</small>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Thời gian còn lại</h6>
+                        @if (Model.Han.HasValue)
+                        {
+                            var daysLeft = (Model.Han.Value - DateTime.Today).Days;
+                            <div class="h6 mb-0">
+                                @if (daysLeft > 0)
+                                {
+                                    <span class="text-success">@daysLeft ngày</span>
+                                }
+                                else if (daysLeft == 0)
+                                {
+                                    <span class="text-warning">Hết hạn hôm nay</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">Quá hạn @Math.Abs(daysLeft) ngày</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <small class="text-muted">Không có thời hạn</small>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

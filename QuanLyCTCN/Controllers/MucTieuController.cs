@@ -2,17 +2,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyCTCN.Data;
 using QuanLyCTCN.Models;
+using QuanLyCTCN.Services;
 
 namespace QuanLyCTCN.Controllers
 {
     public class MucTieuController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly EmailService _emailService;
         private const string _sessionNguoiDungId = "NguoiDungId";
 
-        public MucTieuController(ApplicationDbContext context)
+        public MucTieuController(ApplicationDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // GET: /MucTieu
@@ -289,6 +292,9 @@ namespace QuanLyCTCN.Controllers
             // Kiểm tra nếu đã đạt mục tiêu
             if (mucTieu.SoTienDaTietKiem >= mucTieu.SoTienCan && oldTienTietKiem < mucTieu.SoTienCan)
             {
+                // Gửi email chúc mừng
+                await SendGoalAchievementEmailAsync(mucTieu);
+
                 var nhacNho = new NhacNho
                 {
                     NguoiDungId = nguoiDungId,
@@ -312,6 +318,32 @@ namespace QuanLyCTCN.Controllers
         private bool MucTieuExists(int id)
         {
             return _context.MucTieus.Any(e => e.MucTieuId == id);
+        }
+
+        // Helper method để gửi email chúc mừng hoàn thành mục tiêu
+        private async Task SendGoalAchievementEmailAsync(MucTieu mucTieu)
+        {
+            try
+            {
+                // Lấy thông tin người dùng
+                var nguoiDung = await _context.NguoiDungs
+                    .FirstOrDefaultAsync(n => n.NguoiDungId == mucTieu.NguoiDungId);
+
+                if (nguoiDung != null && !string.IsNullOrEmpty(nguoiDung.Email))
+                {
+                    await _emailService.SendGoalAchievementAsync(
+                        nguoiDung.Email,
+                        nguoiDung.HoTen ?? nguoiDung.TenDangNhap,
+                        mucTieu.TenMucTieu,
+                        mucTieu.SoTienCan
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nhưng không throw exception
+                Console.WriteLine($"Lỗi gửi email chúc mừng: {ex.Message}");
+            }
         }
     }
 }

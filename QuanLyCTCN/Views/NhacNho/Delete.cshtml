@@ -1,0 +1,56 @@
+@model QuanLyCTCN.Models.NhacNho
+
+@{
+    ViewData["Title"] = "Xóa nhắc nhở";
+    ViewData["Subtitle"] = Model.NoiDung;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Xác nhận xóa nhắc nhở
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác. Nhắc nhở này sẽ bị xóa vĩnh viễn.
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Nội dung:</strong></div>
+                    <div class="col-sm-8">@Model.NoiDung</div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Thời gian:</strong></div>
+                    <div class="col-sm-8">@Model.ThoiGian.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Loại:</strong></div>
+                    <div class="col-sm-8">
+                        <span class="badge @(Model.Loai == "ChiTieu" ? "bg-primary" : Model.Loai == "ThuNhap" ? "bg-success" : Model.Loai == "NganSach" ? "bg-warning" : "bg-info")">
+                            @(Model.Loai == "ChiTieu" ? "Chi tiêu" : Model.Loai == "ThuNhap" ? "Thu nhập" : Model.Loai == "NganSach" ? "Ngân sách" : Model.Loai == "MucTieu" ? "Mục tiêu" : Model.Loai)
+                        </span>
+                    </div>
+                </div>
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" asp-for="NhacNhoId" />
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="@Url.Action("Details", new { id = Model.NhacNhoId })" class="btn btn-outline-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Xóa nhắc nhở
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

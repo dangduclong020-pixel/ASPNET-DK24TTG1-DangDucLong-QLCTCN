@@ -2,17 +2,16 @@
 
 @{
     ViewData["Title"] = "Tổng quan tài chính";
+    Layout = "_Layout";
 }
 
 <style>
     :root {
-        --primary-color: #6366f1;
         --success-color: #10b981;
         --danger-color: #ef4444;
         --warning-color: #f59e0b;
         --info-color: #3b82f6;
         --light-bg: #f8fafc;
-        --sidebar-bg: #ffffff;
         --border-color: #e2e8f0;
     }
 
@@ -21,140 +20,8 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .sidebar {
-        background-color: var(--sidebar-bg);
-        min-height: 100vh;
-        border-right: 1px solid var(--border-color);
-        padding: 0;
-    }
-
-    .sidebar-header {
-        padding: 1.5rem 1rem;
-        border-bottom: 1px solid var(--border-color);
-        font-weight: 600;
-        color: #1e293b;
-    }
-
-    .sidebar-menu {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .sidebar-menu li {
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .sidebar-menu a {
-        display: flex;
-        align-items: center;
-        padding: 1rem 1.5rem;
-        color: #64748b;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-
-    .sidebar-menu a:hover,
-    .sidebar-menu a.active {
-        background-color: #f1f5f9;
-        color: var(--primary-color);
-    }
-
-    .sidebar-menu i {
-        width: 20px;
-        margin-right: 0.75rem;
-    }
-
     .main-content {
-        padding: 2rem;
-    }
-
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-
-    .page-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #1e293b;
-        margin: 0;
-    }
-
-    .page-subtitle {
-        color: #64748b;
-        font-size: 0.875rem;
-        margin: 0;
-    }
-
-    .stats-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        border: 1px solid var(--border-color);
-        height: 100%;
-    }
-
-    .stats-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 0.5rem;
-    }
-
-    .stats-card-title {
-        font-size: 0.875rem;
-        color: #64748b;
-        margin: 0;
-    }
-
-    .stats-card-value {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #1e293b;
-        margin: 0.5rem 0;
-    }
-
-    .stats-card-change {
-        font-size: 0.875rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .stats-card-change.positive {
-        color: var(--success-color);
-    }
-
-    .stats-card-change.negative {
-        color: var(--danger-color);
-    }
-
-    .stats-card-change.neutral {
-        color: var(--info-color);
-    }
-
-    .chart-container {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        border: 1px solid var(--border-color);
-        height: 400px;
-    }
-
-    .chart-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-
-    .chart-title {
-        font-size: 1.125rem;
-        font-weight: 600;
-        color: #1e293b;
-        margin: 0;
+        padding: 1rem;
     }
 
     .transactions-card {
@@ -226,19 +93,6 @@
         color: #64748b;
     }
 
-    .btn-primary-custom {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-        font-weight: 500;
-    }
-
-    .btn-primary-custom:hover {
-        background-color: #5856eb;
-        border-color: #5856eb;
-    }
-
     .icon-bg-income {
         background-color: #dbeafe;
         color: var(--info-color);
@@ -255,87 +109,8 @@
     }
 </style>
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-wallet me-2"></i>
-                Chi tiêu cá nhân
-            </div>
-            <ul class="sidebar-menu">
-                <li>
-                    <a asp-controller="Home" asp-action="Index" class="active">
-                        <i class="fas fa-chart-pie"></i>
-                        Tổng quan
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="ChiTieu" asp-action="Index">
-                        <i class="fas fa-exchange-alt"></i>
-                        Chi tiêu
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="ThuNhap" asp-action="Index">
-                        <i class="fas fa-money-bill-wave"></i>
-                        Thu nhập
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="ThongKe" asp-action="Index">
-                        <i class="fas fa-chart-bar"></i>
-                        Báo cáo
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="DanhMuc" asp-action="Index">
-                        <i class="fas fa-tags"></i>
-                        Danh mục
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="NganSach" asp-action="Index">
-                        <i class="fas fa-piggy-bank"></i>
-                        Ngân sách
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="MucTieu" asp-action="Index">
-                        <i class="fas fa-bullseye"></i>
-                        Mục tiêu
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="NhacNho" asp-action="Index">
-                        <i class="fas fa-bell"></i>
-                        Nhắc nhở
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Main Content -->
-        <div class="col-md-9 col-lg-10 main-content">
-            <!-- Page Header -->
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Tổng quan tài chính</h1>
-                    <p class="page-subtitle">Xin chào, @(Model.NguoiDung?.HoTen ?? "người dùng")</p>
-                </div>
-                <div class="d-flex">
-                    <a asp-controller="ChiTieu" asp-action="Create" class="btn btn-primary-custom me-2">
-                        <i class="fas fa-minus me-2"></i>
-                        Thêm chi tiêu
-                    </a>
-                    <a asp-controller="ThuNhap" asp-action="Create" class="btn btn-success">
-                        <i class="fas fa-plus me-2"></i>
-                        Thêm thu nhập
-                    </a>
-                </div>
-            </div>
-
-            <!-- Stats Cards -->
+<div class="container-fluid" style="padding: 0;">
+    <!-- Stats Cards -->
             <div class="row mb-4">
                 <div class="col-md-4 mb-3">
                     <div class="stats-card">
@@ -472,7 +247,17 @@
             </div>
         </div>
     </div>
-</div>
+
+@section HeaderActions {
+    <a asp-controller="ChiTieu" asp-action="Create" class="btn btn-primary-custom me-2">
+        <i class="fas fa-minus me-2"></i>
+        Thêm chi tiêu
+    </a>
+    <a asp-controller="ThuNhap" asp-action="Create" class="btn btn-success">
+        <i class="fas fa-plus me-2"></i>
+        Thêm thu nhập
+    </a>
+}
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

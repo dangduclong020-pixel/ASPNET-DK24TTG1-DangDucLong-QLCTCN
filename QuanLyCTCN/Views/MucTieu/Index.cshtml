@@ -1,0 +1,179 @@
+@model IEnumerable<QuanLyCTCN.Models.MucTieu>
+
+@{
+    ViewData["Title"] = "Mục tiêu tài chính";
+    ViewData["Subtitle"] = "Quản lý các mục tiêu tiết kiệm của bạn";
+}
+
+@section HeaderActions {
+    <div class="d-flex gap-2">
+        <a href="@Url.Action("Create")" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Thêm mục tiêu mới
+        </a>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    @if (!Model.Any())
+    {
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-bullseye fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">Chưa có mục tiêu nào</h4>
+                <p class="text-muted">Hãy tạo mục tiêu tài chính đầu tiên của bạn</p>
+                <a href="@Url.Action("Create")" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Tạo mục tiêu đầu tiên
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="card-title mb-0">@item.TenMucTieu</h6>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="@Url.Action("Details", new { id = item.MucTieuId })">
+                                    <i class="fas fa-eye"></i> Xem chi tiết</a></li>
+                                <li><a class="dropdown-item" href="@Url.Action("Edit", new { id = item.MucTieuId })">
+                                    <i class="fas fa-edit"></i> Chỉnh sửa</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="@Url.Action("Delete", new { id = item.MucTieuId })">
+                                    <i class="fas fa-trash"></i> Xóa</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <div class="h5 mb-0 text-primary">@item.SoTienDaTietKiem?.ToString("N0") VND</div>
+                                <small class="text-muted">Đã tiết kiệm</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h5 mb-0 text-success">@item.SoTienCan.ToString("N0") VND</div>
+                                <small class="text-muted">Mục tiêu</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="text-muted">Tiến độ</small>
+                                <small class="fw-bold">@item.PhanTramHoanThanh%</small>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar @(item.PhanTramHoanThanh >= 100 ? "bg-success" : item.PhanTramHoanThanh >= 50 ? "bg-warning" : "bg-info")"
+                                     role="progressbar"
+                                     style="width: @item.PhanTramHoanThanh%"
+                                     aria-valuenow="@item.PhanTramHoanThanh"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
+                        @if (item.Han.HasValue)
+                        {
+                            var daysLeft = (item.Han.Value - DateTime.Today).Days;
+                            <div class="text-center">
+                                <small class="text-muted">
+                                    @if (daysLeft > 0)
+                                    {
+                                        <span class="text-warning">
+                                            <i class="fas fa-clock"></i> Còn @daysLeft ngày
+                                        </span>
+                                    }
+                                    else if (daysLeft == 0)
+                                    {
+                                        <span class="text-danger">
+                                            <i class="fas fa-exclamation-triangle"></i> Hết hạn hôm nay
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-danger">
+                                            <i class="fas fa-times-circle"></i> Quá hạn @Math.Abs(daysLeft) ngày
+                                        </span>
+                                    }
+                                </small>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex gap-2">
+                            <a href="@Url.Action("Details", new { id = item.MucTieuId })" class="btn btn-outline-primary btn-sm flex-fill">
+                                <i class="fas fa-eye"></i> Chi tiết
+                            </a>
+                            <button type="button" class="btn btn-outline-success btn-sm flex-fill" data-bs-toggle="modal" data-bs-target="#capNhatModal" data-id="@item.MucTieuId" data-ten="@item.TenMucTieu">
+                                <i class="fas fa-plus"></i> Cập nhật
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<!-- Modal cập nhật tiền tiết kiệm -->
+<div class="modal fade" id="capNhatModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cập nhật tiến độ tiết kiệm</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="capNhatForm" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="mucTieuId" name="id" />
+                    <div class="mb-3">
+                        <label for="soTienThem" class="form-label">Số tiền thêm vào tiết kiệm</label>
+                        <input type="number" class="form-control" id="soTienThem" name="soTienThem" min="0" step="1000" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="ghiChu" class="form-label">Ghi chú (tùy chọn)</label>
+                        <textarea class="form-control" id="ghiChu" name="ghiChu" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success">Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Xử lý modal cập nhật
+        const capNhatModal = document.getElementById('capNhatModal');
+        capNhatModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const ten = button.getAttribute('data-ten');
+
+            document.getElementById('mucTieuId').value = id;
+            document.querySelector('.modal-title').textContent = `Cập nhật: ${ten}`;
+            document.getElementById('capNhatForm').action = `@Url.Action("CapNhatTienTietKiem", "MucTieu")/${id}`;
+        });
+
+        // Reset form khi đóng modal
+        capNhatModal.addEventListener('hidden.bs.modal', function () {
+            document.getElementById('capNhatForm').reset();
+        });
+    </script>
+}

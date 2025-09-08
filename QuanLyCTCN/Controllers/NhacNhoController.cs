@@ -2,17 +2,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyCTCN.Data;
 using QuanLyCTCN.Models;
+using QuanLyCTCN.Services;
 
 namespace QuanLyCTCN.Controllers
 {
     public class NhacNhoController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly EmailService _emailService;
         private const string _sessionNguoiDungId = "NguoiDungId";
 
-        public NhacNhoController(ApplicationDbContext context)
+        public NhacNhoController(ApplicationDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // GET: /NhacNho
@@ -100,6 +103,10 @@ namespace QuanLyCTCN.Controllers
             {
                 _context.Add(nhacNho);
                 await _context.SaveChangesAsync();
+
+                // Gửi email nhắc nhở
+                await SendReminderEmailAsync(nhacNho);
+
                 TempData["SuccessMessage"] = "Thêm nhắc nhở thành công!";
                 return RedirectToAction(nameof(Index));
             }
@@ -345,6 +352,12 @@ namespace QuanLyCTCN.Controllers
                     await _context.SaveChangesAsync();
                 }
 
+                // Gửi email cho nhắc nhở đầu tiên nếu thời gian trong vòng 5 phút tới
+                if (nhacNho.ThoiGian <= DateTime.Now.AddMinutes(5))
+                {
+                    await SendReminderEmailAsync(nhacNho);
+                }
+
                 TempData["SuccessMessage"] = "Tạo nhắc nhở định kỳ thành công!";
                 return RedirectToAction(nameof(Index));
             }
@@ -354,6 +367,66 @@ namespace QuanLyCTCN.Controllers
         private bool NhacNhoExists(int id)
         {
             return _context.NhacNhos.Any(e => e.NhacNhoId == id);
+        }
+
+        // POST: /NhacNho/DeleteAll
+        [HttpPost, ActionName("DeleteAll")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAllConfirmed()
+        {
+            // Kiểm tra đăng nhập
+            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
+            if (nguoiDungId == null)
+            {
+                return RedirectToAction("DangNhap", "NguoiDung");
+            }
+
+            // Lấy tất cả nhắc nhở của người dùng
+            var nhacNhos = await _context.NhacNhos
+                .Where(n => n.NguoiDungId == nguoiDungId)
+                .ToListAsync();
+
+            if (nhacNhos.Any())
+            {
+                // Xóa tất cả nhắc nhở
+                _context.NhacNhos.RemoveRange(nhacNhos);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Đã xóa thành công {nhacNhos.Count} nhắc nhở!";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Không có nhắc nhở nào để xóa.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Helper method để gửi email nhắc nhở
+        private async Task SendReminderEmailAsync(NhacNho nhacNho)
+        {
+            try
+            {
+                // Lấy thông tin người dùng
+                var nguoiDung = await _context.NguoiDungs
+                    .FirstOrDefaultAsync(n => n.NguoiDungId == nhacNho.NguoiDungId);
+
+                if (nguoiDung != null && !string.IsNullOrEmpty(nguoiDung.Email))
+                {
+                    await _emailService.SendReminderNotificationAsync(
+                        nguoiDung.Email,
+                        nguoiDung.HoTen ?? nguoiDung.TenDangNhap,
+                        nhacNho.NoiDung ?? "",
+                        nhacNho.ThoiGian,
+                        nhacNho.Loai ?? "Khac"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nhưng không throw exception
+                Console.WriteLine($"Lỗi gửi email nhắc nhở: {ex.Message}");
+            }
         }
     }
 }

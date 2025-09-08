@@ -19,6 +19,12 @@ builder.Services.AddDbContext<QuanLyCTCN.Data.ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Thêm EmailService
+builder.Services.AddScoped<QuanLyCTCN.Services.EmailService>();
+
+// Thêm Background Service
+builder.Services.AddHostedService<QuanLyCTCN.BackgroundServices.ReminderBackgroundService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
