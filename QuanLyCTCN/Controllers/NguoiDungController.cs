@@ -285,6 +285,83 @@ namespace QuanLyCTCN.Controllers
             return View("HoSo", model);
         }
 
+        // GET: /NguoiDung/CaiDat
+        public async Task<IActionResult> CaiDat()
+        {
+            // Kiểm tra đăng nhập
+            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
+            if (nguoiDungId == null)
+            {
+                return RedirectToAction("DangNhap");
+            }
+
+            var nguoiDung = await _context.NguoiDungs.FindAsync(nguoiDungId);
+            if (nguoiDung == null)
+            {
+                return NotFound();
+            }
+
+            var model = new CaiDatViewModel
+            {
+                HoTen = nguoiDung.HoTen,
+                Email = nguoiDung.Email,
+                SoDienThoai = nguoiDung.SoDienThoai,
+                DiaChi = nguoiDung.DiaChi
+            };
+
+            return View(model);
+        }
+
+        // POST: /NguoiDung/CaiDat
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CaiDat(CaiDatViewModel model)
+        {
+            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
+            if (nguoiDungId == null)
+            {
+                return RedirectToAction("DangNhap");
+            }
+
+            var nguoiDung = await _context.NguoiDungs.FindAsync(nguoiDungId);
+            if (nguoiDung == null)
+            {
+                return NotFound();
+            }
+
+            // Cập nhật thông tin cá nhân
+            nguoiDung.HoTen = model.HoTen;
+            nguoiDung.Email = model.Email;
+            nguoiDung.SoDienThoai = model.SoDienThoai;
+            nguoiDung.DiaChi = model.DiaChi;
+
+            // Đổi mật khẩu nếu có
+            if (!string.IsNullOrEmpty(model.MatKhauMoi))
+            {
+                if (string.IsNullOrEmpty(model.MatKhauHienTai))
+                {
+                    ModelState.AddModelError("MatKhauHienTai", "Vui lòng nhập mật khẩu hiện tại");
+                }
+                else if (model.MatKhauHienTai != nguoiDung.MatKhau)
+                {
+                    ModelState.AddModelError("MatKhauHienTai", "Mật khẩu hiện tại không đúng");
+                }
+                else
+                {
+                    nguoiDung.MatKhau = model.MatKhauMoi;
+                }
+            }
+
+            if (ModelState.IsValid)
+            {
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Cập nhật thông tin thành công!";
+                return RedirectToAction("CaiDat");
+            }
+
+            return View(model);
+        }
+
         // GET: /NguoiDung/DangXuat
         public IActionResult DangXuat()
         {

@@ -340,6 +340,15 @@
             cursor: pointer;
         }
 
+        .user-icon-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .user-icon-link:hover .user-icon {
+            background-color: #3367d6;
+        }
+
         /* Content area */
         .content-area {
             padding: 4rem;
@@ -605,9 +614,11 @@
                     </a>
                 }
                 <div class="user-menu">
-                    <div class="user-icon">
-                        <i class="fas fa-user"></i>
-                    </div>
+                    <a asp-controller="NguoiDung" asp-action="CaiDat" class="user-icon-link" title="Cài đặt tài khoản">
+                        <div class="user-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </a>
                 </div>
             </div>
         </header>

@@ -1,0 +1,187 @@
+@model QuanLyCTCN.Models.ViewModels.CaiDatViewModel
+
+@{
+    ViewData["Title"] = "Cài đặt tài khoản";
+    Layout = "_Layout";
+}
+
+<style>
+    .settings-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .settings-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+    }
+
+    .settings-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--primary-color);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 0.875rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+    }
+
+    .btn-primary-custom {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 6px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: #3367d6;
+        border-color: #3367d6;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background-color: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .text-danger {
+        color: var(--danger-color);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style>
+
+<div class="settings-container">
+    <div class="settings-card">
+        <h2 class="settings-title">
+            <i class="fas fa-user-cog me-2"></i>
+            Cài đặt tài khoản
+        </h2>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <form asp-action="CaiDat" method="post">
+            @Html.AntiForgeryToken()
+
+            <!-- Thông tin cá nhân -->
+            <div class="mb-4">
+                <h4 class="mb-3">
+                    <i class="fas fa-user me-2"></i>
+                    Thông tin cá nhân
+                </h4>
+
+                <div class="form-group">
+                    <label asp-for="HoTen" class="form-label"></label>
+                    <input asp-for="HoTen" class="form-control" placeholder="Nhập họ tên" />
+                    <span asp-validation-for="HoTen" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="Nhập email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="SoDienThoai" class="form-label"></label>
+                    <input asp-for="SoDienThoai" class="form-control" placeholder="Nhập số điện thoại" />
+                    <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DiaChi" class="form-label"></label>
+                    <input asp-for="DiaChi" class="form-control" placeholder="Nhập địa chỉ" />
+                    <span asp-validation-for="DiaChi" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Đổi mật khẩu -->
+            <div class="mb-4">
+                <h4 class="mb-3">
+                    <i class="fas fa-lock me-2"></i>
+                    Đổi mật khẩu (tùy chọn)
+                </h4>
+
+                <div class="form-group">
+                    <label asp-for="MatKhauHienTai" class="form-label"></label>
+                    <input asp-for="MatKhauHienTai" type="password" class="form-control" placeholder="Nhập mật khẩu hiện tại" />
+                    <span asp-validation-for="MatKhauHienTai" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="MatKhauMoi" class="form-label"></label>
+                    <input asp-for="MatKhauMoi" type="password" class="form-control" placeholder="Nhập mật khẩu mới" />
+                    <span asp-validation-for="MatKhauMoi" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="XacNhanMatKhauMoi" class="form-label"></label>
+                    <input asp-for="XacNhanMatKhauMoi" type="password" class="form-control" placeholder="Xác nhận mật khẩu mới" />
+                    <span asp-validation-for="XacNhanMatKhauMoi" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn-primary-custom">
+                    <i class="fas fa-save me-2"></i>
+                    Lưu thay đổi
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-hide success message after 5 seconds
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert-success').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+}
