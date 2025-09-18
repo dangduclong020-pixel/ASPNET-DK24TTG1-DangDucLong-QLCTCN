@@ -86,10 +86,10 @@ namespace QuanLyCTCN.Controllers
 
             var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
 
-            // Lấy danh sách danh mục chi tiêu
+            // Lấy danh sách danh mục chi tiêu của chính user hiện tại
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ChiTieu")
+                    .Where(d => d.Loai == "ChiTieu" && d.NguoiDungId == nguoiDungId)
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc");
 
@@ -136,7 +136,7 @@ namespace QuanLyCTCN.Controllers
                     ModelState.AddModelError("", "Ngân sách cho danh mục này đã tồn tại trong tháng/năm đã chọn");
                     ViewBag.DanhMucList = new SelectList(
                         await _context.DanhMucs
-                            .Where(d => d.Loai == "ChiTieu")
+                            .Where(d => d.Loai == "ChiTieu" && d.NguoiDungId == nguoiDungId)
                             .ToListAsync(),
                         "DanhMucId", "TenDanhMuc", nganSach.DanhMucId);
                     return View(nganSach);
@@ -144,14 +144,14 @@ namespace QuanLyCTCN.Controllers
 
                 _context.Add(nganSach);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Thêm ngân sách thành công!";
+                TempData["NganSachSuccessMessage"] = "Thêm ngân sách thành công!";
                 return RedirectToAction(nameof(Index), new { thang = nganSach.Thang, nam = nganSach.Nam });
             }
 
-            // Nếu không thành công, chuẩn bị dữ liệu cho view
+            // Nếu không thành công, chuẩn bị lại danh mục chỉ của user đó
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ChiTieu")
+                    .Where(d => d.Loai == "ChiTieu" && d.NguoiDungId == nguoiDungId)
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc", nganSach.DanhMucId);
 
@@ -183,10 +183,10 @@ namespace QuanLyCTCN.Controllers
                 return NotFound();
             }
 
-            // Lấy danh sách danh mục chi tiêu
+            // Lấy danh sách danh mục chi tiêu của chính user hiện tại
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ChiTieu")
+                    .Where(d => d.Loai == "ChiTieu" && d.NguoiDungId == nguoiDungId)
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc", nganSach.DanhMucId);
 
@@ -239,7 +239,7 @@ namespace QuanLyCTCN.Controllers
                     ModelState.AddModelError("", "Ngân sách cho danh mục này đã tồn tại trong tháng/năm đã chọn");
                     ViewBag.DanhMucList = new SelectList(
                         await _context.DanhMucs
-                            .Where(d => d.Loai == "ChiTieu")
+                            .Where(d => d.Loai == "ChiTieu" && d.NguoiDungId == nguoiDungId)
                             .ToListAsync(),
                         "DanhMucId", "TenDanhMuc", nganSach.DanhMucId);
                     return View(nganSach);
@@ -271,14 +271,14 @@ namespace QuanLyCTCN.Controllers
                         throw;
                     }
                 }
-                TempData["SuccessMessage"] = "Cập nhật ngân sách thành công!";
+                TempData["NganSachSuccessMessage"] = "Cập nhật ngân sách thành công!";
                 return RedirectToAction(nameof(Index), new { thang = nganSach.Thang, nam = nganSach.Nam });
             }
 
-            // Nếu không thành công, chuẩn bị dữ liệu cho view
+            // Nếu validation thất bại, load lại danh mục chỉ của user đó
             ViewBag.DanhMucList = new SelectList(
                 await _context.DanhMucs
-                    .Where(d => d.Loai == "ChiTieu")
+                    .Where(d => d.Loai == "ChiTieu" && d.NguoiDungId == nguoiDungId)
                     .ToListAsync(),
                 "DanhMucId", "TenDanhMuc", nganSach.DanhMucId);
 
@@ -319,54 +319,39 @@ namespace QuanLyCTCN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            // Kiểm tra đăng nhập
-            var redirectResult = RedirectToLoginIfNotAuthenticated();
-            if (redirectResult != null)
-            {
-                return redirectResult;
-            }
-
             var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
-
             var nganSach = await _context.NganSachs
                 .FirstOrDefaultAsync(n => n.NganSachId == id && n.NguoiDungId == nguoiDungId);
-
             if (nganSach == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy ngân sách cần xóa hoặc bạn không có quyền xóa ngân sách này.";
+                TempData["ErrorMessage"] = "Không tìm thấy ngân sách cần xóa hoặc bạn không có quyền.";
                 return RedirectToAction(nameof(Index));
             }
 
             try
             {
-                var thang = nganSach.Thang;
-                var nam = nganSach.Nam;
+                // 1) Xoá luôn các ChiTiêu liên quan (cùng DanhMuc, cùng tháng/năm)
+                var relatedChiTieus = await _context.ChiTieus
+                    .Where(c => c.NguoiDungId == nguoiDungId
+                             && c.DanhMucId == nganSach.DanhMucId
+                             && c.NgayChi.Month == nganSach.Thang
+                             && c.NgayChi.Year == nganSach.Nam)
+                    .ToListAsync();
+                if (relatedChiTieus.Any())
+                {
+                    _context.ChiTieus.RemoveRange(relatedChiTieus);
+                }
 
+                // 2) Xoá ngân sách
                 _context.NganSachs.Remove(nganSach);
-                var result = await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
 
-                if (result > 0)
-                {
-                    TempData["SuccessMessage"] = "Xóa ngân sách thành công!";
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Không thể xóa ngân sách. Vui lòng thử lại.";
-                }
-
-                return RedirectToAction(nameof(Index), new { thang, nam });
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                // Entity đã bị thay đổi hoặc xóa bởi transaction khác
-                TempData["ErrorMessage"] = "Ngân sách đã được thay đổi hoặc xóa bởi người dùng khác. Vui lòng làm mới trang và thử lại.";
-                return RedirectToAction(nameof(Index));
+                TempData["NganSachSuccessMessage"] = "Xóa ngân sách và các chi tiêu liên quan thành công!";
+                return RedirectToAction(nameof(Index), new { thang = nganSach.Thang, nam = nganSach.Nam });
             }
             catch (Exception ex)
             {
-                // Log lỗi để debug
                 Console.WriteLine($"Lỗi khi xóa ngân sách ID {id}: {ex.Message}");
-
                 TempData["ErrorMessage"] = "Có lỗi xảy ra khi xóa ngân sách. Vui lòng thử lại.";
                 return RedirectToAction(nameof(Index));
             }

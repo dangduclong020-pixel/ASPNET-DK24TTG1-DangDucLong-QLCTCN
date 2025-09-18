@@ -7,13 +7,14 @@
 
 @section HeaderActions {
     <div class="d-flex gap-2">
-        <a href="@Url.Action("Index", new { tuNgay = DateTime.Today.AddDays(-7), denNgay = DateTime.Today })" class="btn btn-outline-primary btn-sm">
-            <i class="fas fa-calendar-week"></i> Tuần này
-        </a>
-        <a href="@Url.Action("Index", new { tuNgay = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1), denNgay = DateTime.Today })" class="btn btn-outline-primary btn-sm">
+        @{
+            var today = DateTime.Today;
+        }
+        
+        <a href="@Url.Action("Index")?thang=@today.Month&nam=@today.Year" class="btn btn-outline-primary btn-sm">
             <i class="fas fa-calendar-alt"></i> Tháng này
         </a>
-        <a href="@Url.Action("Index", new { tuNgay = new DateTime(DateTime.Today.Year, 1, 1), denNgay = DateTime.Today })" class="btn btn-outline-primary btn-sm">
+        <a href="@Url.Action("Index")?thang=0&nam=@today.Year" class="btn btn-outline-primary btn-sm">
             <i class="fas fa-calendar"></i> Năm này
         </a>
     </div>
@@ -65,13 +66,14 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <form asp-action="Index" method="get" class="d-flex gap-3 align-items-end flex-wrap">
+                <form asp-action="Index" method="get" class="d-flex gap-3 align-items-end">
+                    <!-- Chỉ giữ lọc theo tháng thu nhập -->
                     <div class="form-group">
                         <label class="form-label">Tháng</label>
                         <select name="thang" class="form-control">
                             @for (int i = 1; i <= 12; i++)
                             {
-                                <option value="@i" selected="@(ViewBag.Thang == i)">Tháng @i</option>
+                                <option value="@i" selected="@(DateTime.Today.Month == i)">Tháng @i</option>
                             }
                         </select>
                     </div>
@@ -80,21 +82,18 @@
                         <select name="nam" class="form-control">
                             @for (int i = DateTime.Today.Year - 5; i <= DateTime.Today.Year + 1; i++)
                             {
-                                <option value="@i" selected="@(ViewBag.Nam == i)">@i</option>
+                                <option value="@i" selected="@(DateTime.Today.Year == i)">@i</option>
                             }
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Từ ngày</label>
-                        <input type="date" name="tuNgay" value="@Model.NgayBatDau.ToString("yyyy-MM-dd")" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Đến ngày</label>
-                        <input type="date" name="denNgay" value="@Model.NgayKetThuc.ToString("yyyy-MM-dd")" class="form-control" />
-                    </div>
+                    
+                    <!-- Buttons -->
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-filter"></i> Lọc
                     </button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <i class="fas fa-undo"></i> Đặt lại
+                    </a>
                 </form>
             </div>
         </div>
@@ -116,17 +115,6 @@
                 <h5 class="chart-title">Chi tiêu theo danh mục</h5>
             </div>
             <canvas id="chiTieuChart" width="400" height="300"></canvas>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="chart-container">
-            <div class="chart-header">
-                <h5 class="chart-title">Xu hướng thu nhập và chi tiêu theo thời gian</h5>
-            </div>
-            <canvas id="thoiGianChart" width="800" height="400"></canvas>
         </div>
     </div>
 </div>
@@ -352,6 +340,50 @@
                     }
                 }
             }
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            console.log('JavaScript loaded'); // Debug
+            
+            // Function để toggle containers
+            function toggleContainers() {
+                var selectedValue = $('input[name="loaiLoc"]:checked').val();
+                console.log('Selected value:', selectedValue); // Debug
+                
+                if (selectedValue === 'NgayNhap') {
+                    console.log('Showing ngayNhapContainer, hiding thangThuNhapContainer'); // Debug
+                    $('#ngayNhapContainer').removeClass('d-none').addClass('d-flex');
+                    $('#thangThuNhapContainer').removeClass('d-flex').addClass('d-none');
+                    
+                    // Enable ngày nhập fields, disable tháng thu nhập fields
+                    $('#ngayNhapContainer input, #ngayNhapContainer select').prop('disabled', false);
+                    $('#thangThuNhapContainer select').prop('disabled', true);
+                } else if (selectedValue === 'ThangThuNhap') {
+                    console.log('Showing thangThuNhapContainer, hiding ngayNhapContainer'); // Debug
+                    $('#ngayNhapContainer').removeClass('d-flex').addClass('d-none');
+                    $('#thangThuNhapContainer').removeClass('d-none').addClass('d-flex');
+                    
+                    // Enable tháng thu nhập fields, disable ngày nhập fields
+                    $('#thangThuNhapContainer select').prop('disabled', false);
+                    $('#ngayNhapContainer input, #ngayNhapContainer select').prop('disabled', true);
+                }
+            }
+            
+            // Xử lý thay đổi radio button
+            $('input[name="loaiLoc"]').on('change', function() {
+                console.log('Radio button changed:', $(this).val()); // Debug
+                toggleContainers();
+            });
+            
+            // Set trạng thái ban đầu
+            toggleContainers();
+            
+            // Force trigger để đảm bảo
+            setTimeout(function() {
+                toggleContainers();
+            }, 100);
         });
     </script>
 }

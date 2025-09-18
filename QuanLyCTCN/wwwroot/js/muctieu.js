@@ -279,9 +279,35 @@ function initializeFormValidation() {
             }
 
             // Format số tiền cho input SoTienCan và SoTienDaTietKiem
-            if (input.name === 'SoTienCan' || input.name === 'SoTienDaTietKiem' || input.id === 'SoTienCan' || input.id === 'SoTienDaTietKiem') {
+            if (['SoTienCan','SoTienDaTietKiem'].includes(input.name) || ['SoTienCan','SoTienDaTietKiem'].includes(input.id)) {
                 formatCurrencyInput(input);
             }
+        });
+
+        // Format lại ô display dành cho SoTienCan
+        const display = form.querySelector('#SoTienCanDisplay');
+        if (display) {
+            formatCurrencyInput(display);
+        }
+       // Format lại ô display dành cho SoTienDaTietKiem
+        const saved = form.querySelector('#SoTienDaTietKiemDisplay');
+        if (saved) {
+            formatCurrencyInput(saved);
+        }
+
+        // Trước khi submit, sync giá trị từ ô display về hidden field
+        form.addEventListener('submit', function() {
+            const d = document.getElementById('SoTienCanDisplay');
+            const h = document.getElementById('SoTienCanHidden');
+            if (d && h) {
+                h.value = d.value.replace(/\./g, '').trim();
+            }
+           // Sync SoTienDaTietKiem
+           const d2 = document.getElementById('SoTienDaTietKiemDisplay');
+           const h2 = document.getElementById('SoTienDaTietKiemHidden');
+           if (d2 && h2) {
+               h2.value = d2.value.replace(/\./g, '').trim();
+           }
         });
 
         // Form submission enhancement
@@ -542,3 +568,21 @@ function formatCurrencyInput(input) {
 function formatNumber(number) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
+
+/* ===== FORMAT SỐ TIỀN CHO Ô CẬP NHẬT TIẾN ĐỘ TRÊN INDEX ===== */
+document.addEventListener('DOMContentLoaded', function() {
+    const display = document.getElementById('soTienThemDisplay');
+    const hidden  = document.getElementById('soTienThem');
+    if (display && hidden) {
+        // Gắn formatter (tháo format khi focus, thêm dấu . khi blur)
+        formatCurrencyInput(display);
+
+        // Trước khi submit, sync giá trị nguyên về hidden
+        const form = display.closest('form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                hidden.value = display.value.replace(/\./g, '').trim();
+            });
+        }
+    }
+});

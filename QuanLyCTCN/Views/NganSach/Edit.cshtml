@@ -14,101 +14,31 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
     <script>
-        $(document).ready(function() {
-            // Format số tiền khi load
-            formatCurrencyInput($('input[name="HanMuc"]')[0]);
+        document.addEventListener('DOMContentLoaded', function () {
+            const hanMucDisplay = document.getElementById('HanMucDisplay');
+            const hanMucHidden  = document.getElementById('HanMucHidden');
+            const initialHanMucValue = '@((long)Model.HanMuc)';
 
-            // Xử lý submit form để loại bỏ format số tiền
-            $('.ngansach-form').on('submit', function(e) {
-                cleanCurrencyInputs();
-            });
-
-            // Function để loại bỏ format số tiền trước khi submit
-            function cleanCurrencyInputs() {
-                // Đồng bộ hóa giá trị từ input text sang hidden input
-                const currencyInputs = document.querySelectorAll('input[name="HanMuc"]:not([type="hidden"])');
-                currencyInputs.forEach(input => {
-                    if (input.value) {
-                        // Loại bỏ dấu chấm và khoảng trắng để gửi giá trị số thô
-                        const cleanValue = input.value.replace(/\./g, '').replace(/\s/g, '');
-                        console.log('Original value:', input.value, 'Cleaned value:', cleanValue);
-                        // Cập nhật hidden input
-                        const hiddenInput = document.getElementById('HanMucHidden');
-                        if (hiddenInput) {
-                            hiddenInput.value = cleanValue;
-                        }
-                    }
-                });
+            if (hanMucDisplay) {
+                hanMucDisplay.value = initialHanMucValue;
+                formatCurrencyInput(hanMucDisplay);
+                // đồng thời cập nhật giá trị thật vào hidden
+                hanMucHidden.value = initialHanMucValue;
             }
 
-            // Function để format số tiền với dấu chấm phân cách
-            function formatCurrencyInput(input) {
-                if (!input) return;
-
-                let isFormatted = false;
-                let originalValue = input.value;
-
-                // Store original value for form submission
-                input.addEventListener('focus', function() {
-                    if (isFormatted && this.value) {
-                        // Remove formatting when focusing (allow raw number input)
-                        const rawValue = this.value.replace(/\./g, '');
-                        this.value = rawValue;
-                        isFormatted = false;
+            // xử lý nút Đặt lại
+            const resetButton = document.querySelector('.ngansach-form button[type="reset"]');
+            if (resetButton) {
+                resetButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    // reset selects...
+                    if (hanMucDisplay) {
+                        hanMucDisplay.value = initialHanMucValue;
+                        formatCurrencyInput(hanMucDisplay);
+                        hanMucHidden.value = initialHanMucValue;
+                        clearFieldError(hanMucDisplay);
                     }
                 });
-
-                input.addEventListener('blur', function() {
-                    const currentValue = this.value.trim();
-                    if (currentValue && !isFormatted) {
-                        // Add formatting when blurring
-                        const numericValue = parseFloat(currentValue.replace(/\./g, ''));
-                        if (!isNaN(numericValue) && numericValue >= 0) {
-                            this.value = formatNumber(numericValue);
-                            isFormatted = true;
-                            originalValue = currentValue;
-                            
-                            // Đồng bộ hóa với hidden input nếu có
-                            const hiddenInput = document.getElementById('HanMucHidden');
-                            if (hiddenInput) {
-                                hiddenInput.value = currentValue;
-                                // Disable input text để tránh conflict khi submit
-                                this.disabled = true;
-                            }
-                        } else if (currentValue !== '') {
-                            // If invalid, restore original value
-                            this.value = originalValue || '';
-                        }
-                    }
-                });
-
-                input.addEventListener('input', function() {
-                    // Allow only numbers during input (remove dots temporarily)
-                    let cleanValue = this.value.replace(/[^\d]/g, '');
-
-                    // Prevent leading zeros
-                    if (cleanValue.length > 1 && cleanValue.startsWith('0')) {
-                        cleanValue = cleanValue.substring(1);
-                    }
-
-                    this.value = cleanValue;
-                    isFormatted = false;
-                });
-
-                // Initialize formatting if input has value
-                if (input.value) {
-                    const numericValue = parseFloat(input.value.replace(/\./g, ''));
-                    if (!isNaN(numericValue) && numericValue >= 0) {
-                        input.value = formatNumber(numericValue);
-                        isFormatted = true;
-                        originalValue = input.value.replace(/\./g, '');
-                    }
-                }
-            }
-
-            // Format number with Vietnamese thousand separators
-            function formatNumber(number) {
-                return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
             }
         });
     </script>
@@ -151,10 +81,11 @@
                                             <span class="ngansach-input-group-text">
                                                 <i class="fas fa-money-bill-wave"></i>
                                             </span>
-                                            <input asp-for="HanMuc" class="ngansach-form-control grouped" placeholder="Nhập hạn mức" type="text" required />
+                                            <!-- Chỉ hiển thị, không asp-for để khỏi vướng validation number -->
+                                            <input id="HanMucDisplay" class="ngansach-form-control grouped" placeholder="Nhập hạn mức" type="text" />
                                         </div>
-                                        <span asp-validation-for="HanMuc" class="ngansach-text-danger"></span>
-                                        <input type="hidden" id="HanMucHidden" name="HanMuc" value="@Model.HanMuc" />
+                                        <!-- Trường ẩn bind giá trị nguyên cho server -->
+                                        <input asp-for="HanMuc" type="hidden" id="HanMucHidden" />
                                     </div>
                                 </div>
                             </div>

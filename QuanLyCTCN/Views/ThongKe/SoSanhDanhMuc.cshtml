@@ -1,14 +1,29 @@
 @{
     ViewData["Title"] = "So sánh theo danh mục";
-    ViewData["Subtitle"] = $"{(ViewBag.Loai == "ChiTieu" ? "Chi tiêu" : "Thu nhập")} - Từ {ViewBag.TuNgay} đến {ViewBag.DenNgay}";
+    ViewData["Subtitle"] = $"{(ViewBag.Loai == "ChiTieu" ? "Chi tiêu" : "Thu nhập")} - Tháng {ViewBag.Thang}/{ViewBag.Nam}";
 }
 
 @section HeaderActions {
     <div class="d-flex gap-2">
         <form method="get" class="d-flex gap-2">
             <input type="hidden" name="loai" value="@ViewBag.Loai" />
-            <input type="date" name="tuNgay" value="@ViewBag.TuNgay" class="form-control form-control-sm" />
-            <input type="date" name="denNgay" value="@ViewBag.DenNgay" class="form-control form-control-sm" />
+            <!-- Thay đổi từ date input thành select tháng/năm -->
+            <div class="form-group">
+                <select name="thang" class="form-control form-control-sm">
+                    @for (int i = 1; i <= 12; i++)
+                    {
+                        <option value="@i" selected="@(ViewBag.Thang == i)">Tháng @i</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <select name="nam" class="form-control form-control-sm">
+                    @for (int i = DateTime.Today.Year - 5; i <= DateTime.Today.Year + 1; i++)
+                    {
+                        <option value="@i" selected="@(ViewBag.Nam == i)">@i</option>
+                    }
+                </select>
+            </div>
             <button type="submit" class="btn btn-primary btn-sm">
                 <i class="fas fa-search"></i> Lọc
             </button>
@@ -54,11 +69,11 @@
             <div class="chart-header">
                 <h5 class="chart-title">@(ViewBag.Loai == "ChiTieu" ? "Chi tiêu" : "Thu nhập") theo danh mục</h5>
                 <div class="btn-group" role="group">
-                    <a href="@Url.Action("SoSanhDanhMuc", new { loai = "ThuNhap", tuNgay = ViewBag.TuNgay, denNgay = ViewBag.DenNgay })"
+                    <a href="@Url.Action("SoSanhDanhMuc", new { loai = "ThuNhap", thang = ViewBag.Thang, nam = ViewBag.Nam })"
                        class="btn btn-sm @(ViewBag.Loai == "ThuNhap" ? "btn-primary" : "btn-outline-primary")">
                         Thu nhập
                     </a>
-                    <a href="@Url.Action("SoSanhDanhMuc", new { loai = "ChiTieu", tuNgay = ViewBag.TuNgay, denNgay = ViewBag.DenNgay })"
+                    <a href="@Url.Action("SoSanhDanhMuc", new { loai = "ChiTieu", thang = ViewBag.Thang, nam = ViewBag.Nam })"
                        class="btn btn-sm @(ViewBag.Loai == "ChiTieu" ? "btn-primary" : "btn-outline-primary")">
                         Chi tiêu
                     </a>

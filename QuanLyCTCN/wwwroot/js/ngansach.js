@@ -341,65 +341,46 @@ window.NganSachUtils = {
 
 // Format currency input with thousand separators
 function formatCurrencyInput(input) {
-    let isFormatted = false;
-    let originalValue = input.value;
+    if (!input) return;
 
-    // Store original value for form submission
+    let isFormatted = false;
+
+    const reformat = (el) => {
+        const rawValue = el.value.trim();
+        if (!rawValue) return;
+
+        // 1) Loại bỏ tất cả ký tự không phải chữ số
+        const digitsOnly = rawValue.replace(/\D/g, '');
+        // 2) Chuyển về số nguyên
+        const numericValue = parseInt(digitsOnly, 10);
+
+        if (!isNaN(numericValue)) {
+            // 3) Định dạng lại với dấu chấm ngăn cách hàng nghìn
+            el.value = formatNumber(numericValue);
+            isFormatted = true;
+            // 4) Cập nhật hidden input nếu tồn tại
+            const hidden = document.getElementById(el.name + 'Hidden') 
+                        || document.getElementById('HanMucHidden');
+            if (hidden) hidden.value = numericValue;
+        } else {
+            el.value = '';
+        }
+    };
+
     input.addEventListener('focus', function() {
-        if (isFormatted && this.value) {
-            // Remove formatting when focusing (allow raw number input)
-            const rawValue = this.value.replace(/\./g, '');
-            this.value = rawValue;
+        if (isFormatted) {
+            // Lúc focus bỏ hết dấu chấm
+            this.value = this.value.replace(/\./g, '');
             isFormatted = false;
         }
     });
 
     input.addEventListener('blur', function() {
-        const currentValue = this.value.trim();
-        if (currentValue && !isFormatted) {
-            // Add formatting when blurring
-            const numericValue = parseFloat(currentValue.replace(/\./g, ''));
-            if (!isNaN(numericValue) && numericValue >= 0) {
-                this.value = formatNumber(numericValue);
-                isFormatted = true;
-                originalValue = currentValue;
-                
-                // Đồng bộ hóa với hidden input nếu có
-                const hiddenInput = document.getElementById('HanMucHidden');
-                if (hiddenInput) {
-                    hiddenInput.value = currentValue;
-                    // Disable input text để tránh conflict khi submit
-                    this.disabled = true;
-                }
-            } else if (currentValue !== '') {
-                // If invalid, restore original value
-                this.value = originalValue || '';
-            }
-        }
+        reformat(this);
     });
 
-    input.addEventListener('input', function() {
-        // Allow only numbers during input (remove dots temporarily)
-        let cleanValue = this.value.replace(/[^\d]/g, '');
-        
-        // Prevent leading zeros
-        if (cleanValue.length > 1 && cleanValue.startsWith('0')) {
-            cleanValue = cleanValue.substring(1);
-        }
-        
-        this.value = cleanValue;
-        isFormatted = false;
-    });
-
-    // Initialize formatting if input has value
-    if (input.value) {
-        const numericValue = parseFloat(input.value.replace(/\./g, ''));
-        if (!isNaN(numericValue) && numericValue >= 0) {
-            input.value = formatNumber(numericValue);
-            isFormatted = true;
-            originalValue = input.value.replace(/\./g, '');
-        }
-    }
+    // Định dạng lần đầu khi tải trang
+    reformat(input);
 }
 
 // Format number with Vietnamese thousand separators

@@ -18,6 +18,12 @@ namespace QuanLyCTCN.Models.ViewModels
         [Display(Name = "Địa chỉ")]
         public string? DiaChi { get; set; }
 
+        // Ảnh đại diện
+        [Display(Name = "Ảnh đại diện")]
+        public IFormFile? AnhDaiDien { get; set; }
+
+        public string? AnhDaiDienHienTai { get; set; }
+
         // Đổi mật khẩu
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu hiện tại")]

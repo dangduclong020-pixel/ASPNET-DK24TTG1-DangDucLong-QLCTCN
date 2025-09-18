@@ -542,7 +542,14 @@ function formatCurrencyInput(input) {
 
     input.addEventListener('blur', function() {
         const currentValue = this.value.trim();
-        if (currentValue && !isFormatted) {
+        
+        // Nếu ô trống, không làm gì cả
+        if (!currentValue) {
+            isFormatted = false;
+            return;
+        }
+        
+        if (!isFormatted) {
             // Add formatting when blurring
             const numericValue = parseFloat(currentValue.replace(/\./g, ''));
             if (!isNaN(numericValue) && numericValue >= 0) {
@@ -554,6 +561,7 @@ function formatCurrencyInput(input) {
                 const hiddenInput = document.getElementById('SoTienHidden');
                 if (hiddenInput) {
                     hiddenInput.value = currentValue;
+                    // KHÔNG disable input text
                 }
             } else if (currentValue !== '') {
                 // If invalid, restore original value

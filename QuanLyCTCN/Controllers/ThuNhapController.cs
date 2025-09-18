@@ -134,11 +134,9 @@ namespace QuanLyCTCN.Controllers
             {
                 _context.Add(thuNhap);
                 await _context.SaveChangesAsync();
-
-                // Kiểm tra và cập nhật mục tiêu tiết kiệm nếu cần
                 await KiemTraVaCapNhatMucTieu(thuNhap.NguoiDungId!.Value);
 
-                TempData["SuccessMessage"] = "Thêm thu nhập thành công!";
+                TempData["ThuNhapSuccessMessage"] = "Thêm thu nhập thành công!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -244,7 +242,7 @@ namespace QuanLyCTCN.Controllers
                         throw;
                     }
                 }
-                TempData["SuccessMessage"] = "Cập nhật thu nhập thành công!";
+                TempData["ThuNhapSuccessMessage"] = "Cập nhật thu nhập thành công!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -319,7 +317,7 @@ namespace QuanLyCTCN.Controllers
                 {
                     // Cập nhật lại mục tiêu sau khi xóa thu nhập
                     await KiemTraVaCapNhatMucTieu(nguoiDungId!.Value);
-                    TempData["SuccessMessage"] = "Xóa thu nhập thành công!";
+                    TempData["ThuNhapSuccessMessage"] = "Xóa thu nhập thành công!";
                 }
                 else
                 {

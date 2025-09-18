@@ -165,9 +165,12 @@
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" value="@Model.MucTieuId" />
                     <div class="mb-3">
-                        <label for="soTienThem" class="form-label">Số tiền thêm</label>
+                        <label for="soTienThemDisplay" class="form-label">Số tiền thêm</label>
                         <div class="input-group">
-                            <input type="number" class="form-control" id="soTienThem" name="soTienThem" min="0" step="1000" required />
+                            <!-- ô hiển thị đã format -->
+                            <input type="text" class="form-control" id="soTienThemDisplay" placeholder="0" required />
+                            <!-- hidden field bind giá trị nguyên lên server -->
+                            <input type="hidden" id="soTienThem" name="soTienThem" />
                             <span class="input-group-text">VND</span>
                         </div>
                     </div>

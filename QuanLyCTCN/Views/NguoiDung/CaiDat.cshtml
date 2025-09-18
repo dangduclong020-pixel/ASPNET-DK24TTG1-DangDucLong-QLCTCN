@@ -7,25 +7,115 @@
 
 <style>
     .settings-container {
-        max-width: 800px;
+        max-width: 1000px;
         margin: 0 auto;
+        padding: 2rem 1rem;
     }
 
-    .settings-card {
+    .settings-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .settings-main-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--primary-color), #3367d6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .settings-subtitle {
+        color: #6b7280;
+        font-size: 1rem;
+    }
+
+    .tabs-container {
         background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        border: 1px solid var(--border-color);
-        margin-bottom: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
     }
 
-    .settings-title {
-        font-size: 1.25rem;
+    .tab-navigation {
+        display: flex;
+        background: #f8fafc;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .tab-button {
+        flex: 1;
+        padding: 1.5rem 2rem;
+        background: none;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .tab-button.active {
+        color: var(--primary-color);
+        background: white;
+    }
+
+    .tab-button.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(135deg, var(--primary-color), #3367d6);
+    }
+
+    .tab-button:hover:not(.active) {
+        color: var(--primary-color);
+        background: rgba(66, 133, 244, 0.05);
+    }
+
+    .tab-content {
+        padding: 2.5rem;
+    }
+
+    .tab-pane {
+        display: none;
+    }
+
+    .tab-pane.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
         font-weight: 600;
         color: var(--dark-color);
         margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
         padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--primary-color);
+        border-bottom: 2px solid #f3f4f6;
     }
 
     .form-group {
@@ -37,151 +127,503 @@
         color: var(--dark-color);
         margin-bottom: 0.5rem;
         display: block;
+        font-size: 0.9rem;
     }
 
     .form-control {
         width: 100%;
-        padding: 0.75rem;
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        font-size: 0.875rem;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background: #fafbfc;
     }
 
     .form-control:focus {
         outline: none;
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        transform: translateY(-1px);
     }
 
     .btn-primary-custom {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        color: white;
-        padding: 0.75rem 2rem;
-        border-radius: 6px;
-        font-weight: 500;
+        background: linear-gradient(135deg, var(--primary-color), #3367d6);
         border: none;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+        font-size: 0.9rem;
     }
 
     .btn-primary-custom:hover {
-        background-color: #3367d6;
-        border-color: #3367d6;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+    }
+
+    .btn-secondary-custom {
+        background: #f3f4f6;
+        border: 2px solid #e5e7eb;
+        color: #374151;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .btn-secondary-custom:hover {
+        background: #e5e7eb;
+        transform: translateY(-1px);
     }
 
     .alert {
-        padding: 1rem;
-        border-radius: 6px;
-        margin-bottom: 1.5rem;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        border-left: 4px solid;
     }
 
     .alert-success {
-        background-color: #d1fae5;
+        background-color: #ecfdf5;
         color: #065f46;
-        border: 1px solid #a7f3d0;
+        border-left-color: #10b981;
     }
 
     .text-danger {
-        color: var(--danger-color);
-        font-size: 0.875rem;
+        color: #dc2626;
+        font-size: 0.8rem;
         margin-top: 0.25rem;
+        font-weight: 500;
+    }
+
+    /* Avatar styles */
+    .avatar-section {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .avatar-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .avatar-preview {
+        position: relative;
+    }
+
+    .avatar-preview img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+    }
+
+    .avatar-preview:hover img {
+        transform: scale(1.05);
+        box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+    }
+
+    .avatar-upload {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .avatar-upload input[type="file"] {
+        padding: 0.75rem 1rem;
+        border: 2px dashed var(--primary-color);
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .avatar-upload input[type="file"]:hover {
+        border-color: #3367d6;
+        background: #f8fafc;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .password-strength {
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .strength-weak { color: #dc2626; }
+    .strength-medium { color: #f59e0b; }
+    .strength-strong { color: #10b981; }
+
+    @@media (max-width: 768px) {
+        .settings-container {
+            padding: 1rem;
+        }
+
+        .tab-navigation {
+            flex-direction: column;
+        }
+
+        .tab-content {
+            padding: 1.5rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .avatar-container {
+            gap: 1rem;
+        }
+
+        .avatar-preview img {
+            width: 100px;
+            height: 100px;
+        }
     }
 </style>
 
 <div class="settings-container">
-    <div class="settings-card">
-        <h2 class="settings-title">
+    <div class="settings-header">
+        <h1 class="settings-main-title">
             <i class="fas fa-user-cog me-2"></i>
             Cài đặt tài khoản
-        </h2>
+        </h1>
+        <p class="settings-subtitle">Quản lý thông tin cá nhân và bảo mật tài khoản của bạn</p>
+    </div>
 
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle me-2"></i>
-                @TempData["SuccessMessage"]
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i>
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="tabs-container">
+        <div class="tab-navigation">
+            <button class="tab-button active" data-tab="profile">
+                <i class="fas fa-user"></i>
+                Thông tin cá nhân
+            </button>
+            <button class="tab-button" data-tab="password">
+                <i class="fas fa-key"></i>
+                Đổi mật khẩu
+            </button>
+        </div>
+
+        <div class="tab-content">
+            <!-- Tab Thông tin cá nhân -->
+            <div id="profile-tab" class="tab-pane active">
+                <form asp-action="CaiDat" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    
+                    <!-- Ảnh đại diện -->
+                    <div class="avatar-section">
+                        <div class="section-title">
+                            <i class="fas fa-camera"></i>
+                            Ảnh đại diện
+                        </div>
+                        <div class="avatar-container">
+                            <div class="avatar-preview">
+                                <img id="avatar-preview" 
+                                     src="@(!string.IsNullOrEmpty(Model?.AnhDaiDienHienTai) ? Url.Content("~/uploads/avatars/" + Model.AnhDaiDienHienTai) : "/images/default-avatar.svg")" 
+                                     alt="Ảnh đại diện" 
+                                     onerror="this.src='/images/default-avatar.svg'" />
+                            </div>
+                            <div class="avatar-upload">
+                                <input asp-for="AnhDaiDien" type="file" id="avatar-input" accept="image/*" class="form-control" />
+                                <small class="text-muted">JPG, PNG hoặc GIF (tối đa 5MB)</small>
+                                <span asp-validation-for="AnhDaiDien" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin cá nhân -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Thông tin cơ bản
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label asp-for="HoTen" class="form-label">Họ và tên</label>
+                                <input asp-for="HoTen" class="form-control" placeholder="Nhập họ và tên đầy đủ" />
+                                <span asp-validation-for="HoTen" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Email" class="form-label">Email</label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="Nhập địa chỉ email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label asp-for="SoDienThoai" class="form-label">Số điện thoại</label>
+                                <input asp-for="SoDienThoai" class="form-control" placeholder="Nhập số điện thoại" />
+                                <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="DiaChi" class="form-label">Địa chỉ</label>
+                                <input asp-for="DiaChi" class="form-control" placeholder="Nhập địa chỉ" />
+                                <span asp-validation-for="DiaChi" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary-custom">
+                            <i class="fas fa-times me-2"></i>
+                            Hủy bỏ
+                        </button>
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="fas fa-save me-2"></i>
+                            Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
             </div>
-        }
 
-        <form asp-action="CaiDat" method="post">
-            @Html.AntiForgeryToken()
+            <!-- Tab Đổi mật khẩu -->
+            <div id="password-tab" class="tab-pane">
+                <form action="@Url.Action("DoiMatKhau", "NguoiDung")" method="post">
+                    @Html.AntiForgeryToken()
+                    
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-shield-alt"></i>
+                            Thay đổi mật khẩu
+                        </div>
 
-            <!-- Thông tin cá nhân -->
-            <div class="mb-4">
-                <h4 class="mb-3">
-                    <i class="fas fa-user me-2"></i>
-                    Thông tin cá nhân
-                </h4>
+                        <div class="form-group">
+                            <label for="MatKhauHienTai" class="form-label">Mật khẩu hiện tại</label>
+                            <input name="MatKhauHienTai" type="password" class="form-control" placeholder="Nhập mật khẩu hiện tại" required />
+                            @if (ViewBag.PasswordErrors != null && ViewBag.PasswordErrors.ContainsKey("MatKhauHienTai"))
+                            {
+                                <span class="text-danger">@ViewBag.PasswordErrors["MatKhauHienTai"]</span>
+                            }
+                        </div>
 
-                <div class="form-group">
-                    <label asp-for="HoTen" class="form-label"></label>
-                    <input asp-for="HoTen" class="form-control" placeholder="Nhập họ tên" />
-                    <span asp-validation-for="HoTen" class="text-danger"></span>
-                </div>
+                        <div class="form-group">
+                            <label for="MatKhauMoi" class="form-label">Mật khẩu mới</label>
+                            <input name="MatKhauMoi" type="password" class="form-control" placeholder="Nhập mật khẩu mới" id="new-password" required />
+                            <div id="password-strength" class="password-strength"></div>
+                            @if (ViewBag.PasswordErrors != null && ViewBag.PasswordErrors.ContainsKey("MatKhauMoi"))
+                            {
+                                <span class="text-danger">@ViewBag.PasswordErrors["MatKhauMoi"]</span>
+                            }
+                        </div>
 
-                <div class="form-group">
-                    <label asp-for="Email" class="form-label"></label>
-                    <input asp-for="Email" type="email" class="form-control" placeholder="Nhập email" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
+                        <div class="form-group">
+                            <label for="XacNhanMatKhauMoi" class="form-label">Xác nhận mật khẩu mới</label>
+                            <input name="XacNhanMatKhauMoi" type="password" class="form-control" placeholder="Nhập lại mật khẩu mới" required />
+                            @if (ViewBag.PasswordErrors != null && ViewBag.PasswordErrors.ContainsKey("XacNhanMatKhauMoi"))
+                            {
+                                <span class="text-danger">@ViewBag.PasswordErrors["XacNhanMatKhauMoi"]</span>
+                            }
+                        </div>
 
-                <div class="form-group">
-                    <label asp-for="SoDienThoai" class="form-label"></label>
-                    <input asp-for="SoDienThoai" class="form-control" placeholder="Nhập số điện thoại" />
-                    <span asp-validation-for="SoDienThoai" class="text-danger"></span>
-                </div>
+                        <div class="alert" style="background-color: #fef3c7; color: #92400e; border-left-color: #f59e0b;">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Lưu ý:</strong> Mật khẩu mới phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường và số.
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label asp-for="DiaChi" class="form-label"></label>
-                    <input asp-for="DiaChi" class="form-control" placeholder="Nhập địa chỉ" />
-                    <span asp-validation-for="DiaChi" class="text-danger"></span>
-                </div>
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary-custom">
+                            <i class="fas fa-times me-2"></i>
+                            Hủy bỏ
+                        </button>
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="fas fa-key me-2"></i>
+                            Đổi mật khẩu
+                        </button>
+                    </div>
+                </form>
             </div>
-
-            <!-- Đổi mật khẩu -->
-            <div class="mb-4">
-                <h4 class="mb-3">
-                    <i class="fas fa-lock me-2"></i>
-                    Đổi mật khẩu (tùy chọn)
-                </h4>
-
-                <div class="form-group">
-                    <label asp-for="MatKhauHienTai" class="form-label"></label>
-                    <input asp-for="MatKhauHienTai" type="password" class="form-control" placeholder="Nhập mật khẩu hiện tại" />
-                    <span asp-validation-for="MatKhauHienTai" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="MatKhauMoi" class="form-label"></label>
-                    <input asp-for="MatKhauMoi" type="password" class="form-control" placeholder="Nhập mật khẩu mới" />
-                    <span asp-validation-for="MatKhauMoi" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="XacNhanMatKhauMoi" class="form-label"></label>
-                    <input asp-for="XacNhanMatKhauMoi" type="password" class="form-control" placeholder="Xác nhận mật khẩu mới" />
-                    <span asp-validation-for="XacNhanMatKhauMoi" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="text-end">
-                <button type="submit" class="btn-primary-custom">
-                    <i class="fas fa-save me-2"></i>
-                    Lưu thay đổi
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
-        // Auto-hide success message after 5 seconds
         $(document).ready(function() {
+            // Check if we should show password tab
+            @if (TempData["ShowPasswordTab"] != null)
+            {
+                <text>
+                // Switch to password tab
+                $('.tab-button').removeClass('active');
+                $('.tab-pane').removeClass('active');
+                $('[data-tab="password"]').addClass('active');
+                $('#password-tab').addClass('active');
+                </text>
+            }
+
+            // Tab switching functionality
+            $('.tab-button').click(function() {
+                var targetTab = $(this).data('tab');
+                
+                // Remove active class from all tabs and buttons
+                $('.tab-button').removeClass('active');
+                $('.tab-pane').removeClass('active');
+                
+                // Add active class to clicked button and corresponding tab
+                $(this).addClass('active');
+                $('#' + targetTab + '-tab').addClass('active');
+            });
+
+            // Auto-hide success message after 5 seconds
             setTimeout(function() {
                 $('.alert-success').fadeOut('slow');
             }, 5000);
+
+            // Check if there's a success message and refresh sidebar avatar
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                // Refresh sidebar avatar by reloading the UserProfile component
+                setTimeout(function() {
+                    $.get('/NguoiDung/GetUserProfile', function(data) {
+                        if (data && data.anhDaiDien) {
+                            var avatarSrc = '/uploads/avatars/' + data.anhDaiDien;
+                            $('.sidebar-user-avatar img').attr('src', avatarSrc);
+                        }
+                    }).fail(function() {
+                        // If the endpoint doesn't exist, just reload the page
+                        location.reload();
+                    });
+                }, 1000);
+                </text>
+            }
+
+            // Avatar preview functionality
+            $('#avatar-input').change(function() {
+                const file = this.files[0];
+                if (file) {
+                    // Check file size (5MB limit)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('File quá lớn. Vui lòng chọn file nhỏ hơn 5MB.');
+                        this.value = '';
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#avatar-preview').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Password strength checker
+            $('#new-password').on('input', function() {
+                var password = $(this).val();
+                var strength = checkPasswordStrength(password);
+                var strengthElement = $('#password-strength');
+                
+                if (password.length > 0) {
+                    strengthElement.show();
+                    switch(strength) {
+                        case 'weak':
+                            strengthElement.html('<i class="fas fa-exclamation-triangle"></i> Mật khẩu yếu')
+                                .removeClass('strength-medium strength-strong')
+                                .addClass('strength-weak');
+                            break;
+                        case 'medium':
+                            strengthElement.html('<i class="fas fa-check-circle"></i> Mật khẩu trung bình')
+                                .removeClass('strength-weak strength-strong')
+                                .addClass('strength-medium');
+                            break;
+                        case 'strong':
+                            strengthElement.html('<i class="fas fa-shield-check"></i> Mật khẩu mạnh')
+                                .removeClass('strength-weak strength-medium')
+                                .addClass('strength-strong');
+                            break;
+                    }
+                } else {
+                    strengthElement.hide();
+                }
+            });
+
+            // Cancel buttons functionality
+            $('.btn-secondary-custom').click(function() {
+                if (confirm('Bạn có chắc chắn muốn hủy bỏ? Tất cả thay đổi sẽ bị mất.')) {
+                    location.reload();
+                }
+            });
+
+            // Form validation improvements
+            $('form').submit(function(e) {
+                var isValid = true;
+                var activeTab = $('.tab-pane.active');
+                
+                // Check required fields in active tab
+                activeTab.find('input[required]').each(function() {
+                    if ($(this).val().trim() === '') {
+                        isValid = false;
+                        $(this).focus();
+                        return false;
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Vui lòng điền đầy đủ thông tin bắt buộc.');
+                }
+            });
         });
+
+        // Password strength checking function
+        function checkPasswordStrength(password) {
+            var strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/)) strength++;
+            if (password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+            
+            if (strength < 3) return 'weak';
+            if (strength < 5) return 'medium';
+            return 'strong';
+        }
     </script>
 }

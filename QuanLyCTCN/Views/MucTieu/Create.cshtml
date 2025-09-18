@@ -39,7 +39,10 @@
                     <div class="mb-3">
                         <label asp-for="SoTienCan" class="form-label"></label>
                         <div class="input-group">
-                            <input asp-for="SoTienCan" class="form-control" type="number" min="0" step="1000" />
+                            <!-- ô hiển thị có format, không dùng asp-for -->
+                            <input id="SoTienCanDisplay" class="form-control" type="text" placeholder="0" required />
+                            <!-- field ẩn bind giá trị số nguyên lên server -->
+                            <input asp-for="SoTienCan" type="hidden" id="SoTienCanHidden" />
                             <span class="input-group-text">VND</span>
                         </div>
                         <span asp-validation-for="SoTienCan" class="text-danger"></span>
@@ -48,7 +51,10 @@
                     <div class="mb-3">
                         <label asp-for="SoTienDaTietKiem" class="form-label"></label>
                         <div class="input-group">
-                            <input asp-for="SoTienDaTietKiem" class="form-control" type="number" min="0" step="1000" value="0" />
+                            <!-- ô hiển thị đã format, không dùng asp-for -->
+                            <input id="SoTienDaTietKiemDisplay" class="form-control" type="text" placeholder="0" required />
+                            <!-- hidden field bind số nguyên -->
+                            <input asp-for="SoTienDaTietKiem" type="hidden" id="SoTienDaTietKiemHidden" value="0" />
                             <span class="input-group-text">VND</span>
                         </div>
                         <div class="form-text">Số tiền bạn đã tiết kiệm được cho mục tiêu này</div>

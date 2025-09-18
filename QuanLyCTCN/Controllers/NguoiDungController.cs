@@ -186,7 +186,8 @@ namespace QuanLyCTCN.Controllers
                 if (nguoiDung.MatKhau != model.MatKhauHienTai) // Trong thực tế nên sử dụng mã hóa
                 {
                     ModelState.AddModelError("MatKhauHienTai", "Mật khẩu hiện tại không đúng");
-                    return View(model);
+                    TempData["ShowPasswordTab"] = true;
+                    return RedirectToAction("CaiDat");
                 }
 
                 // Cập nhật mật khẩu mới
@@ -194,7 +195,8 @@ namespace QuanLyCTCN.Controllers
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
-                return RedirectToAction("HoSo");
+                TempData["ShowPasswordTab"] = true;
+                return RedirectToAction("CaiDat");
             }
 
             return View(model);
@@ -306,7 +308,8 @@ namespace QuanLyCTCN.Controllers
                 HoTen = nguoiDung.HoTen,
                 Email = nguoiDung.Email,
                 SoDienThoai = nguoiDung.SoDienThoai,
-                DiaChi = nguoiDung.DiaChi
+                DiaChi = nguoiDung.DiaChi,
+                AnhDaiDienHienTai = nguoiDung.AnhDaiDien
             };
 
             return View(model);
@@ -335,6 +338,48 @@ namespace QuanLyCTCN.Controllers
             nguoiDung.SoDienThoai = model.SoDienThoai;
             nguoiDung.DiaChi = model.DiaChi;
 
+            // Xử lý upload ảnh đại diện
+            if (model.AnhDaiDien != null && model.AnhDaiDien.Length > 0)
+            {
+                // Kiểm tra định dạng file
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                var fileExtension = Path.GetExtension(model.AnhDaiDien.FileName).ToLowerInvariant();
+                
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    ModelState.AddModelError("AnhDaiDien", "Chỉ chấp nhận file ảnh có định dạng .jpg, .jpeg, .png, .gif");
+                }
+                else if (model.AnhDaiDien.Length > 5 * 1024 * 1024) // 5MB
+                {
+                    ModelState.AddModelError("AnhDaiDien", "Kích thước file không được vượt quá 5MB");
+                }
+                else
+                {
+                    // Tạo tên file unique
+                    var fileName = $"{nguoiDungId}_{Guid.NewGuid()}{fileExtension}";
+                    var uploadPath = Path.Combine(_hostEnvironment.WebRootPath, "uploads", "avatars");
+                    var filePath = Path.Combine(uploadPath, fileName);
+
+                    // Xóa ảnh cũ nếu có
+                    if (!string.IsNullOrEmpty(nguoiDung.AnhDaiDien))
+                    {
+                        var oldFilePath = Path.Combine(uploadPath, nguoiDung.AnhDaiDien);
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                    }
+
+                    // Lưu file mới
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.AnhDaiDien.CopyToAsync(stream);
+                    }
+
+                    nguoiDung.AnhDaiDien = fileName;
+                }
+            }
+
             // Đổi mật khẩu nếu có
             if (!string.IsNullOrEmpty(model.MatKhauMoi))
             {
@@ -359,6 +404,8 @@ namespace QuanLyCTCN.Controllers
                 return RedirectToAction("CaiDat");
             }
 
+            // Nếu có lỗi, giữ lại thông tin ảnh đại diện hiện tại
+            model.AnhDaiDienHienTai = nguoiDung.AnhDaiDien;
             return View(model);
         }
 
@@ -366,7 +413,33 @@ namespace QuanLyCTCN.Controllers
         public IActionResult DangXuat()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("DangNhap");
+            return RedirectToAction("Index", "Home");
+        }
+
+        // API endpoint to get current user profile data
+        [HttpGet]
+        public async Task<IActionResult> GetUserProfile()
+        {
+            var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
+            if (nguoiDungId == null)
+            {
+                return Json(new { success = false });
+            }
+
+            var nguoiDung = await _context.NguoiDungs
+                .FirstOrDefaultAsync(n => n.NguoiDungId == nguoiDungId);
+
+            if (nguoiDung == null)
+            {
+                return Json(new { success = false });
+            }
+
+            return Json(new { 
+                success = true,
+                anhDaiDien = nguoiDung.AnhDaiDien,
+                hoTen = nguoiDung.HoTen,
+                email = nguoiDung.Email 
+            });
         }
     }
 }

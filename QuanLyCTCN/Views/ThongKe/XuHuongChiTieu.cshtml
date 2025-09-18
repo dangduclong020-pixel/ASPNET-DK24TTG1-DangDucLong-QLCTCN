@@ -7,10 +7,10 @@
     <div class="d-flex gap-2">
         <form method="get" class="d-flex gap-2">
             <select name="soThang" class="form-select form-select-sm" onchange="this.form.submit()">
-                <option value="3">3 tháng</option>
-                <option value="6">6 tháng</option>
-                <option value="12">12 tháng</option>
-                <option value="24">24 tháng</option>
+                <option value="3" selected="@(ViewBag.SoThang == 3)">3 tháng</option>
+                <option value="6" selected="@(ViewBag.SoThang == 6)">6 tháng</option>
+                <option value="12" selected="@(ViewBag.SoThang == 12)">12 tháng</option>
+                <option value="24" selected="@(ViewBag.SoThang == 24)">24 tháng</option>
             </select>
         </form>
     </div>

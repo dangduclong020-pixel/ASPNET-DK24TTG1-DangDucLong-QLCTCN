@@ -5,7 +5,9 @@
         @if (!string.IsNullOrEmpty(Model.AnhDaiDien))
         {
             <div class="sidebar-user-avatar">
-                <img src="@Model.AnhDaiDien" alt="@Model.HoTen" />
+                <img src="@Url.Content("~/uploads/avatars/" + Model.AnhDaiDien)" 
+                     alt="@(Model.HoTen ?? Model.TenDangNhap)" 
+                     onerror="this.src='/images/default-avatar.svg'" />
             </div>
         }
         else

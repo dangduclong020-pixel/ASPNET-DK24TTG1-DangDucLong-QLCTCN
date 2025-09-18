@@ -62,8 +62,8 @@
                 loadDanhMucByDate();
             });
 
-            $('#SoTien').on('input change', function() {
-                console.log('Amount changed to:', $(this).val());
+            // Thay vì lắng nghe #SoTien, dùng #SoTienDisplay
+            $('#SoTienDisplay').on('input change', function() {
                 kiemTraNganSach();
             });
 
@@ -74,6 +74,9 @@
                 // Loại bỏ format số tiền trước khi submit
                 cleanCurrencyInputs();
                 
+                const raw = $('#SoTienDisplay').val().replace(/\./g, '').trim();
+                $('#SoTienHidden').val(raw);
+
                 if (isVuotNganSach) {
                     e.preventDefault();
                     console.log('Preventing form submission, showing modal...');
@@ -160,12 +163,14 @@
                 }
             }
 
+            // Hàm kiểm tra ngân sách
             function kiemTraNganSach() {
+                const raw = $('#SoTienDisplay').val().replace(/\./g, '').replace(/\s/g, '');
+                const soTien = parseFloat(raw) || 0;
                 var danhMucId = $('#DanhMucId').val();
-                // Loại bỏ dấu chấm phân cách hàng nghìn trước khi parse
-                var soTienRaw = $('#SoTien').val().replace(/\./g, '').replace(/\s/g, '');
-                var soTien = parseFloat(soTienRaw) || 0;
-                console.log('Checking budget - Category:', danhMucId, 'Raw amount:', soTienRaw, 'Parsed amount:', soTien);
+                console.log('Checking budget - Category:', danhMucId,
+                            'Raw amount:', raw,      // <-- dùng raw thay vì soTienRaw
+                            'Parsed amount:', soTien);
                 console.log('nganSachData for category:', nganSachData[danhMucId]);
 
                 if (danhMucId && nganSachData[danhMucId] && soTien > 0) {
@@ -224,11 +229,11 @@
                 }
             }
 
+            // Hàm hiển thị modal
             function showNganSachModal() {
-                console.log('Showing budget modal...');
                 var danhMucId = $('#DanhMucId').val();
-                // Loại bỏ dấu chấm phân cách hàng nghìn trước khi parse
-                var soTienRaw = $('#SoTien').val().replace(/\./g, '').replace(/\s/g, '');
+                // <-- đọc đúng từ ô display
+                var soTienRaw = $('#SoTienDisplay').val().replace(/\./g, '').replace(/\s/g, '');
                 var soTien = parseFloat(soTienRaw) || 0;
 
                 if (danhMucId && nganSachData[danhMucId]) {
@@ -281,21 +286,81 @@
 
             // Function để loại bỏ format số tiền trước khi submit
             function cleanCurrencyInputs() {
-                // Đồng bộ hóa giá trị từ input text sang hidden input
-                const currencyInputs = document.querySelectorAll('input[name="SoTien"]:not([type="hidden"])');
-                currencyInputs.forEach(input => {
-                    if (input.value) {
-                        // Loại bỏ dấu chấm và khoảng trắng để gửi giá trị số thô
-                        const cleanValue = input.value.replace(/\./g, '').replace(/\s/g, '');
-                        console.log('Original value:', input.value, 'Cleaned value:', cleanValue);
-                        // Cập nhật hidden input
-                        const hiddenInput = document.getElementById('SoTienHidden');
-                        if (hiddenInput) {
-                            hiddenInput.value = cleanValue;
+                const display = document.getElementById('SoTienDisplay');
+                const hidden  = document.getElementById('SoTienHidden');
+                if (display && hidden) {
+                    hidden.value = display.value.replace(/\./g, '').replace(/\s/g, '').trim();
+                }
+            }
+
+            // Thay thế phần format currency trong Create.cshtml
+            function formatCurrencyInput(input) {
+                if (!input) return;
+
+                let isFormatted = false;
+                let originalValue = input.value;
+
+                input.addEventListener('focus', function() {
+                    if (isFormatted && this.value) {
+                        // Remove formatting when focusing (allow raw number input)
+                        const rawValue = this.value.replace(/\./g, '');
+                        this.value = rawValue;
+                        isFormatted = false;
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    const currentValue = this.value.trim();
+                    
+                    // Nếu ô trống, không làm gì cả
+                    if (!currentValue) {
+                        isFormatted = false;
+                        return;
+                    }
+                    
+                    if (!isFormatted) {
+                        // Add formatting when blurring
+                        const numericValue = parseFloat(currentValue.replace(/\./g, ''));
+                        if (!isNaN(numericValue) && numericValue >= 0) {
+                            this.value = formatNumber(numericValue);
+                            isFormatted = true;
+                            originalValue = currentValue;
+                            
+                            // Đồng bộ hóa với hidden input nếu có
+                            const hiddenInput = document.getElementById('SoTienHidden');
+                            if (hiddenInput) {
+                                hiddenInput.value = currentValue;
+                                // KHÔNG disable input text
+                            }
+                        } else if (currentValue !== '') {
+                            // If invalid, restore original value
+                            this.value = originalValue || '';
                         }
                     }
                 });
+
+                input.addEventListener('input', function() {
+                    // Allow only numbers during input
+                    this.value = this.value.replace(/[^\d]/g, '');
+                    isFormatted = false;
+                });
+
+                // Initialize formatting if input has value
+                if (input.value) {
+                    const numericValue = parseFloat(input.value.replace(/\./g, ''));
+                    if (!isNaN(numericValue) && numericValue >= 0) {
+                        input.value = formatNumber(numericValue);
+                        isFormatted = true;
+                        originalValue = input.value.replace(/\./g, '');
+                    }
+                }
             }
+
+            // Apply currency formatting to all relevant inputs
+            const currencyInputs = document.querySelectorAll('input[name="SoTien"]:not([type="hidden"])');
+            currencyInputs.forEach(input => {
+                formatCurrencyInput(input);
+            });
         });
     </script>
 }
@@ -357,8 +422,10 @@
                                         <span class="chitieu-input-group-text">
                                             <i class="fas fa-money-bill-wave"></i>
                                         </span>
-                                        <input asp-for="SoTien" class="chitieu-form-control grouped" type="text" placeholder="0" required />
-                                        <input type="hidden" id="SoTienHidden" name="SoTien" value="" />
+                                        <!-- ô hiển thị đã format, không dùng asp-for -->
+                                        <input id="SoTienDisplay" class="chitieu-form-control grouped" type="text" placeholder="0" required />
+                                        <!-- field ẩn bind số nguyên lên server -->
+                                        <input asp-for="SoTien" type="hidden" id="SoTienHidden" />
                                     </div>
                                     <span asp-validation-for="SoTien" class="chitieu-text-danger"></span>
                                 </div>

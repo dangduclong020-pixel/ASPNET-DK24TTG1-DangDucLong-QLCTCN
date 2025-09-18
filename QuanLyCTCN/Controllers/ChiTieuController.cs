@@ -163,13 +163,10 @@ namespace QuanLyCTCN.Controllers
 
             if (ModelState.IsValid)
             {
-                // Kiểm tra ngân sách trước khi lưu
                 var canhBaoNganSach = await KiemTraNganSachTruocKhiChi(chiTieu);
 
                 _context.Add(chiTieu);
                 await _context.SaveChangesAsync();
-
-                // Kiểm tra ngân sách và cập nhật nếu cần
                 await KiemTraVaCapNhatNganSach(chiTieu);
 
                 if (!string.IsNullOrEmpty(canhBaoNganSach))
@@ -178,7 +175,7 @@ namespace QuanLyCTCN.Controllers
                 }
                 else
                 {
-                    TempData["SuccessMessage"] = "Thêm chi tiêu thành công!";
+                    TempData["ChiTieuSuccessMessage"] = "Thêm chi tiêu thành công!";
                 }
 
                 return RedirectToAction(nameof(Index));
@@ -353,7 +350,6 @@ namespace QuanLyCTCN.Controllers
             {
                 try
                 {
-                    // Kiểm tra ngân sách trước khi cập nhật
                     var canhBaoNganSach = await KiemTraNganSachTruocKhiCapNhat(existingChiTieu, chiTieu);
 
                     // Cập nhật các thuộc tính của entity hiện có
@@ -375,7 +371,7 @@ namespace QuanLyCTCN.Controllers
                     }
                     else
                     {
-                        TempData["SuccessMessage"] = "Cập nhật chi tiêu thành công!";
+                        TempData["ChiTieuSuccessMessage"] = "Cập nhật chi tiêu thành công!";
                     }
                 }
                 catch (DbUpdateConcurrencyException)
@@ -466,7 +462,7 @@ namespace QuanLyCTCN.Controllers
 
                 if (result > 0)
                 {
-                    TempData["SuccessMessage"] = "Xóa chi tiêu thành công!";
+                    TempData["ChiTieuSuccessMessage"] = "Xóa chi tiêu thành công!";
                 }
                 else
                 {

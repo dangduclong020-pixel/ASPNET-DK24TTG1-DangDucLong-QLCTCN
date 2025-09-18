@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyCTCN.Data;
+using QuanLyCTCN.Models;
 using QuanLyCTCN.Models.ViewModels;
 
 namespace QuanLyCTCN.Controllers
@@ -16,7 +17,7 @@ namespace QuanLyCTCN.Controllers
         }
 
         // GET: /ThongKe
-        public async Task<IActionResult> Index(DateTime? tuNgay, DateTime? denNgay, int? thang, int? nam)
+        public async Task<IActionResult> Index(int? thang = null, int? nam = null)
         {
             // Kiểm tra đăng nhập
             var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
@@ -25,61 +26,34 @@ namespace QuanLyCTCN.Controllers
                 return RedirectToAction("DangNhap", "NguoiDung");
             }
 
-            // Ưu tiên sử dụng tháng và năm nếu có (khi người dùng chỉ chọn tháng/năm mà không chọn ngày)
-            if (thang.HasValue && nam.HasValue && !tuNgay.HasValue && !denNgay.HasValue)
+            // Xử lý logic lọc
+            DateTime? tuNgay, denNgay;
+            
+            if (thang == 0 && nam.HasValue)
             {
-                tuNgay = new DateTime(nam.Value, thang.Value, 1);
-                denNgay = new DateTime(nam.Value, thang.Value, DateTime.DaysInMonth(nam.Value, thang.Value));
+                // Trường hợp xem cả năm (thang = 0)
+                tuNgay = new DateTime(nam.Value, 1, 1);
+                denNgay = new DateTime(nam.Value, 12, 31);
             }
-            // Ưu tiên sử dụng tuNgay và denNgay nếu có
-            else if (tuNgay.HasValue && denNgay.HasValue)
-            {
-                // Giữ nguyên tuNgay và denNgay đã chọn
-                thang = tuNgay.Value.Month;
-                nam = tuNgay.Value.Year;
-            }
-            // Nếu chỉ có tuNgay, set denNgay là cuối tháng
-            else if (tuNgay.HasValue && !denNgay.HasValue)
-            {
-                denNgay = new DateTime(tuNgay.Value.Year, tuNgay.Value.Month,
-                    DateTime.DaysInMonth(tuNgay.Value.Year, tuNgay.Value.Month));
-                thang = tuNgay.Value.Month;
-                nam = tuNgay.Value.Year;
-            }
-            // Nếu chỉ có denNgay, set tuNgay là đầu tháng
-            else if (!tuNgay.HasValue && denNgay.HasValue)
-            {
-                tuNgay = new DateTime(denNgay.Value.Year, denNgay.Value.Month, 1);
-                thang = denNgay.Value.Month;
-                nam = denNgay.Value.Year;
-            }
-            // Nếu có tham số tháng và năm, sử dụng chúng
-            else if (thang.HasValue && nam.HasValue)
-            {
-                tuNgay = new DateTime(nam.Value, thang.Value, 1);
-                denNgay = new DateTime(nam.Value, thang.Value, DateTime.DaysInMonth(nam.Value, thang.Value));
-            }
-            // Mặc định là tháng hiện tại
             else
             {
-                var today = DateTime.Today;
-                tuNgay = new DateTime(today.Year, today.Month, 1);
-                denNgay = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
-                thang = today.Month;
-                nam = today.Year;
+                // Trường hợp xem theo tháng
+                thang ??= DateTime.Today.Month;
+                nam ??= DateTime.Today.Year;
+                tuNgay = new DateTime(nam.Value, thang.Value, 1);
+                denNgay = new DateTime(nam.Value, thang.Value, DateTime.DaysInMonth(nam.Value, thang.Value));
             }
 
-            // Lấy dữ liệu thu nhập (sử dụng thang_thu_nhap và nam_thu_nhap nếu có, ngược lại dùng ngay_nhap)
+            // Lấy dữ liệu thu nhập
             var thuNhaps = await _context.ThuNhaps
                 .Include(t => t.DanhMuc)
                 .Where(t => t.NguoiDungId == nguoiDungId &&
-                            ((t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue &&
-                              t.ThangThuNhap == thang && t.NamThuNhap == nam) ||
-                             (!t.ThangThuNhap.HasValue && !t.NamThuNhap.HasValue &&
-                              t.NgayNhap >= tuNgay && t.NgayNhap <= denNgay)))
+                           t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue &&
+                           t.NamThuNhap == nam &&
+                           (thang == 0 || t.ThangThuNhap == thang)) // thang = 0 nghĩa là lấy tất cả tháng
                 .ToListAsync();
 
-            // Lấy dữ liệu chi tiêu
+            // Lấy dữ liệu chi tiêu theo ngày chi
             var chiTieus = await _context.ChiTieus
                 .Include(c => c.DanhMuc)
                 .Where(c => c.NguoiDungId == nguoiDungId &&
@@ -128,9 +102,20 @@ namespace QuanLyCTCN.Controllers
                 }
             }
 
-            // Thống kê theo thời gian (ngày cho chi tiêu, tháng cho thu nhập)
+            // Thống kê theo thời gian
             var thuNhapTheoNgay = thuNhaps
-                .GroupBy(t => t.NgayNhap.Date)
+                .GroupBy(t => {
+                    if (t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue)
+                    {
+                        // Sử dụng ngày đầu tháng từ thang_thu_nhap
+                        return new DateTime(t.NamThuNhap.Value, t.ThangThuNhap.Value, 1);
+                    }
+                    else
+                    {
+                        // Sử dụng ngay_nhap
+                        return t.NgayNhap.Date;
+                    }
+                })
                 .Select(group => new ThongKeTheoThoiGianViewModel
                 {
                     Ngay = group.Key,
@@ -152,8 +137,8 @@ namespace QuanLyCTCN.Controllers
             // Tạo view model
             var viewModel = new ThongKeViewModel
             {
-                NgayBatDau = tuNgay ?? DateTime.Today,
-                NgayKetThuc = denNgay ?? DateTime.Today,
+                NgayBatDau = tuNgay.GetValueOrDefault(DateTime.Today),
+                NgayKetThuc = denNgay.GetValueOrDefault(DateTime.Today),
                 TongThuNhap = tongThuNhap,
                 TongChiTieu = tongChiTieu,
                 ThuNhapTheoDanhMuc = thuNhapTheoDanhMuc,
@@ -162,10 +147,32 @@ namespace QuanLyCTCN.Controllers
                 ChiTieuTheoThoiGian = chiTieuTheoNgay
             };
 
-            ViewBag.Thang = thang ?? DateTime.Today.Month;
-            ViewBag.Nam = nam ?? DateTime.Today.Year;
-
             return View(viewModel);
+        }
+
+        // Method riêng để lấy dữ liệu thu nhập
+        private async Task<List<ThuNhap>> GetThuNhapData(int? nguoiDungId, DateTime? tuNgay, DateTime? denNgay, string loaiLoc)
+        {
+            if (loaiLoc == "ThangThuNhap")
+            {
+                // Lấy thu nhập theo thang_thu_nhap/nam_thu_nhap
+                return await _context.ThuNhaps
+                    .Include(t => t.DanhMuc)
+                    .Where(t => t.NguoiDungId == nguoiDungId &&
+                               t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue &&
+                               t.ThangThuNhap == tuNgay.Value.Month &&
+                               t.NamThuNhap == tuNgay.Value.Year)
+                    .ToListAsync();
+            }
+            else
+            {
+                // Lọc theo ngay_nhap (mặc định)
+                return await _context.ThuNhaps
+                    .Include(t => t.DanhMuc)
+                    .Where(t => t.NguoiDungId == nguoiDungId &&
+                               t.NgayNhap >= tuNgay && t.NgayNhap <= denNgay)
+                    .ToListAsync();
+            }
         }
 
         // GET: /ThongKe/TheoThang
@@ -214,7 +221,7 @@ namespace QuanLyCTCN.Controllers
         }
 
         // GET: /ThongKe/SoSanhDanhMuc
-        public async Task<IActionResult> SoSanhDanhMuc(string loai, DateTime? tuNgay, DateTime? denNgay)
+        public async Task<IActionResult> SoSanhDanhMuc(string loai, int? thang = null, int? nam = null)
         {
             // Kiểm tra đăng nhập
             var nguoiDungId = HttpContext.Session.GetInt32(_sessionNguoiDungId);
@@ -225,13 +232,12 @@ namespace QuanLyCTCN.Controllers
 
             // Mặc định là chi tiêu và tháng hiện tại
             loai ??= "ChiTieu";
-            
-            if (!tuNgay.HasValue)
-            {
-                var today = DateTime.Today;
-                tuNgay = new DateTime(today.Year, today.Month, 1);
-                denNgay = new DateTime(today.Year, today.Month, DateTime.DaysInMonth(today.Year, today.Month));
-            }
+            thang ??= DateTime.Today.Month;
+            nam ??= DateTime.Today.Year;
+
+            // Chuyển đổi tháng/năm thành từ ngày/đến ngày
+            var tuNgay = new DateTime(nam.Value, thang.Value, 1);
+            var denNgay = new DateTime(nam.Value, thang.Value, DateTime.DaysInMonth(nam.Value, thang.Value));
 
             // Dữ liệu thống kê theo danh mục
             var thongKeTheoDanhMuc = new List<ThongKeTheoDanhMucViewModel>();
@@ -259,14 +265,12 @@ namespace QuanLyCTCN.Controllers
             }
             else
             {
-                // Thống kê thu nhập theo danh mục (sử dụng thang_thu_nhap và nam_thu_nhap nếu có)
+                // Thống kê thu nhập theo danh mục (sử dụng thang_thu_nhap và nam_thu_nhap)
                 var thuNhaps = await _context.ThuNhaps
                     .Include(t => t.DanhMuc)
                     .Where(t => t.NguoiDungId == nguoiDungId &&
-                                ((t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue &&
-                                  t.ThangThuNhap == tuNgay.Value.Month && t.NamThuNhap == tuNgay.Value.Year) ||
-                                 (!t.ThangThuNhap.HasValue && !t.NamThuNhap.HasValue &&
-                                  t.NgayNhap >= tuNgay && t.NgayNhap <= denNgay)))
+                               t.ThangThuNhap.HasValue && t.NamThuNhap.HasValue &&
+                               t.ThangThuNhap == thang && t.NamThuNhap == nam)
                     .ToListAsync();
 
                 tongTien = thuNhaps.Sum(t => t.SoTien);
@@ -291,8 +295,8 @@ namespace QuanLyCTCN.Controllers
             }
 
             ViewBag.Loai = loai;
-            ViewBag.TuNgay = (tuNgay ?? DateTime.Today).ToString("yyyy-MM-dd");
-            ViewBag.DenNgay = (denNgay ?? DateTime.Today).ToString("yyyy-MM-dd");
+            ViewBag.Thang = thang;
+            ViewBag.Nam = nam;
             ViewBag.TongTien = tongTien;
 
             return View(thongKeTheoDanhMuc);
@@ -311,9 +315,9 @@ namespace QuanLyCTCN.Controllers
             // Mặc định là 6 tháng gần nhất
             soThang ??= 6;
 
-            // Tính ngày bắt đầu (6 tháng trước)
+            // Tính ngày bắt đầu (soThang tháng trước)
             var today = DateTime.Today;
-            var startDate = today.AddMonths(-(soThang ?? 6) + 1).Date;
+            var startDate = today.AddMonths(-soThang.Value + 1).Date;
             startDate = new DateTime(startDate.Year, startDate.Month, 1);
             
             // Lấy dữ liệu thu nhập và chi tiêu theo tháng

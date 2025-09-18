@@ -14,6 +14,34 @@
 }
 
 <div class="container-fluid py-4 thunhap-page">
+    <!-- Hiển thị thông báo thành công cho ThuNhap -->
+    @if (TempData["ThuNhapSuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i>
+            @TempData["ThuNhapSuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    <!-- (nếu có WarningMessage hoặc ErrorMessage thì giữ nguyên) -->
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            @Html.Raw(TempData["WarningMessage"])
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Phần còn lại của trang -->
     <div class="row">
         <div class="col-12">
             <div class="thunhap-card">

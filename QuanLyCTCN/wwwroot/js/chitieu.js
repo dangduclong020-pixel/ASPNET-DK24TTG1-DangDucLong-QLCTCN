@@ -50,15 +50,26 @@ function initializeFormValidation() {
             }
         });
 
+        // Chỉ format SoTienDisplay
+        const display = form.querySelector('#SoTienDisplay');
+        if (display) {
+            formatCurrencyInput(display);
+        }
+
         // Form submission enhancement
         form.addEventListener('submit', function(e) {
-            const submitBtn = this.querySelector('.chitieu-btn[type="submit"]');
-            if (submitBtn) {
-                submitBtn.classList.add('chitieu-loading');
-                submitBtn.innerHTML = '<div class="chitieu-spinner"></div> Đang xử lý...';
-            }
+            syncSoTienHidden();
         });
     });
+}
+
+/** Trước khi submit hoặc khi cần, gọi hàm này để cập nhật field ẩn */
+function syncSoTienHidden() {
+    const display = document.getElementById('SoTienDisplay');
+    const hidden  = document.getElementById('SoTienHidden');
+    if (display && hidden) {
+        hidden.value = display.value.replace(/\./g, '').trim();
+    }
 }
 
 // Input validation
@@ -524,12 +535,14 @@ function initializePrint() {
 
 // Format currency input with thousand separators
 function formatCurrencyInput(input) {
+    if (!input) return;
+
     let isFormatted = false;
     let originalValue = input.value;
 
     // Store original value for form submission
     input.addEventListener('focus', function() {
-        if (isFormatted && this.value) {
+        if (isFormatted && this.value && !this._formatCurrencyDisabled) {
             // Remove formatting when focusing (allow raw number input)
             const rawValue = this.value.replace(/\./g, '');
             this.value = rawValue;
@@ -538,8 +551,20 @@ function formatCurrencyInput(input) {
     });
 
     input.addEventListener('blur', function() {
+        // Skip formatting if disabled (during reset)
+        if (this._formatCurrencyDisabled) {
+            return;
+        }
+        
         const currentValue = this.value.trim();
-        if (currentValue && !isFormatted) {
+        
+        // Nếu ô trống, không làm gì cả
+        if (!currentValue) {
+            isFormatted = false;
+            return;
+        }
+        
+        if (!isFormatted) {
             // Add formatting when blurring
             const numericValue = parseFloat(currentValue.replace(/\./g, ''));
             if (!isNaN(numericValue) && numericValue >= 0) {
@@ -551,8 +576,6 @@ function formatCurrencyInput(input) {
                 const hiddenInput = document.getElementById('SoTienHidden');
                 if (hiddenInput) {
                     hiddenInput.value = currentValue;
-                    // Disable input text để tránh conflict khi submit
-                    this.disabled = true;
                 }
             } else if (currentValue !== '') {
                 // If invalid, restore original value
@@ -561,22 +584,23 @@ function formatCurrencyInput(input) {
         }
     });
 
-    // For number inputs, don't interfere with input event
-    // Let the browser handle number validation
-    if (input.type !== 'number') {
-        input.addEventListener('input', function() {
-            // Allow only numbers during input (remove dots temporarily)
-            let cleanValue = this.value.replace(/[^\d]/g, '');
-
-            // Prevent leading zeros
-            if (cleanValue.length > 1 && cleanValue.startsWith('0')) {
-                cleanValue = cleanValue.substring(1);
-            }
-
-            this.value = cleanValue;
-            isFormatted = false;
-        });
-    }
+    input.addEventListener('input', function() {
+        // Skip if disabled
+        if (this._formatCurrencyDisabled) {
+            return;
+        }
+        
+        // Allow only numbers during input (remove dots temporarily)
+        let cleanValue = this.value.replace(/[^\d]/g, '');
+        
+        // Prevent leading zeros
+        if (cleanValue.length > 1 && cleanValue.startsWith('0')) {
+            cleanValue = cleanValue.substring(1);
+        }
+        
+        this.value = cleanValue;
+        isFormatted = false;
+    });
 
     // Initialize formatting if input has value
     if (input.value) {

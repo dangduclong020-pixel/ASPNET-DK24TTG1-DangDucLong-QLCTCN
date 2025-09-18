@@ -108,7 +108,7 @@ namespace QuanLyCTCN.Controllers
 
                 _context.Add(danhMuc);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Thêm danh mục thành công!";
+                TempData["DanhMucSuccessMessage"] = "Thêm danh mục thành công!";
                 return RedirectToAction(nameof(Index));
             }
             return View(danhMuc);
@@ -195,6 +195,7 @@ namespace QuanLyCTCN.Controllers
 
                     _context.Update(existingDanhMuc);
                     await _context.SaveChangesAsync();
+                    TempData["DanhMucSuccessMessage"] = "Cập nhật danh mục thành công!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -207,7 +208,6 @@ namespace QuanLyCTCN.Controllers
                         throw;
                     }
                 }
-                TempData["SuccessMessage"] = "Cập nhật danh mục thành công!";
                 return RedirectToAction(nameof(Index));
             }
             return View(danhMuc);
@@ -321,7 +321,7 @@ namespace QuanLyCTCN.Controllers
 
                 if (result > 0)
                 {
-                    TempData["SuccessMessage"] = "Xóa danh mục thành công!";
+                    TempData["DanhMucSuccessMessage"] = "Xóa danh mục thành công!";
                 }
                 else
                 {

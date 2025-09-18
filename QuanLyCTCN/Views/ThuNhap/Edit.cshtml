@@ -17,7 +17,78 @@
         $(document).ready(function() {
             // Format số tiền khi load
             formatCurrencyInput($('#SoTien')[0]);
+
+            // Xử lý nút reset
+            $('#resetBtn').on('click', function(e) {
+                if (hasFormChanges()) {
+                    e.preventDefault();
+                    showResetConfirmation();
+                } else {
+                    // Nếu không có thay đổi, reset trực tiếp
+                    resetFormSafely();
+                }
+            });
         });
+
+        function showResetConfirmation() {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Xác nhận đặt lại',
+                    text: 'Bạn có chắc chắn muốn đặt lại tất cả các trường?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#f59e0b',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Đặt lại',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        resetFormSafely();
+                    }
+                });
+            } else {
+                if (confirm('Bạn có chắc chắn muốn đặt lại tất cả các trường?')) {
+                    resetFormSafely();
+                }
+            }
+        }
+
+        function resetFormSafely() {
+            // Tạm thời disable format currency
+            const soTienInput = $('#SoTien')[0];
+            if (soTienInput && soTienInput._formatCurrencyDisabled !== true) {
+                soTienInput._formatCurrencyDisabled = true;
+
+                // Reset form
+                $('.thunhap-form')[0].reset();
+
+                // Reset floating labels
+                const inputs = document.querySelectorAll('.thunhap-form-control');
+                inputs.forEach(input => {
+                    input.parentElement.classList.remove('focused');
+                    input.classList.remove('is-valid', 'is-invalid');
+                });
+
+                // Re-enable format currency sau 100ms
+                setTimeout(() => {
+                    soTienInput._formatCurrencyDisabled = false;
+                    // Re-initialize format nếu cần
+                    if (soTienInput.value) {
+                        formatCurrencyInput(soTienInput);
+                    }
+                }, 100);
+            }
+        }
+
+        function hasFormChanges() {
+            const inputs = document.querySelectorAll('.thunhap-form-control');
+            for (let input of inputs) {
+                if (input.value !== input.defaultValue) {
+                    return true;
+                }
+            }
+            return false;
+        }
     </script>
 }
 
@@ -135,7 +206,7 @@
                                     <button type="submit" class="thunhap-btn thunhap-btn-warning">
                                         <i class="fas fa-save thunhap-icon"></i> Cập nhật
                                     </button>
-                                    <button type="reset" class="thunhap-btn thunhap-btn-secondary">
+                                    <button type="reset" id="resetBtn" class="thunhap-btn thunhap-btn-secondary">
                                         <i class="fas fa-undo thunhap-icon"></i> Đặt lại
                                     </button>
                                 </div>

@@ -15,11 +15,11 @@
 
 <div class="container-fluid py-4 chitieu-page">
     <!-- Hiển thị thông báo -->
-    @if (TempData["SuccessMessage"] != null)
+    @if (TempData["ChiTieuSuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle"></i>
-            @TempData["SuccessMessage"]
+            @TempData["ChiTieuSuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }

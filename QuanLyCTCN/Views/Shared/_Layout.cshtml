@@ -201,7 +201,6 @@
 
         .sidebar-menu .dropdown-toggle {
             display: flex;
-            justify-content: space-between;
             align-items: center;
         }
 
@@ -1024,111 +1023,6 @@
         <div class="content-area">
             @RenderBody()
         </div>
-
-        <!-- Footer -->
-        <footer class="main-footer @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["Action"]?.ToString() == "Index" ? "home-page" : "")">
-            <div class="container">
-                <div class="footer-content">
-                    <!-- Brand Section -->
-                    <div class="footer-brand">
-                        <div class="brand-logo">
-                            <i class="fas fa-wallet"></i>
-                            Chi Tiêu Cá Nhân
-                        </div>
-                        <p class="brand-description">
-                            Ứng dụng quản lý tài chính cá nhân giúp bạn theo dõi chi tiêu, thu nhập và đạt được mục tiêu tiết kiệm một cách hiệu quả.
-                        </p>
-                    </div>
-
-                    <!-- Footer Grid -->
-                    <div class="footer-grid">
-                        <!-- Quick Links -->
-                        <div class="footer-section">
-                            <h5>Liên kết nhanh</h5>
-                            <ul class="footer-links">
-                                <li><a asp-controller="Home" asp-action="Index"><i class="fas fa-home"></i> Trang chủ</a></li>
-                                <li><a asp-controller="ChiTieu" asp-action="Index"><i class="fas fa-exchange-alt"></i> Chi tiêu</a></li>
-                                <li><a asp-controller="ThuNhap" asp-action="Index"><i class="fas fa-money-bill-wave"></i> Thu nhập</a></li>
-                                <li><a asp-controller="ThongKe" asp-action="Index"><i class="fas fa-chart-bar"></i> Báo cáo</a></li>
-                                <li><a asp-controller="MucTieu" asp-action="Index"><i class="fas fa-bullseye"></i> Mục tiêu</a></li>
-                            </ul>
-                        </div>
-
-                        <!-- Features -->
-                        <div class="footer-section">
-                            <h5>Tính năng</h5>
-                            <ul class="footer-links">
-                                <li><a asp-controller="DanhMuc" asp-action="Index"><i class="fas fa-tags"></i> Quản lý danh mục</a></li>
-                                <li><a asp-controller="NganSach" asp-action="Index"><i class="fas fa-piggy-bank"></i> Ngân sách</a></li>
-                                <li><a asp-controller="NhacNho" asp-action="Index"><i class="fas fa-bell"></i> Nhắc nhở</a></li>
-                                <li><a asp-controller="ThongKe" asp-action="TheoThang"><i class="fas fa-calendar-alt"></i> Báo cáo theo tháng</a></li>
-                                <li><a asp-controller="ThongKe" asp-action="XuHuongChiTieu"><i class="fas fa-chart-line"></i> Xu hướng chi tiêu</a></li>
-                            </ul>
-                        </div>
-
-                        <!-- Contact & Social -->
-                        <div class="footer-section">
-                            <h5>Kết nối</h5>
-                            <ul class="footer-contact">
-                                <li>
-                                    <i class="fas fa-envelope"></i>
-                                    <span>support@chitieucanhan.com</span>
-                                </li>
-                                <li>
-                                    <i class="fas fa-phone"></i>
-                                    <span>+84 xxx xxx xxx</span>
-                                </li>
-                                <li>
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span>Việt Nam</span>
-                                </li>
-                            </ul>
-
-                            <!-- Social Links -->
-                            <div class="footer-social">
-                                <a href="#" class="social-link" title="Facebook">
-                                    <i class="fab fa-facebook-f"></i>
-                                </a>
-                                <a href="#" class="social-link" title="Twitter">
-                                    <i class="fab fa-twitter"></i>
-                                </a>
-                                <a href="#" class="social-link" title="Instagram">
-                                    <i class="fab fa-instagram"></i>
-                                </a>
-                                <a href="#" class="social-link" title="LinkedIn">
-                                    <i class="fab fa-linkedin-in"></i>
-                                </a>
-                            </div>
-
-                            <!-- Newsletter Signup -->
-                            <div class="newsletter-signup">
-                                <div class="newsletter-title">Đăng ký nhận tin</div>
-                                <div class="newsletter-description">Nhận thông tin cập nhật về tính năng mới</div>
-                                <form class="newsletter-form">
-                                    <input type="email" class="newsletter-input" placeholder="Email của bạn" required>
-                                    <button type="submit" class="newsletter-btn">Đăng ký</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Footer Bottom -->
-                    <div class="footer-bottom">
-                        <div class="footer-bottom-content">
-                            <p class="copyright">
-                                <i class="fas fa-copyright"></i>
-                                @DateTime.Now.Year Chi Tiêu Cá Nhân. Tất cả quyền được bảo lưu.
-                            </p>
-                            <div class="footer-bottom-links">
-                                <a asp-controller="Home" asp-action="Privacy">Chính sách bảo mật</a>
-                                <a asp-controller="Home" asp-action="Terms">Điều khoản sử dụng</a>
-                                <a href="#" onclick="scrollToTop()">Về đầu trang</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
