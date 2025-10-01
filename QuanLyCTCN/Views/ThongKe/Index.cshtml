@@ -73,7 +73,7 @@
                         <select name="thang" class="form-control">
                             @for (int i = 1; i <= 12; i++)
                             {
-                                <option value="@i" selected="@(DateTime.Today.Month == i)">Tháng @i</option>
+                                <option value="@i" selected="@(Model.Thang == i)">Tháng @i</option>
                             }
                         </select>
                     </div>
@@ -82,7 +82,7 @@
                         <select name="nam" class="form-control">
                             @for (int i = DateTime.Today.Year - 5; i <= DateTime.Today.Year + 1; i++)
                             {
-                                <option value="@i" selected="@(DateTime.Today.Year == i)">@i</option>
+                                <option value="@i" selected="@(Model.Nam == i)">@i</option>
                             }
                         </select>
                     </div>

@@ -144,7 +144,9 @@ namespace QuanLyCTCN.Controllers
                 ThuNhapTheoDanhMuc = thuNhapTheoDanhMuc,
                 ChiTieuTheoDanhMuc = chiTieuTheoDanhMuc,
                 ThuNhapTheoThoiGian = thuNhapTheoNgay,
-                ChiTieuTheoThoiGian = chiTieuTheoNgay
+                ChiTieuTheoThoiGian = chiTieuTheoNgay,
+                Thang = thang ?? DateTime.Today.Month,
+                Nam = nam ?? DateTime.Today.Year
             };
 
             return View(viewModel);

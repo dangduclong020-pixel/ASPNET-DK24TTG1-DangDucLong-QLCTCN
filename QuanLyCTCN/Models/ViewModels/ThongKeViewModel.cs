@@ -14,6 +14,8 @@ namespace QuanLyCTCN.Models.ViewModels
 
         // Tổng chi tiêu trong khoảng thời gian
         public decimal TongChiTieu { get; set; }
+        public int? Thang { get; set; }
+        public int? Nam { get; set; }
 
         // Thu nhập theo danh mục
         public List<ThongKeTheoDanhMucViewModel> ThuNhapTheoDanhMuc { get; set; } = new List<ThongKeTheoDanhMucViewModel>();

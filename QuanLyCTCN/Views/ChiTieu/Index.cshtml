@@ -50,7 +50,9 @@
                     <div class="row mb-3">
                         <div class="col-12">
                             <!-- Thay thế phần filter form -->
-                            <div class="chitieu-filter-section">
+                            <div class="chitieu-filter-section"
+                                 data-intro="Bạn có thể lọc danh sách chi tiêu theo tháng và năm tại đây."
+                                 data-step="1">
                                 <form asp-action="Index" method="get" class="chitieu-filter-form chitieu-d-flex chitieu-gap-3 chitieu-align-items-end chitieu-flex-wrap">
                                     <div class="chitieu-form-group">
                                         <label class="chitieu-form-label">Tháng chi tiêu</label>
@@ -76,7 +78,9 @@
                                     <button type="button" class="chitieu-btn chitieu-btn-secondary chitieu-clear-filters">
                                         <i class="fas fa-times chitieu-icon"></i> Xóa lọc
                                     </button>
-                                    <div class="d-flex align-items-end ms-auto">
+                                    <div class="d-flex align-items-end ms-auto"
+                                         data-intro="Nhấn vào đây để thêm một khoản chi tiêu mới."
+                                         data-step="2">
                                         <a asp-action="Create" class="btn btn-primary">
                                             <i class="fas fa-plus me-2"></i> Thêm mới
                                         </a>
@@ -88,7 +92,9 @@
                 </div>
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
-                        <table class="chitieu-table">
+                        <table class="chitieu-table"
+                               data-intro="Danh sách các khoản chi tiêu sẽ hiển thị tại đây."
+                               data-step="3">
                             <thead>
                                 <tr>
                                     <th data-sort="ngay">Ngày</th>
@@ -168,3 +174,15 @@
         </div>
     </div>
 </div>
+<script>
+    function startHelp() {
+        introJs().setOptions({
+            nextLabel: 'Tiếp',
+            prevLabel: 'Quay lại',
+            skipLabel: 'Bỏ qua',
+            doneLabel: 'Hoàn tất',
+            showProgress: true,
+            tooltipClass: 'custom-intro-tooltip'
+        }).start();
+    }
+</script>

@@ -11,6 +11,9 @@
         <button class="btn btn-primary dropdown-toggle" type="button" id="addActionDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fas fa-plus"></i> Thêm mới
         </button>
+        <button type="button" onclick="startHelp()" class="btn btn-outline-info btn-sm">
+            <i class="fas fa-question-circle"></i> Hướng dẫn
+        </button>
         <ul class="dropdown-menu" aria-labelledby="addActionDropdown">
             <li><a class="dropdown-item" asp-controller="ChiTieu" asp-action="Create"><i class="fas fa-minus text-danger me-2"></i> Thêm chi tiêu</a></li>
             <li><a class="dropdown-item" asp-controller="ThuNhap" asp-action="Create"><i class="fas fa-plus text-success me-2"></i> Thêm thu nhập</a></li>
