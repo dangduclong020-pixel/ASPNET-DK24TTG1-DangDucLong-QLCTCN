@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <!-- Background Circle -->
+  <circle cx="200" cy="200" r="180" fill="none" stroke="#2c3e50" stroke-width="8"/>
+  
+  <!-- Wallet Shape -->
+  <g transform="translate(200, 200)">
+    <!-- Main wallet body -->
+    <rect x="-80" y="-40" width="160" height="80" rx="8" fill="#a8c8a8" stroke="#2c3e50" stroke-width="3"/>
+    
+    <!-- Wallet flap -->
+    <path d="M 60 -40 L 80 -40 Q 85 -40 85 -35 L 85 15 Q 85 20 80 20 L 60 20 Z" fill="#8bb68b" stroke="#2c3e50" stroke-width="3"/>
+    
+    <!-- Money bills sticking out -->
+    <rect x="-70" y="-50" width="50" height="30" rx="3" fill="#90c890" stroke="#2c3e50" stroke-width="2"/>
+    <rect x="-60" y="-55" width="50" height="30" rx="3" fill="#95cd95" stroke="#2c3e50" stroke-width="2"/>
+    <rect x="-50" y="-60" width="50" height="30" rx="3" fill="#9dd29d" stroke="#2c3e50" stroke-width="2"/>
+    
+    <!-- Dollar sign on the front bill -->
+    <text x="-25" y="-42" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#2c3e50">$</text>
+    
+    <!-- Wallet clasp -->
+    <ellipse cx="72" cy="-10" rx="8" ry="12" fill="#2c3e50"/>
+    <ellipse cx="72" cy="-10" rx="4" ry="6" fill="#34495e"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="200" y="320" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#2c3e50">PERSONAL</text>
+  <text x="200" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#2c3e50">FINANCE</text>
+  <text x="200" y="375" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="normal" fill="#2c3e50">MANAGEMENT</text>
+</svg>
